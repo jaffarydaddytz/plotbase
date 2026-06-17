@@ -1,0 +1,134 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+/* Theme variables (Tailwind v4 style) */
+@theme {
+    --font-comfortaa: "Comfortaa", sans-serif;
+
+    --color-primary: #0d9488;
+    --color-primary-light: #ccfbf1;
+    --color-primary-dark: #0f766e;
+    --color-secondary: #f0fdfa;
+    --color-accent: #f59e0b;
+    --color-border: #e5e7eb;
+}
+
+/* Base styles */
+@layer base {
+    * {
+        @apply m-0 p-0 box-border;
+    }
+
+    body {
+        @apply font-[var(--font-comfortaa)] text-[#111827] bg-[#ffffff] leading-relaxed antialiased overflow-x-hidden;
+    }
+
+    h1, h2, h3, h4 {
+        @apply font-bold leading-tight;
+    }
+
+    a {
+        @apply no-underline text-inherit;
+    }
+
+    ul {
+        @apply list-none;
+    }
+
+    /* Hide password reveal button (Edge) */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+        display: none;
+    }
+}
+
+/* Components */
+@layer components {
+
+    .container {
+        @apply max-w-[1280px] mx-auto px-8;
+    }
+
+    .glass {
+        @apply bg-white/80 backdrop-blur-[12px] border border-white/30;
+    }
+
+    .text-gradient {
+        @apply bg-gradient-to-br from-primary to-primary-dark bg-clip-text text-transparent;
+    }
+
+    /* Buttons */
+    .btn {
+        @apply inline-flex items-center justify-center px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-300 text-[15px] gap-2;
+    }
+
+    .btn-primary {
+        @apply bg-primary text-white hover:bg-primary-dark hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30;
+    }
+
+    .btn-outline {
+        @apply bg-transparent border border-border text-[#111827] hover:bg-[#f9fafb] hover:border-[#111827] hover:-translate-y-0.5;
+    }
+
+    /* Cards */
+    .card-premium {
+        @apply bg-white rounded-3xl border border-border transition-all duration-[0.4s] overflow-hidden hover:-translate-y-2.5 hover:shadow-lg;
+    }
+
+    /* Badges */
+    .badge {
+        @apply px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.025em];
+    }
+
+    .badge-sale {
+        @apply bg-[#dcfce7] text-[#166534];
+    }
+
+    .badge-rent {
+        @apply bg-[#dbeafe] text-[#1e40af];
+    }
+
+    /* Sidebar */
+    .sidebar-link {
+        @apply flex items-center gap-4 px-6 py-4 rounded-xl font-semibold text-[15px] text-[#64748b] transition-all duration-200 hover:bg-[#f1f5f9] hover:text-primary hover:translate-x-1;
+    }
+
+    .sidebar-link.active {
+        @apply bg-primary-light text-primary;
+    }
+}
+
+/* Utilities */
+@layer utilities {
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .fade-in {
+        @apply animate-[fadeIn_0.8s_ease-out_forwards];
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes rotation {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
