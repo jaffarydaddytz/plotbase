@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useEffect as useEffectHook, useMemo } from 'react'
+import  { useEffect, useRef, useState, useEffect as useEffectHook, useMemo } from 'react'
 import { adminUsersStyles as s } from '../../assets/dummyStyles'
 import { useAuth } from '../../context/AuthContext'
 import axios from 'axios'
@@ -98,7 +98,7 @@ const AdminUsers = () => {
         setUsers(users.filter((u) => u._id  !== id));
     } catch (error) {
 
-        alert("failed to delete user")
+        console.log("faled to delete user", error)
         
     }
 

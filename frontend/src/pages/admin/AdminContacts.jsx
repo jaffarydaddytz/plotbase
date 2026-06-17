@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { adminContactsStyles as s } from '../../assets/dummyStyles'
 import { useAuth } from '../../context/AuthContext'
 import axios from 'axios';
 import API_URL from '../../config';
-import { HiOutlineClock, HiOutlineMail } from 'react-icons/hi';
+import { HiOutlineClock, HiOutlineMail, HiOutlinePhone } from 'react-icons/hi';
 
 const AdminContacts = () => {
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
     const {token} = useAuth();
 
-    //to fetch the contacts
+useEffect(()=>{
+    // to fetch the contacts
     const fetchContacts = async () => {
         try {
             const res = await axios.get(`${API_URL}/api/contact`,{
@@ -19,17 +20,15 @@ const AdminContacts = () => {
             if (res.data.success) {
                 setContacts(res.data.contacts);
             }
-            setLoading(false)
         } catch (error) {
             console.log("failed to load contacts", error)
+        } finally {
             setLoading(false);
-            
         }
-        
     };
 
-useEffect(()=>{
-    fetchContacts();
+    if (token) fetchContacts();
+
 }, [token])
 
 if (loading)

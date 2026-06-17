@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { propertyDetailsStyles as s } from "../../assets/dummyStyles";
 import Navbar from "../../components/common/Navbar";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -17,6 +17,7 @@ import {
   HiOutlineHome,
   HiOutlineUserGroup,
   HiOutlineViewGrid,
+  HiX,
 } from "react-icons/hi";
 import API_URL from "../../config";
 
@@ -93,12 +94,13 @@ const PropertyDetails = () => {
       }
     } catch (err) {
       alert("failed to wishlist");
+      console.log(err)
     }
   };
 
   //to handle inquiry submit
   const handleInquirySubmit = async (e) => {
-    e.preventDefaUlt();
+    e.preventDefault();
     if (!user) return navigate("/login");
     if (user.role !== "buyer") return alert("only buyers can send inquiries");
     setInquiryStatus({ ...inquiryStatus, loading: true });
@@ -114,6 +116,7 @@ const PropertyDetails = () => {
       setInquiryStatus({ loading: false, success: true, error: null });
       setInquiry({ ...inquiry, message: "" });
     } catch (err) {
+      console.log(err)
       setInquiryStatus({
         loading: false,
         success: false,
@@ -126,37 +129,38 @@ const PropertyDetails = () => {
   const handleChatStart = async () => {
     if (!user) return navigate("/login");
     if (user.role !== "buyer") {
-      return alert("only buyer can chat with seller");
+      alert("only buyer can chat with seller");
+      return;
+    }
 
-      try {
-        const res = await axios.post(
-          `${API_URL}/api/chat/start`,
-          {
-            propertyId: id,
-            sellerId: property.seller._id,
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+    try {
+      const res = await axios.post(
+        `${API_URL}/api/chat/start`,
+        {
+          propertyId: id,
+          sellerId: property.seller._id,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
-        const chat = res.data;
-        await axios.post(
-          `${API_URL}/api/chat/send`,
-          {
-            chatId: chat._id,
-            text: `(context: Interested in property  "${property.title}")`,
-            image: property.images[0],
-          },
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+      const chat = res.data;
+      await axios.post(
+        `${API_URL}/api/chat/send`,
+        {
+          chatId: chat._id,
+          text: `(context: Interested in property  "${property.title}")`,
+          image: property.images[0],
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
 
-        navigate("/chat-messages", { state: { chat } });
-      } catch (err) {
-        console.error("error starting chat");
-      }
+      navigate("/chat-messages", { state: { chat } });
+    } catch (err) {
+      console.error("error starting chat", err);
     }
   };
 
@@ -255,7 +259,7 @@ const PropertyDetails = () => {
         {lightboxIndex !== null && (
           <div className={s.lightboxOverlay} onClick={closeLightbox}>
             <button onClick={closeLightbox} className={s.lightboxCloseBtn}>
-              <Hix size={24} className={s.lightboxCloseIcon} />
+              <HiX size={24} className={s.lightboxCloseIcon} />
             </button>
 
             <div

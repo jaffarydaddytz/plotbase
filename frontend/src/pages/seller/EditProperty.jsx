@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { editPropertyStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,7 +26,6 @@ const EditProperty = () => {
     propertyType: "flat",
     bhk: "",
     bathrooms: "",
-    area: "",
     furnishing: "unfurnished",
     status: "sale",
     amenities: [],
@@ -75,6 +74,7 @@ const EditProperty = () => {
       } catch (error) {
         setError("failed to load property details");
         setLoading(false);
+        console.log("failed to edit property", error)
       }
     };
     fetchProperty();

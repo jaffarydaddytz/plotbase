@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import  { useCallback, useEffect, useRef, useState } from "react";
 import { propertiesStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";
@@ -48,7 +48,7 @@ const Properties = () => {
     { label: "Unfurnished", value: "unfurnished" },
   ];
 
-  const fetchWishlist = async () => {
+  const fetchWishlist = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}/api/wishlist`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -62,7 +62,7 @@ const Properties = () => {
     } catch (err) {
       console.error("failed to fetch wishlist", err);
     }
-  };
+  }, [token]);
 
   // to toggle wishlist
   const handleToggleWishlist = async (propertyId) => {
@@ -90,7 +90,7 @@ const Properties = () => {
   };
 
   //to fetch property
-  const fetchProperties = async (currentFilters) => {
+  const fetchProperties = useCallback(async (currentFilters) => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -111,10 +111,11 @@ const Properties = () => {
       setError(null);
     } catch (err) {
       setError("Failed to load properties. Please try again later.");
+      console.log(err)
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const fetchTimer = useRef(null);
 
@@ -192,7 +193,7 @@ const Properties = () => {
     return `TZS ${value}`;
   };
 
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
+  const [showMobileFilters, setShowMobileFilter] = useState(false);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
@@ -207,12 +208,18 @@ const Properties = () => {
       bhk,
     };
 
-    setFilters(initialFilters);
-    fetchProperties(initialFilters);
-    if (user) {
-      fetchWishlist();
-    }
-  }, [location.search, user]);
+    const initialize = async () => {
+      await fetchProperties(initialFilters);
+      if (user) {
+        await fetchWishlist();
+      }
+    };
+
+    initialize();
+  }, [location.search, user, fetchProperties, fetchWishlist,filters]);
+
+
+
 
 
 
@@ -231,7 +238,7 @@ const Properties = () => {
       <div className={s.container}>
         <div className={s.mobileFilterButtonWrapper}>
           <button
-            onClick={() => setShowMobileFilters(true)}
+            onClick={() => setShowMobileFilter(true)}
             className={s.mobileFilterButton}
           >
             <HiFilter /> Show Filters & Search
@@ -486,7 +493,7 @@ const Properties = () => {
 
 
 {showMobileFilters && (
-    <div onClick={()=>setShowMobileFilters(false)} className={s.mobileOverlay}>
+    <div onClick={()=>setShowMobileFilter(false)} className={s.mobileOverlay}>
     </div>
 )}
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { profileStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";

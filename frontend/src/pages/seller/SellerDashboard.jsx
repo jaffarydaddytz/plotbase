@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { sellerDashboardStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 
@@ -328,11 +328,11 @@ const SellerDashboard = () => {
             </p>
 
             <div className={s.inquiriesList}>
-                {inquiries.map((inq, i)=> (
+                {inquiries.map((inq)=> (
                     <div key={inq._id} className={s.inquiryItem}>
                         <div className={s.inquiryLeft}>
                             <div className={s.inquiryItem}>
-                                {inquiries.map((inq, i) => (
+                                {inquiries.map((inq) => (
                                     <div key={inq._id} className={s.inquiryItem
 
                                     }>

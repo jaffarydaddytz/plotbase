@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from 'react'
+import  { useEffect, useRef, useState } from 'react'
 import { chatMessagesStyles as s } from '../../assets/dummyStyles'
 import { useAuth } from '../../context/AuthContext'
 import { useChat } from '../../context/ChatContext'
@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../../config'
 import Navbar from '../../components/common/Navbar'
-import { HiOutlineChatAlt2, HiOutlineTrash, HiPaperAirplane } from 'react-icons/hi'
+import { HiChevronLeft, HiOutlineChatAlt2, HiOutlineTrash, HiPaperAirplane } from 'react-icons/hi'
 
 
 
@@ -14,7 +14,7 @@ import { HiOutlineChatAlt2, HiOutlineTrash, HiPaperAirplane } from 'react-icons/
 const ChatMessages = () => {
     const {user, token} = useAuth();
     const location = useLocation();
-    const {socket, activeChat, setActiveChat, joinChat, sendMessage} = useChat();
+    const {socket, activeChat, setActiveChat, joinChat} = useChat();
     const [conversations, setConversations] = useState([]);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState("");
@@ -25,6 +25,19 @@ const ChatMessages = () => {
 const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
 }
+
+// to get the partner
+const getChatPartner = (chat) => {
+  if (!chat) return null;
+  // chat may have buyer/seller or participants structure
+  if (chat.buyer && chat.seller && user) {
+    return user._id === chat.buyer._id ? chat.seller : chat.buyer;
+  }
+  if (chat.participants && Array.isArray(chat.participants) && user) {
+    return chat.participants.find(p => p._id !== user._id) || null;
+  }
+  return null;
+};
 
 // to fetch the conversations
 useEffect(() => {
@@ -61,7 +74,7 @@ useEffect(() => {
 
     fetchConversations();
 
-}, [user, location.state]);
+}, [user, location.state, setActiveChat, token]);
 
 
 
@@ -84,7 +97,7 @@ useEffect(() => {
         } 
         fetchMessages();
     }
-}, [activeChat]);
+}, [activeChat, token, joinChat]);
 
 // updating the chat when new message arrives
 useEffect(() => {
@@ -156,9 +169,9 @@ const handleDeleteChat = async (e, chatId) => {
     if(!Window.confirm("are you sure you want to delete this chat?"))
         return;
 
-
+                          
     try {
-        await axios.delete(`${API_URL/api/chatId}`, {
+        await axios.delete(`${API_URL}/api/chatId}`, {
             headers: {Authorization: `Bearer ${token}`}
         });
 
@@ -166,6 +179,7 @@ const handleDeleteChat = async (e, chatId) => {
         if(activeChat?._id === chatId) 
             setActiveChat(null);
     } catch (error) {
+        console.log(error)
         
     }
     
@@ -190,13 +204,6 @@ const handleDeleteMessage = async (chatId, messageId) => {
         
     }
 
-
-    // to get the partner
-
-    const getChatPartner = (chat) => {
-        return user._id === chat.buyer._id ? chat.seller : chat.buyer;
-
-    };
 
   if (loading) {
     return (

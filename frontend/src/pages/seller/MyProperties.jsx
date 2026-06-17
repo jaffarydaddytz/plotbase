@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { myPropertiesStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
@@ -10,32 +10,30 @@ import { HiOutlineCheckCircle, HiOutlineLibrary, HiOutlinePencilAlt, HiOutlineTr
 const MyProperties = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const { token } = useAuth();
 
-  // fetch properties
-  const fetchProperties = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/api/property/my`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const props = Array.isArray(res.data)
-        ? res.data
-        : res.data.properties || [];
-
-      setProperties(props);
-      setLoading(false);
-    } catch (err) {
-      setError("Failed to load your properties");
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchProperties();
-  }, []);
+    const fetchProperties = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/api/property/my`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const props = Array.isArray(res.data)
+          ? res.data
+          : res.data.properties || [];
+
+        setProperties(props);
+        setLoading(false);
+      } catch (error) {
+        setLoading(false);
+        console.log("error in my property", error);
+      }
+    };
+
+    if (token) fetchProperties();
+  }, [token]);
 
   // delete property
   const handleDelete = async (id) => {
@@ -50,6 +48,7 @@ const MyProperties = () => {
       setProperties((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
       alert("Failed to delete property");
+      console.log("error", err)
     }
   };
 
@@ -71,6 +70,7 @@ const MyProperties = () => {
       );
     } catch (err) {
       alert("Failed to update status");
+      console.log("error", err)
     }
   };
 

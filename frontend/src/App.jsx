@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
+import  { useEffect, useState } from "react";
+import { Navigate,  Route, Routes, useLocation } from "react-router-dom";
 import LandingPage from "./pages/shared/LandingPage";
 import Properties from "./pages/shared/Properties";
 import PropertyDetails from "./pages/shared/PropertyDetails";
@@ -19,7 +19,6 @@ import SellerDashboard from "./pages/seller/SellerDashboard";
 import AddProperty from "./pages/seller/AddProperty";
 import EditProperty from "./pages/seller/EditProperty";
 import { FaChevronUp } from "react-icons/fa";
-import { useAuth } from "./context/AuthContext";
 import { ProtectedRoute, PublicRoute } from "./components/common/ProtectedRoute";
 import MyProperties from "./pages/seller/MyProperties";
 import MyInquiries from "./pages/buyer/MyInquiries";
@@ -62,16 +61,6 @@ const ScrollTopButton = () => {
       <FaChevronUp size={22} />
     </button>
   );
-};
-
-{/ * smart layout wrapper for seller and buyer * /}
-
-const SellerLayoutWrapper = () => {
-  const { user } = useAuth();
-
-  if (user?.role !== "seller") return <Navigate to="/" replace />;
-
-  return <Outlet />;
 };
 
 const App = () => {

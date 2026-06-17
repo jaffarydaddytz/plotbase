@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import  {  useState } from 'react'
 import { pendingApprovalStyles as s } from '../../assets/dummyStyles'
 import { useAuth } from '../../context/AuthContext'
 import { HiOutlineClock, HiOutlineRefresh, HiOutlineSupport } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
 
 const PendingApproval = () => {
-    const {logout, user, refreshUser} = useAuth();
+    const {user, refreshUser} = useAuth();
     const [refreshing, setRefreshing]  = useState(false);
 
     // auto refresh
