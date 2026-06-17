@@ -26,7 +26,7 @@ connectDB();
 //middlewares
 const allowedOrigins = [
     // "http://localhost:5173",
-     "https://plotbase-web.vercel.app/",
+     "https://plotbase-usyn.vercel.app/",
      //" http://192.168.0.7:5173/"
      
 ].filter(Boolean);
