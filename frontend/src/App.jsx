@@ -97,25 +97,27 @@ const App = () => {
         <Route element={<ProtectedRoute allowedRoles={["buyer", "seller", "admin"]} />}>
 
           {/* SELLER + SHARED LAYOUT */}
-          <Route element={<SellerLayout />}>
+      
 
             {/* PROFILE (FIXED: now has sidebar/header) */}
             <Route path="/profile" element={<Profile />} />
-             <Route path="/inquiries" element={<MyInquiries/>} />
-              <Route path="/contact" element={<Contact/>} />
+            <Route path="/inquiries" element={<MyInquiries/>} />
+            <Route path="/contact" element={<Contact/>} />
              
              <Route path="/chat-messages" element={<ChatMessages/>} />
 
             {/* SELLER ONLY */}
             <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
+              <Route element={<SellerLayout />}>
               <Route path="/dashboard" element={<SellerDashboard />} />
               <Route path="/seller-dashboard" element={<SellerDashboard />} />
               <Route path="/add-property" element={<AddProperty />} />
               <Route path="/my-properties" element={<MyProperties />} />
               <Route path="/edit-property/:id" element={<EditProperty />} />
+              </Route>
             </Route>
 
-          </Route>
+          
 
           {/* ADMIN */}
           <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
