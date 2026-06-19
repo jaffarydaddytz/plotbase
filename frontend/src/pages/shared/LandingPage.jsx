@@ -195,9 +195,9 @@ const LandingPage = () => {
       {/* HERO */}
       <section className={s.heroSection}>
         <div className={s.heroContent}>
-          <span className={s.badge}>
+          {/* <span className={s.badge}>
             Trusted by 20,000+ investors
-          </span>
+          </span> */}
 
           <h1 className={s.heroTitle}>
             Find your <span className={s.textGradient}>Perfect</span> Next Chapter
