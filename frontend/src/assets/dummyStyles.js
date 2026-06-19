@@ -675,7 +675,7 @@ export const landingPageStyles = {
   categoryTitle: "text-[2.5rem] font-extrabold mb-4 max-sm:text-[2rem]",
   categoryDesc: "text-text-muted",
   categoryGrid:
-    "category-grid grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 max-sm:grid-cols-2 max-sm:gap-4",
+    "category-grid grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-6 max-sm:grid-cols-2 max-sm:gap-4 p-2",
   categoryCard:
     "category-card py-10 px-6 text-center cursor-pointer bg-white rounded-3xl border border-[#e2e8f0] transition-all duration-300 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] hover:-translate-y-2 hover:border-primary hover:shadow-[0_12px_25px_-5px_rgba(13,148,136,0.1)] group max-sm:py-6 max-sm:px-4",
   categoryIconWrapper:
