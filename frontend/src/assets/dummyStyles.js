@@ -531,9 +531,10 @@ export const chatMessagesStyles = {
   noChatTitle: "font-bold",
 };
 
+
 export const contactStyles = {
   // Layout
-  container: "min-h-screen bg-[#f8fafc] pt-32 max-lg:pt-28",
+  container: "min-h-screen bg-[#f8fafc] pt-32 max-lg:pt-5",
   mainContainer: "container py-16 px-6 max-w-[1000px] mx-auto",
 
   // Header
@@ -546,7 +547,7 @@ export const contactStyles = {
 
   // Contact Info section
   contactInfoContainer: "flex flex-col gap-8",
-  contactInfoCard: "card-premium p-8",
+  contactInfoCard: "card-premium p-4",
   contactItem: "flex items-center gap-4",
   contactItemMarginBottom: "mb-6",
   contactIconWrapper: "w-10 h-10 rounded-xl bg-primary-light text-primary flex items-center justify-center",
@@ -560,7 +561,7 @@ export const contactStyles = {
   quickSupportText: "text-[0.9rem] opacity-90",
 
   // Form section
-  formCard: "card-premium p-10",
+  formCard: "card-premium p-10 mt-10",
   successContainer: "text-center py-8",
   successIcon: "text-primary mx-auto mb-6",
   successTitle: "mb-4 text-2xl font-bold",
@@ -572,7 +573,7 @@ export const contactStyles = {
   inputGroup: "",
   label: "block mb-2 font-semibold text-[0.9rem] items-center",
   input: "w-full p-3 rounded-xl border border-[#e2e8f0] outline-none transition-colors focus:border-primary",
-  textarea: "resize-none",
+  textarea: "resize-none w-full",
   errorMessage: "text-red-600 text-[0.875rem] p-3 bg-red-50 rounded-lg",
   submitButton: "btn btn-primary w-full p-4 rounded-xl font-bold text-base mt-4",
 };

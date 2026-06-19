@@ -158,7 +158,7 @@ const Contact = () => {
                                 <HiOutlineAnnotation size={16} className="mr-1"/> Message
                             </label>
 
-                            <textarea name="message" required value={formData.message} onChange={handleChange}  placeholder="Tell us how we can help..."  rows="5"  className={`${s.textarea}`}> </textarea>
+                            <textarea name="message" required value={formData.message} onChange={handleChange}  placeholder="Tell us how we can help..."  rows="5"  className={s.textarea}> </textarea>
 
                            
 
