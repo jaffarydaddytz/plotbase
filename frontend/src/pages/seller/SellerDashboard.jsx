@@ -67,7 +67,7 @@ const SellerDashboard = () => {
             : []
         );
       } catch (error) {
-        console.error("Failed to load dashboard data:", error);
+        console.log("Failed to load dashboard data:", error.response.data.message);
       } finally {
         setLoading(false);
       }

@@ -103,7 +103,7 @@ const AddProperty = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      navigate("/dashboard");
+      navigate("/seller/my-properties");
     } catch (error) {
       setError(error.response?.data?.message || "failed to add property");
       setLoading(false);
@@ -390,7 +390,7 @@ const AddProperty = () => {
           <div className={s.footerButtons}>
             <button
               type="button"
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/seller/dashboard")}
               className={s.cancelButton}
             >
               {" "}

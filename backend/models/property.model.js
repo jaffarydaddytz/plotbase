@@ -66,7 +66,7 @@ const propertySchema = new mongoose.Schema(
     images: [{ type: String }],
     seller: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
       required: true,
     },
     isVerified: {

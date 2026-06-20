@@ -55,7 +55,7 @@ export const addProperty = async (req, res) => {
 
     res.json({ success: true, property });
   } catch (error) {
-    console.error("add property error:", error);
+    console.log("add property error:", error);
     res.status(500).json({
       success: false,
       message: error.message || "internal server error",

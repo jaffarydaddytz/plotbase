@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+
 import { navbarStyles as s } from "../../assets/dummyStyles";
 import Logo from "./Logo";
 import { useAuth } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
-import { HiMenuAlt3, HiX, HiXCircle } from "react-icons/hi";
+import { HiMenuAlt3, HiX,  } from "react-icons/hi";
+import { useState } from "react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +49,7 @@ const Navbar = () => {
           </Link>
 
           <Link
-            to="/chat-messages"
+            to="/messages"
             className={s.navLink}
             onClick={() => setIsOpen(false)}
           >
@@ -80,7 +81,7 @@ const Navbar = () => {
       {/* For Seller */}
       {user && user.role === "seller" && (
         <>
-          <Link to="/dashboard" onClick={() => setIsOpen(false)}>
+          <Link to="/seller/dashboard" onClick={() => setIsOpen(false)}>
             Dashboard
           </Link>
         </>

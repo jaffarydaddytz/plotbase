@@ -1,4 +1,4 @@
-import React from "react";
+
 import { useAuth } from "../../context/AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
 
@@ -39,7 +39,7 @@ export const PublicRoute = () => {
 
   if (user) {
     if (user.role === "admin") return <Navigate to="/admin-dashboard" replace />;
-    if (user.role === "seller") return <Navigate to="/dashboard" replace />;
+    if (user.role === "seller") return <Navigate to="/seller/dashboard" replace />;
     return <Navigate to="/" replace />;
   }
 

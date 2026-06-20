@@ -31,6 +31,7 @@ export const sendInquiry = async (req, res) => {
 
 
     } catch (error) {
+        console.log("inquiry", error.message)
 
         res.status(500).json({
             success: false,
@@ -41,13 +42,13 @@ export const sendInquiry = async (req, res) => {
 }
 
 // seller view inquiries
-export const getSellerInquiries = async (req, res) =>{
+export const getSellerInquiries = async (req, res) => {
     try {
         const inquiries = await Inquiry.find({
             seller: req.user._id
         })
         .populate("buyer", "name email phone")
-        .populate("property", "title, price images city")
+        .populate("property", "title price images city")
         .sort({createdAt:-1})
 
 
@@ -57,6 +58,7 @@ export const getSellerInquiries = async (req, res) =>{
             inquiries
         })
     } catch (error) {
+        console.log("inquiry error", error.message)
          res.status(500).json({
             success: false,
             message: error.message

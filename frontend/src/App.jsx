@@ -1,5 +1,5 @@
-import  { useEffect, useState } from "react";
-import { Navigate,  Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import LandingPage from "./pages/shared/LandingPage";
 import Properties from "./pages/shared/Properties";
 import PropertyDetails from "./pages/shared/PropertyDetails";
@@ -19,23 +19,24 @@ import SellerDashboard from "./pages/seller/SellerDashboard";
 import AddProperty from "./pages/seller/AddProperty";
 import EditProperty from "./pages/seller/EditProperty";
 import { FaChevronUp } from "react-icons/fa";
-import { ProtectedRoute, PublicRoute } from "./components/common/ProtectedRoute";
+import {
+  ProtectedRoute,
+  PublicRoute,
+} from "./components/common/ProtectedRoute";
 import MyProperties from "./pages/seller/MyProperties";
 import MyInquiries from "./pages/buyer/MyInquiries";
 import ChatMessages from "./pages/shared/ChatMessages";
 import Contact from "./pages/shared/Contact";
-
-
+import Wishlist from "./pages/buyer/Wishlist";
 
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  },[pathname]);
+  }, [pathname]);
   return null;
 };
-
 
 const ScrollTopButton = () => {
   const [visible, setVisible] = useState(false);
@@ -72,7 +73,7 @@ const App = () => {
       document.body.style.overflowX = "";
       document.documentElement.style.overflowX = "";
     };
-  }, []); 
+  }, []);
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden">
@@ -80,7 +81,6 @@ const App = () => {
       <ScrollTopButton />
 
       <Routes>
-
         {/* PUBLIC AUTH */}
         <Route element={<PublicRoute />}>
           <Route path="/login" element={<Login />} />
@@ -93,53 +93,47 @@ const App = () => {
         <Route path="/properties" element={<Properties />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
 
-        {/* PROTECTED AREA */}
-        <Route element={<ProtectedRoute allowedRoles={["buyer", "seller", "admin"]} />}>
-
-          {/* SELLER + SHARED LAYOUT */}
       
 
-            {/* PROFILE (FIXED: now has sidebar/header) */}
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/inquiries" element={<MyInquiries/>} />
-            <Route path="/contact" element={<Contact/>} />
-             
-             <Route path="/chat-messages" element={<ChatMessages/>} />
+        {/* BUYER ONLY */}
+        <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/messages" element={<ChatMessages />} />
+          <Route path="/inquiries" element={<MyInquiries />} />
+          <Route path="/wishlist" element={<Wishlist/>} />
+          <Route path="/contact" element={<Contact />} />
+        </Route>
 
-            {/* SELLER ONLY */}
-            <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
-              <Route element={<SellerLayout />}>
-              <Route path="/dashboard" element={<SellerDashboard />} />
-              <Route path="/seller-dashboard" element={<SellerDashboard />} />
-              <Route path="/add-property" element={<AddProperty />} />
-              <Route path="/my-properties" element={<MyProperties />} />
-              <Route path="/edit-property/:id" element={<EditProperty />} />
-              </Route>
-            </Route>
-
-          
-
-          {/* ADMIN */}
-          <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-            <Route element={<AdminLayout />}>
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
-              <Route path="/admin/users" element={<AdminUsers />} />
-              <Route path="/admin/seller-requests" element={<SellerRequests />} />
-              <Route path="/admin/properties" element={<AdminProperties />} />
-              <Route path="/admin/inquiries" element={<AdminInquiries />} />
-              <Route path="/admin/contacts" element={<AdminContacts />} />
-            </Route>
+        {/* SELLER ONLY */}
+        <Route element={<ProtectedRoute allowedRoles={["seller"]} />}>
+          <Route element={<SellerLayout />}>
+            <Route path="/seller/inquiries" element={<MyInquiries />} />
+            <Route path="seller/profile" element={<Profile />} />
+            <Route path="/seller/chat-messages" element={<ChatMessages />} />
+            <Route path="/seller/contact" element={<Contact />} />
+            <Route path="/seller/dashboard" element={<SellerDashboard />} />
+            <Route path="/seller-dashboard" element={<SellerDashboard />} />
+            <Route path="/add-property" element={<AddProperty />} />
+            <Route path="/seller/my-properties" element={<MyProperties />} />
+            <Route path="/edit-property/:id" element={<EditProperty />} />
           </Route>
+        </Route>
 
+        {/* ADMIN */}
+        <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/seller-requests" element={<SellerRequests />} />
+            <Route path="/admin/properties" element={<AdminProperties />} />
+            <Route path="/admin/inquiries" element={<AdminInquiries />} />
+            <Route path="/admin/contacts" element={<AdminContacts />} />
+          </Route>
         </Route>
 
         {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
-
       </Routes>
-
-
-
     </div>
   );
 };

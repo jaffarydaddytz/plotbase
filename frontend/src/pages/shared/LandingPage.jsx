@@ -64,7 +64,7 @@ const LandingPage = () => {
       } catch (err) {
         if (!isMounted) return;
         setError("failed to load properties, please try again");
-        console.error(err);
+        console.log("failed api/property", err.response.data);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -99,7 +99,7 @@ const LandingPage = () => {
             .map((item) => String(item.property._id))
         );
       } catch (err) {
-        console.error("failed to fetch wishlist", err);
+        console.log("failed to fetch wishlist", err.response.data.message);
       }
     };
 
@@ -259,7 +259,7 @@ const LandingPage = () => {
       </section>
 
       {/* PROPERTIES */}
-      <section className={s.featuredSection}>
+      <section className={s.featuresSection}>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (

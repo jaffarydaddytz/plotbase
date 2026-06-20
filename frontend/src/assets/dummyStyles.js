@@ -532,22 +532,22 @@ export const chatMessagesStyles = {
 };
 
 
-export const contactStyles = {
+export const contactStyles = { 
   // Layout
-  container: "min-h-screen bg-[#f8fafc] pt-32 max-lg:pt-5",
+  container: "min-h-screen bg-[#f8fafc] pt-3 max-lg:pt-5 ",
   mainContainer: "container py-16 px-6 max-w-[1000px] mx-auto",
 
   // Header
-  header: "text-center mb-14",
-  heading: "text-[2.5rem] font-extrabold text-text-main mb-4",
+  header: "text-center mb-2",
+  heading: "text-[2.5rem] font-extrabold text-text-main ",
   subheading: "text-text-muted text-[1.1rem] max-w-[600px] mx-auto",
 
   // Grid
-  grid: "grid grid-cols-[1fr_1.5fr] gap-12 items-start max-lg:grid-cols-1 max-lg:gap-8",
+  grid: "grid grid-cols-[1fr_1.5fr] gap-10 items-start max-lg:grid-cols-1 max-lg:gap-8",
 
   // Contact Info section
   contactInfoContainer: "flex flex-col gap-8",
-  contactInfoCard: "card-premium p-4",
+  contactInfoCard: "card-premium p-4 h-[150px]",
   contactItem: "flex items-center gap-4",
   contactItemMarginBottom: "mb-6",
   contactIconWrapper: "w-10 h-10 rounded-xl bg-primary-light text-primary flex items-center justify-center",
@@ -556,12 +556,12 @@ export const contactStyles = {
   contactDetail: "text-text-muted text-[0.9rem]",
 
   // Quick support card
-  quickSupportCard: "card-premium h-[200px] bg-primary text-white flex flex-col justify-center items-center p-8 text-center",
+  quickSupportCard: "card-premium h-[150px] bg-primary text-white flex flex-col justify-center items-center p-8 text-center",
   quickSupportTitle: "mb-2 font-bold text-xl",
   quickSupportText: "text-[0.9rem] opacity-90",
 
   // Form section
-  formCard: "card-premium p-10 mt-10",
+  formCard: "card-premium p-10 mt-0",
   successContainer: "text-center py-8",
   successIcon: "text-primary mx-auto mb-6",
   successTitle: "mb-4 text-2xl font-bold",
@@ -569,26 +569,26 @@ export const contactStyles = {
   successButton: "btn btn-primary py-3 px-8",
 
   form: "flex flex-col gap-6",
-  formTwoColGrid: "grid grid-cols-2 gap-4 max-sm:grid-cols-1",
+  formTwoColGrid: "grid  grid-cols-2 gap-4 max-sm:grid-cols-1",
   inputGroup: "",
-  label: "block mb-2 font-semibold text-[0.9rem] items-center",
+  label: "block mb-1 font-semibold text-[0.9rem] items-center",
   input: "w-full p-3 rounded-xl border border-[#e2e8f0] outline-none transition-colors focus:border-primary",
   textarea: "resize-none w-full",
   errorMessage: "text-red-600 text-[0.875rem] p-3 bg-red-50 rounded-lg",
-  submitButton: "btn btn-primary w-full p-4 rounded-xl font-bold text-base mt-4",
+  submitButton: "btn btn-primary w-full  rounded-xl font-bold text-base ",
 };
 
 
 export const profileStyles = {
-  containerWrapper: (role) => role !== 'seller' ? 'bg-bg-alt min-h-screen pt-32 max-lg:pt-10' : 'bg-transparent min-h-auto',
-  mainContainer: (role) => `container fade-in max-w-[800px] mb-16 ${role !== 'seller' ? 'mx-auto pt-12' : 'mx-0 pt-0'}`,
+  containerWrapper: (role) => role !== 'seller' ? 'bg-bg-alt min-h-screen pt-10 max-lg:pt-10' : 'bg-transparent min-h-auto',
+  mainContainer: (role) => `container fade-in max-w-[450px] mb-16 ${role !== 'seller' ? 'mx-auto pt-12' : 'mx-0 pt-0'}`,
   header: "mb-5 md:text-center md:mb-8",
   pageTitle: "text-[2.5rem] mb-2 md:text-[2rem]",
   pageSubtitle: "text-text-muted",
   card: "card-premium p-1 md:p-4",
-  profileHeader: "flex flex-col md:flex-row items-center gap-4 md:gap-8 mb-10 md:mb-16 text-center md:text-left",
+  profileHeader: "flex flex-col md:flex-row items-center gap-4 md:gap-8 mb-10 md:mb-8 text-center md:text-left",
   avatarSection: "relative",
-  avatarWrapper: "w-[100px] h-[100px] rounded-[2.5rem] bg-primary-light overflow-hidden flex items-center justify-center text-[3rem] font-bold text-primary border-4 border-white shadow-lg",
+  avatarWrapper: "w-[70px] h-[70px] rounded-[2.5rem] bg-primary-light overflow-hidden flex items-center justify-center text-[3rem] font-bold text-primary border-4 border-white shadow-lg",
   avatarImage: "w-full h-full object-cover",
   avatarPlaceholder: "text-primary opacity-60",
   uploadButton: "absolute -bottom-2.5 -right-2.5 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-[0_4px_10px_rgba(0,0,0,0.2)] border-4 border-white z-10 hover:bg-primary-dark transition-colors",
@@ -684,9 +684,9 @@ export const landingPageStyles = {
   categoryCount: "text-text-muted text-[0.875rem]",
 
   // Features section
-  featuresSection: "py-32",
+  featuresSection: "py-30 m-5",
   featuresContainer:
-    "container features-container flex gap-24 items-center max-lg:flex-col max-lg:gap-12",
+    "container  features-container flex gap-24 items-center  max-lg:flex-col max-lg:gap-12",
   featuresList:
     "features-list-container flex-1 grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-8 max-md:grid-cols-1 max-md:gap-8",
   featureCard:
@@ -858,9 +858,9 @@ export const propertiesStyles = {
 };
 
 export const propertyDetailsStyles = {
-  pageContainer: "bg-[#fdfdfd] min-h-screen pb-24 pt-32 max-lg:pt-28",
+  pageContainer: "bg-[#fdfdfd] min-h-screen pb-24 pt-20 max-lg:pt-4",
   mainContainer: "container fade-in pt-4",
-  breadcrumbs: "flex items-center flex-wrap gap-2 text-sm text-[#64748b] mb-6",
+  breadcrumbs: "flex items-center flex-wrap gap-2 text-sm text-[#64748b] mb-2",
   breadcrumbLink: "text-inherit no-underline",
   breadcrumbCurrent: "text-text-main font-semibold break-words max-w-full",
   galleryContainer: "property-gallery-container mb-8",

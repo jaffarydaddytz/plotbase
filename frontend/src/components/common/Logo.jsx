@@ -10,6 +10,7 @@ const Logo = ({
 }) => {
   return (
     <Link
+    
       to="/"
       {...props}
       className={`${s.link} ${props.className || ""}`}

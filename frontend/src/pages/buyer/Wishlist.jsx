@@ -82,3 +82,25 @@
 // }
 
 // export default Wishlist
+import { wishlistStyles as s } from "../../assets/dummyStyles"
+import Navbar from "../../components/common/Navbar"
+import { useAuth } from "../../context/AuthContext"
+
+
+
+
+const Wishlist = () => {
+    const {user} = useAuth();
+  return (
+    <div className={s.pageContainer}>
+        {user?.role !== "seller" && <Navbar />}
+
+<div className={s.mainContainer}>
+ Wishlist being cooked!
+</div>
+       
+    </div>
+  )
+}
+
+export default Wishlist
