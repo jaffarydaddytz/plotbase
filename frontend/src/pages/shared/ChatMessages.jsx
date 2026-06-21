@@ -7,6 +7,7 @@ import axios from 'axios'
 import API_URL from '../../config'
 import Navbar from '../../components/common/Navbar'
 import { HiChevronLeft, HiOutlineChatAlt2, HiOutlineTrash, HiPaperAirplane } from 'react-icons/hi'
+import Loader from '../../components/common/Loader'
 
 
 
@@ -203,16 +204,13 @@ const handleDeleteMessage = async (chatId, messageId) => {
         console.error("error deleting message", error)
         
     }
+};
 
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-10 h-10 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
-      </div>
-    );
-  }
-    
+    if (loading) {
+  return (
+    <Loader/>
+   
+  );
 }
 
   return (

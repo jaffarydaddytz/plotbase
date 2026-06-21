@@ -18,6 +18,7 @@ import chatRouter from './routes/chat.routes.js';
 import { Socket } from 'socket.io';
 import inquiryRouter from './routes/inquiry.routes.js';
 import adminRouter from './routes/admin.routes.js';
+import wishlistRouter from './routes/wishlist.routes.js';
 
 
 //DB
@@ -25,7 +26,7 @@ connectDB();
 
 //middlewares
 const allowedOrigins = [
-     //"http://localhost:5173",
+     "http://localhost:5173",
      "https://plotbase-usyn.vercel.app",
      //" http://192.168.0.7:5173/"
      
@@ -55,6 +56,7 @@ app.use("/api/property", PropertyRouter)
 app.use("/api/inquiry", inquiryRouter)
 app.use("/api/chat", chatRouter)
 app.use("/api/admin", adminRouter)
+app.use("/api/wishlist", wishlistRouter)
 
 
 

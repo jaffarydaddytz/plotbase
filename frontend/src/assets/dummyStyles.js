@@ -240,10 +240,10 @@ export const sellerRequestsStyles = {
 export const wishlistStyles = {
   loaderFullPage: "loader-full-page",
   loader: "loader",
-  pageContainer: "bg-bg-alt min-h-screen pt-32 max-lg:pt-28",
+  pageContainer: "bg-bg-alt min-h-screen pt-10 max-lg:pt-28",
   mainContainer: "container fade-in py-12 px-4 md:px-8",
   headingWrapper: "mb-12",
-  heading: "text-[2.5rem] mb-2",
+  heading: "text-[1.5rem] mb-2",
   subheading: "text-text-muted",
   emptyCard: "card-premium py-24 px-8 text-center",
   emptyIconWrapper: "bg-bg-alt w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8 text-text-muted",

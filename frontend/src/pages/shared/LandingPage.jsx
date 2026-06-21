@@ -18,6 +18,7 @@ import banner from "../../assets/image.jpeg";
 import PropertyCard from "../../components/common/PropertyCard";
 import axios from "axios";
 import API_URL from "../../config";
+import Loader from "../../components/common/Loader";
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -187,6 +188,13 @@ const LandingPage = () => {
       type: "commercial",
     },
   ];
+
+    if (loading) {
+  return (
+    <Loader/>
+   
+  );
+}
 
   return (
     <div className={s.bgMain}>

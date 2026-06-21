@@ -15,6 +15,7 @@ import axios from "axios";
 import API_URL from "../../config";
 import PropertyCard from "../../components/common/PropertyCard";
 
+
 const Properties = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
@@ -216,20 +217,19 @@ const Properties = () => {
     };
 
     initialize();
-  }, [location.search, user, fetchProperties, fetchWishlist,filters]);
+  }, [location.search, user, fetchProperties, fetchWishlist, filters]);
 
 
 
 
 
 
-  if (loading) {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="w-10 h-10 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
-    </div>
-  );
-}
+//   if (loading) {
+//   return (
+//     <Loader/>
+   
+//   );
+// }
 
   return (
     <div className={s.pageContainer}>

@@ -20,6 +20,8 @@ import {
   HiX,
 } from "react-icons/hi";
 import API_URL from "../../config";
+import Loader from "../../components/common/Loader";
+
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -165,14 +167,13 @@ const PropertyDetails = () => {
   };
 
   const [lightboxIndex, setLightboxIndex] = useState(null);
-
-  if (loading) {
+    if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="w-10 h-10 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
-      </div>
+     <Loader/>
     );
   }
+
+ 
 
   if (error || !property)
     return (
@@ -198,6 +199,11 @@ const PropertyDetails = () => {
     setLightboxIndex(
       (prev) => (prev - 1 + property.images.length) % property.images.length,
     );
+
+
+   
+
+
 
   return (
     <div className={s.pageContainer}>

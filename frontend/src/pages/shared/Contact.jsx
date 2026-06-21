@@ -11,6 +11,7 @@ import {
   HiOutlinePhone,
   HiOutlineUser,
 } from "react-icons/hi";
+import Loader from "../../components/common/Loader";
 
 const Contact = () => {
   const { user } = useAuth();
@@ -48,6 +49,14 @@ const Contact = () => {
       setLoading(false);
     }
   };
+
+
+    if (loading) {
+  return (
+    <Loader/>
+   
+  );
+}
 
   return (
     <div className={s.container}>
