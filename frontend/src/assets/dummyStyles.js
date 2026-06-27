@@ -477,12 +477,12 @@ export const sellerDashboardStyles = {
 };
 
 export const chatMessagesStyles = {
-  // Loader (reuse existing)
+  // Loader
   loaderFullPage: "loader-full-page",
   loader: "loader",
 
   // Main container
-  chatContainer: "flex flex-col overflow-hidden",
+  chatContainer: "flex flex-row overflow-hidden",   // ✅ changed from flex-col to flex-row
   chatContainerSeller: "h-[calc(100vh-120px)]",
   chatContainerNonSeller: "h-screen md:h-screen pt-32 max-lg:pt-28",
 
@@ -490,8 +490,8 @@ export const chatMessagesStyles = {
   chatWrapper: "flex flex-1 bg-[#f8fafc] font-sans relative overflow-hidden mt-0 md:mt-0",
 
   // Sidebar
-  sidebar: "w-full absolute inset-0 z-10 transition-transform duration-300 lg:relative lg:w-[350px] shrink-0 bg-white border-r border-[#e2e8f0] flex flex-col lg:translate-x-0",
-  sidebarHidden: "-translate-x-full lg:-translate-x-0 hidden lg:flex",
+  sidebar: "w-full lg:w-[350px] shrink-0 bg-white border-r border-[#e2e8f0] flex flex-col transition-transform duration-300",
+  sidebarHidden: "hidden lg:flex",   // ✅ simplified: hide sidebar when not needed
   sidebarHeader: "p-5 border-b border-[#f1f5f9]",
   sidebarTitle: "m-0 text-xl font-bold text-[#1e293b]",
   sidebarContent: "flex-1 overflow-y-auto",
@@ -507,7 +507,7 @@ export const chatMessagesStyles = {
   deleteChatButton: "bg-transparent border-none text-[#94a3b8] p-2 rounded-lg cursor-pointer opacity-100 md:opacity-0 transition-all duration-200 flex items-center justify-center hover:text-red-500 hover:bg-red-100 md:group-hover:opacity-100",
 
   // Chat area
-  chatArea: "absolute inset-0 z-[5] lg:relative lg:flex-1 lg:z-auto flex flex-col bg-white w-full",
+  chatArea: "flex-1 flex flex-col bg-white w-full",   // ✅ no absolute positioning
   chatHeader: "p-[10px_15px] md:p-[15px_25px] bg-white sticky md:relative top-0 z-20 border-b border-[#e2e8f0] flex items-center justify-between",
   chatHeaderLeft: "flex items-center gap-3",
   backButton: "flex lg:hidden mr-2.5 bg-[#f1f5f9] border-none p-1.5 rounded-full text-[#1e293b]",
@@ -522,14 +522,19 @@ export const chatMessagesStyles = {
   messageText: "break-all",
   deleteMessageButton: "bg-transparent border-none text-white/60 cursor-pointer p-0.5 rounded transition-all duration-200 mt-0.5 hover:text-white hover:bg-white/20",
   messageTime: "text-[0.75rem] mt-1.5 opacity-70 block",
+
   messageForm: "p-[12px_15px] md:p-[20px_25px] bg-white sticky md:relative bottom-0 border-t border-[#e2e8f0] flex gap-[15px] items-center",
-  messageInput: "flex-1 min-w-0 border border-[#e2e8f0] rounded-[30px] p-[12px_25px] outline-none text-[0.95rem] transition-colors duration-200 focus:border-[#00b4d8]",
+  messageInput: "flex-1 min-w-0 border border-[#00b4d8] rounded-[10px]  outline text-[0.95rem] transition-colors duration-200 focus:border-[#00b4d8] p-2",
   sendButton: "bg-[#00b4d8] text-white border-none w-[45px] h-[45px] rounded-full cursor-pointer flex items-center justify-center transition-all duration-200 text-xl hover:bg-[#0077b6] hover:scale-105 active:scale-95 shrink-0",
+
+
+  
   sendIcon: "rotate-90",
   noChatSelected: "flex-1 flex flex-col items-center justify-center text-[#94a3b8] text-center p-10",
   noChatIcon: "w-20 h-20 mb-5 opacity-50",
   noChatTitle: "font-bold",
 };
+
 
 
 export const contactStyles = { 

@@ -31,7 +31,7 @@ const chatSchema = new mongoose.Schema(
     },
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
-      rer: "Usser",
+      ref: "User",
       required: true,
     },
     seller: {
@@ -40,7 +40,13 @@ const chatSchema = new mongoose.Schema(
       required: true,
     },
     messages: [messageSchema],
+     lastMessage: {
+      text: String,
+      sender: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+      createdAt: Date,
+    },
   },
+  
 
   { timestamps: true },
 );

@@ -128,43 +128,65 @@ const PropertyDetails = () => {
   };
 
   //to start a chat
-  const handleChatStart = async () => {
-    if (!user) return navigate("/login");
-    if (user.role !== "buyer") {
-      alert("only buyer can chat with seller");
-      return;
-    }
+const handleChatStart = async () => {
+  console.log("CHAT BTN CLICKED");
 
-    try {
-      const res = await axios.post(
-        `${API_URL}/api/chat/start`,
-        {
-          propertyId: id,
-          sellerId: property.seller._id,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+  if (!user) return navigate("/login");
+  if (user.role !== "buyer") {
+    alert("Only buyers can chat with sellers");
+    return;
+  }
 
-      const chat = res.data;
-      await axios.post(
-        `${API_URL}/api/chat/send`,
-        {
-          chatId: chat._id,
-          text: `(context: Interested in property  "${property.title}")`,
-          image: property.images[0],
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+  try {
+    // 1. Start or fetch chat
+    const res = await axios.post(
+      `${API_URL}/api/chat/start`,
+      {
+        propertyId: id,
+        sellerId: property.seller._id,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
 
-      navigate("/chat-messages", { state: { chat } });
-    } catch (err) {
-      console.error("error starting chat", err);
-    }
-  };
+    const chat = res.data;
+
+    // 2. First message: property info + image
+    await axios.post(
+      `${API_URL}/api/chat/send`,
+      {
+        chatId: chat._id,
+        text: `🏡 ${property.title}\n💰 Bei: ${property.price}`,
+        image: property.images[0],
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    // 3. Second message: greeting only
+    await axios.post(
+      `${API_URL}/api/chat/send`,
+      {
+        chatId: chat._id,
+        text: `Hujambo ${property.seller.name.charAt(0).toUpperCase()}${property.seller.name.slice(1).toLowerCase()}! `,
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    // 4. Navigate to messages view
+    navigate("/messages", { state: { chat } });
+  } catch (err) {
+    console.error("Error starting chat:", err.response?.data?.message || err.message);
+  }
+};
+
+
+
+
 
   const [lightboxIndex, setLightboxIndex] = useState(null);
     if (loading) {

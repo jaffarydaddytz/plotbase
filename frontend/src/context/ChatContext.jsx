@@ -1,11 +1,11 @@
-import React, {
+/* eslint-disable react-refresh/only-export-components */
+import {
   createContext,
+  useContext,
   useEffect,
   useRef,
   useState,
-  useContext
 } from "react";
-
 import { io } from "socket.io-client";
 import API_URL from "../config";
 import { useAuth } from "./AuthContext";
@@ -15,53 +15,76 @@ const ChatContext = createContext();
 export const ChatProvider = ({ children }) => {
   const { user } = useAuth();
 
-  const [socket, setSocket] = useState(null);
-  const [activeChat, setActiveChat] = useState(null);
-  const [notification, setNotification] = useState([]);
-
+  const socketRef = useRef(null);
   const activeChatRef = useRef(null);
 
-  // keep latest chat reference
+  const [activeChat, setActiveChat] = useState(null);
+  const [notification, setNotification] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [conversations, setConversations] = useState([]); // NEW: store all chats
+
+  // keep latest active chat in ref
   useEffect(() => {
     activeChatRef.current = activeChat;
   }, [activeChat]);
 
-  // reset when user changes
+  // reset on user change
   useEffect(() => {
-    setActiveChat(null);
-    setNotification([]);
+    const t = setTimeout(() => {
+      setActiveChat(null);
+      setNotification([]);
+      setMessages([]);
+      setConversations([]);
+    }, 0);
+    return () => clearTimeout(t);
   }, [user]);
 
-  // 🔥 FIXED SOCKET EFFECT (CRITICAL)
+  // socket connection
   useEffect(() => {
     if (!user) return;
 
-    const newSocket = io(API_URL, {
-      transports: ["websocket"] // stops polling spam
+    const s = io(API_URL, { transports: ["websocket"] });
+    socketRef.current = s;
+    const t = setTimeout(() => setSocket(s), 0);
+
+    s.emit("setup", user);
+
+    // unified message listener
+    s.on("receiveMessage", (data) => {
+      if (activeChatRef.current?._id === data.chatId) {
+        setMessages((prev) => [...prev, data]);
+      } else {
+        setNotification((prev) => {
+          if (prev.some((n) => n._id === data._id)) return prev;
+          return [...prev, data];
+        });
+      }
     });
 
-    setSocket(newSocket);
-
-    const handleMessage = (data) => {
-      if (activeChatRef.current?._id !== data.chatId) {
-        setNotification((prev) => [...prev, data]);
-      }
-    };
-
-    newSocket.on("receiveMessage", handleMessage);
-
     return () => {
-      newSocket.off("receiveMessage", handleMessage);
-      newSocket.disconnect(); // 🔥 IMPORTANT
+      clearTimeout(t);
+      s.disconnect();
+      socketRef.current = null;
+      setSocket(null);
     };
-  }, [user]); // ONLY RUN WHEN USER CHANGES
+  }, [user]);
 
-  // join chat
-  const joinChat = (chatId) => {
-    if (socket) {
-      socket.emit("joinChat", chatId);
-    }
-  };
+  // join active chat room
+  useEffect(() => {
+    const s = socketRef.current;
+    if (!s || !activeChat?._id) return;
+    s.emit("joinChat", activeChat._id);
+  }, [activeChat?._id]);
+
+  // NEW: join all user’s chat rooms once conversations are loaded
+  useEffect(() => {
+    const s = socketRef.current;
+    if (!s || conversations.length === 0) return;
+    conversations.forEach((chat) => {
+      s.emit("joinChat", chat._id);
+    });
+  }, [socket, conversations]);
 
   // send message
   const sendMessage = (
@@ -71,33 +94,34 @@ export const ChatProvider = ({ children }) => {
     createdAt = new Date(),
     image = null
   ) => {
-    if (socket && user) {
-      const messageData = {
-        chatId,
-        sender: user._id,
-        text,
-        createdAt,
-        _id: messageId,
-        image
-      };
+    if (!socketRef.current || !user) return null;
 
-      socket.emit("sendMessage", messageData);
-      return messageData;
-    }
+    const messageData = {
+      chatId,
+      sender: user._id,
+      text,
+      createdAt,
+      _id: messageId,
+      image,
+    };
 
-    return null;
+    socketRef.current.emit("sendMessage", messageData);
+    return messageData;
   };
 
   return (
     <ChatContext.Provider
       value={{
-        socket,
         activeChat,
         setActiveChat,
-        joinChat,
         sendMessage,
         notification,
-        setNotification
+        setNotification,
+        socket,
+        messages,
+        setMessages,
+        conversations,
+        setConversations, // expose so ChatMessages can set it
       }}
     >
       {children}

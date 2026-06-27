@@ -2,18 +2,22 @@ import express from "express";
 import Chat from "../models/chat.model.js";
 import { protect } from "../middlewares/auth.middleware.js";
 
-
-
 const chatRouter = express.Router();
 
+/* =========================
+   APPLY AUTH TO ALL ROUTES
+========================= */
 chatRouter.use(protect);
 
-//to create a chat
-
-chatRouter.post("/start", async (requestAnimationFrame, res) => {
+/* =========================
+   START CHAT
+========================= */
+chatRouter.post("/start", async (req, res) => {
   try {
     const { propertyId, sellerId, buyerId: providedBuyerId } = req.body;
+
     let buyerId, finalSellerId;
+
     if (req.user.role === "seller") {
       buyerId = providedBuyerId;
       finalSellerId = req.user._id;
@@ -22,21 +26,21 @@ chatRouter.post("/start", async (requestAnimationFrame, res) => {
       finalSellerId = sellerId;
     }
 
-    if (!buyerId || !finalSellerId) {
+    if (!buyerId || !finalSellerId || !propertyId) {
       return res.status(400).json({
-        message: "missing buyer or seller id",
+        message: "missing buyer, seller or property id",
       });
     }
 
-    //check for existing chat btn buyer and seller
     let chat = await Chat.findOne({
       buyer: buyerId,
       seller: finalSellerId,
+      property: propertyId,
     });
 
     if (!chat) {
-      chat = await chat.create({
-        property: propertyId, // inititla property  context
+      chat = await Chat.create({
+        property: propertyId,
         buyer: buyerId,
         seller: finalSellerId,
         messages: [],
@@ -45,33 +49,45 @@ chatRouter.post("/start", async (requestAnimationFrame, res) => {
 
     chat = await Chat.findById(chat._id)
       .populate("buyer", "name email profilePic")
-      .populate("seller", " name email profilePic ")
+      .populate("seller", "name email profilePic")
       .populate("property", "title price images");
+
     res.json(chat);
   } catch (error) {
     res.status(500).json({
-      message: "error creating chat or getting previous one",
+      message: "error creating chat",
       error: error.message,
     });
   }
 });
 
-// to send message
+/* =========================
+   SEND MESSAGE
+========================= */
 chatRouter.post("/send", async (req, res) => {
   try {
     const { chatId, text, image } = req.body;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     const chat = await Chat.findById(chatId);
-    if (!chat)
-      return res.status(404).json({
-        message: "chat not found",
-      });
+    if (!chat) return res.status(404).json({ message: "chat not found" });
 
-    //ensure sender is part of this chat
-    if (chat.buyer.toString() !== userId && chat.seller.toString() !== userId) {
+    const buyerId =
+      typeof chat.buyer === "object"
+        ? chat.buyer._id.toString()
+        : chat.buyer.toString();
+
+    const sellerId =
+      typeof chat.seller === "object"
+        ? chat.seller._id.toString()
+        : chat.seller.toString();
+
+    if (
+      buyerId !== userId.toString() &&
+      sellerId !== userId.toString()
+    ) {
       return res.status(403).json({
-        message: "not authorized to send message in this chat",
+        message: "not authorized to send message",
       });
     }
 
@@ -82,30 +98,49 @@ chatRouter.post("/send", async (req, res) => {
       createdAt: new Date(),
     };
 
-    chat.messages.push(newmessage);
+    chat.messages.push(newMessage);
+
+    chat.lastMessage = {
+      text: newMessage.text,
+      sender: newMessage.sender,
+      createdAt: newMessage.createdAt,
+    };
+
     await chat.save();
 
-    const savedMessages = chat.mesages[chat.messages.length - 1];
+    const savedMessage = chat.messages.at(-1);
+
+    const io = req.app.get("io");
+    if (io) {
+      io.to(chatId).emit("receiveMessage", {
+        ...savedMessage.toObject(),
+        chatId,
+      });
+    }
+
     res.json({ chat, newMessage: savedMessage });
   } catch (error) {
     res.status(500).json({
-      message: "error sending messages",
-      error: err.message,
+      message: "error sending message",
+      error: error.message,
     });
   }
 });
 
-// to get chats for user
+/* =========================
+   GET USER CHATS
+========================= */
 chatRouter.get("/user", async (req, res) => {
   try {
     const userId = req.user._id;
+
     const chats = await Chat.find({
       $or: [{ buyer: userId }, { seller: userId }],
     })
-
-      .populate("buyer", "name email profilePic")
-      .populate("seller", " name email profilePic ")
+      .populate("buyer", "name email profilePic")   // ✅ ensure buyer details
+      .populate("seller", "name email profilePic")  // ✅ ensure seller details
       .populate("property", "title price images")
+      .populate("lastMessage.sender", "name profilePic") // ✅ add sender details for preview
       .sort({ updatedAt: -1 });
 
     res.json(chats);
@@ -116,19 +151,33 @@ chatRouter.get("/user", async (req, res) => {
     });
   }
 });
-
-// to get chat message
+/* =========================
+   GET SINGLE CHAT (FIXED)
+========================= */
 chatRouter.get("/:chatId", async (req, res) => {
   try {
-    const chat = await Chat.findById(req.params.chatId).populate(
-      "messages.sender",
-      "name profilePic",
-    );
+    const chat = await Chat.findById(req.params.chatId)
+      .populate("buyer", "name email profilePic")
+      .populate("seller", "name email profilePic")
+      .populate("messages.sender", "name profilePic");
 
-    if (!chat) return res.status(404).json({ message: "chat not found" });
+    if (!chat) {
+      return res.status(404).json({ message: "chat not found" });
+    }
+
     const userId = req.user._id.toString();
 
-    if (chat.buyer.toString() !== userId && chat.seller.toString() !== userId) {
+    const buyerId =
+      typeof chat.buyer === "object"
+        ? chat.buyer._id.toString()
+        : chat.buyer.toString();
+
+    const sellerId =
+      typeof chat.seller === "object"
+        ? chat.seller._id.toString()
+        : chat.seller.toString();
+
+    if (buyerId !== userId && sellerId !== userId) {
       return res.status(403).json({
         message: "you are not authorized",
       });
@@ -137,74 +186,87 @@ chatRouter.get("/:chatId", async (req, res) => {
     res.json(chat);
   } catch (error) {
     res.status(500).json({
-      message: "error fetcing chat messages",
+      message: "error fetching chat messages",
       error: error.message,
     });
   }
 });
 
-//to delete an entire chat
-
+/* =========================
+   DELETE CHAT
+========================= */
 chatRouter.delete("/:chatId", async (req, res) => {
   try {
     const userId = req.user._id;
     const chat = await Chat.findById(req.params.chatId);
 
-    if (!chat)
-      return res.status(404).json({
-        message: "chat not found",
-      });
+    if (!chat) {
+      return res.status(404).json({ message: "chat not found" });
+    }
 
-    //now we ensure the user is part of the chat
-    if (
-      chat.buyer.toString() !== userId.toString() &&
-      chat.seller.tostring() !== userId.toString()
-    ) {
+    const buyerId =
+      typeof chat.buyer === "object"
+        ? chat.buyer._id.toString()
+        : chat.buyer.toString();
+
+    const sellerId =
+      typeof chat.seller === "object"
+        ? chat.seller._id.toString()
+        : chat.seller.toString();
+
+    if (buyerId !== userId.toString() && sellerId !== userId.toString()) {
       return res.status(403).json({ message: "not authorized" });
     }
 
     await Chat.findByIdAndDelete(req.params.chatId);
-    res.json({message: "chat deleted successfuly!"})
+
+    res.json({ message: "chat deleted successfully!" });
   } catch (error) {
     res.status(500).json({
-        message: "error fetching chat messages",
-        error: err.message
-    })
+      message: "error deleting chat",
+      error: error.message,
+    });
   }
 });
 
-// to delete a specific message
-chatRouter.delete("/:chatId/message/:messageId", async (req, res) =>{
-    try {
-        const userId = req.user._id;
-        const chat = await Chat.findById(req.params.chatId);
+/* =========================
+   DELETE MESSAGE
+========================= */
+chatRouter.delete("/:chatId/message/:messageId", async (req, res) => {
+  try {
+    const userId = req.user._id;
 
-        if(!chat) return res.status(404).json({message: "chat not found"});
-        const message = chat.messagee.is(req.params.messageId);
-        if(!message) return res.status(404).json({message: "message not found"});
+    const chat = await Chat.findById(req.params.chatId);
 
-        // only sender can delete their message
-        if(message.sender.toString() !== userId.toString()){
-            return res.status(403).json({
-                message: "not authorized to delete this message"
-            });
-        }
+    if (!chat) {
+      return res.status(404).json({ message: "chat not found" });
+    }
 
-        chat.message.pull(req.params.messageId);
-        await chat.save();
-        res.json({message: "message deleted successfuly!", chat})
-        
-    } catch (error) {
-      res.status(500).json({
-      message: "error fetching user chats",
+    const message = chat.messages.id(req.params.messageId);
+
+    if (!message) {
+      return res.status(404).json({ message: "message not found" });
+    }
+
+    if (message.sender.toString() !== userId.toString()) {
+      return res.status(403).json({
+        message: "not authorized to delete this message",
+      });
+    }
+
+    chat.messages.pull(req.params.messageId);
+    await chat.save();
+
+    res.json({
+      message: "message deleted successfully!",
+      chat,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "error deleting message",
       error: error.message,
     });
-        
-    }
+  }
 });
 
 export default chatRouter;
-
-
-
-

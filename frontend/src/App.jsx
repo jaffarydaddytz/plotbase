@@ -92,6 +92,8 @@ const App = () => {
         <Route path="/" element={<LandingPage />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
+        
+
 
       
 

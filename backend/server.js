@@ -27,7 +27,7 @@ connectDB();
 //middlewares
 const allowedOrigins = [
      "http://localhost:5173",
-     "https://plotbase-usyn.vercel.app",
+     //"https://plotbase-usyn.vercel.app",
      //" http://192.168.0.7:5173/"
      
 ].filter(Boolean);
@@ -75,12 +75,15 @@ const io = new Server(server, {
     },
 
 });
+
 io.on("connection", (socket)=>{
+    console.log("USER CONNECTED SOCKET:", socket.id);
+
     socket.on("joinChat", (chatId)=>{
         socket.join(chatId);
     });
     socket.on("sendMessage", (data)=>{
-        io.to(data.chatId).emit("receivemessage", data);
+        io.to(data.chatId).emit("receiveMessage", data);
 
     });
 
@@ -88,6 +91,9 @@ io.on("connection", (socket)=>{
 
     })
 })
+
+app.set("io", io);
+
 
 server.listen(PORT, "0.0.0.0", () => {
     console.log(`server Started on port ${PORT}`);
