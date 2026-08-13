@@ -257,19 +257,19 @@ export const wishlistStyles = {
 
 export const addPropertyStyles = {
   // Container
-  outerContainer: "fade-in px-4 py-8 md:py-12 w-full mx-auto dashboard-content",
-  innerContainer: "max-w-[900px] w-full mx-auto",
-  header: "mb-12 text-center",
-  heading: "text-[clamp(1.75rem,5vw,2.5rem)] mb-4 text-text-main font-extrabold",
+  outerContainer: "fade-in px-4 py-4 md:py-4 w-full mx-auto dashboard-content",
+  innerContainer: "max-w-[700px] w-full mx-auto",
+  header: "mb-1 text-center",
+  heading: "text-xl mb-1 text-text-main font-extrabold",
   subheading: "text-text-muted text-base",
-  form: "card-premium p-6 md:p-10",
+  form: "card-premium  md:p-10",
   error: "p-4 bg-red-50 text-red-600 rounded-xl mb-8",
 
   // Sections
-  section: "mb-12",
-  sectionHeader: "flex items-center gap-4",
-  sectionHeaderLargeMargin: "mb-8",
-  sectionHeaderSmallMargin: "mb-6",
+  section: "mb-1",
+  sectionHeader: "flex items-center gap-2",
+  sectionHeaderLargeMargin: "mb-2",
+  sectionHeaderSmallMargin: "mb-2",
   sectionBar: "w-1 h-6 bg-primary rounded-sm",
   sectionTitle: "text-xl font-extrabold text-text-main",
 
@@ -279,18 +279,18 @@ export const addPropertyStyles = {
   contentGroupSmall: "flex flex-col gap-5", // same as medium
 
   // Labels
-  label: "block mb-2.5 text-sm font-bold text-text-main",
+  label: "block mb-1 text-sm font-bold text-text-main",
   labelSmallMargin: "block mb-2 text-sm font-bold text-text-main",
 
   // Inputs
-  input: "w-full py-3.5 px-4 rounded-xl border border-[#e2e8f0] outline-none bg-white text-[0.9375rem] focus:border-primary transition-colors",
-  textarea: "h-[120px] resize-none leading-relaxed",
+  input: "w-full py-2 px-2 rounded-xl border border-[#e2e8f0] outline-none bg-white text-[0.9375rem] focus:border-primary transition-colors",
+  textarea: "h-[100px] resize-none leading-relaxed",
   select: "cursor-pointer",
 
   // Grid layouts
   twoColumnGrid: "grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-8 mb-12",
-  gridThreeCol: "grid grid-cols-1 sm:grid-cols-3 gap-4",
-  gridTwoCol: "grid grid-cols-1 sm:grid-cols-2 gap-4",
+  gridThreeCol: "grid grid-cols-1 sm:grid-cols-3 gap-2",
+  gridTwoCol: "grid grid-cols-1 sm:grid-cols-2 gap-2",
   amenitiesGrid: "grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4",
 
   // Amenities label styles
@@ -303,8 +303,8 @@ export const addPropertyStyles = {
   amenityTextInactive: "text-text-main",
 
   // Image upload
-  uploadArea: "border-2 border-dashed border-[#cbd5e1] p-12 rounded-xl text-center cursor-pointer relative bg-[#f8fafc] transition-colors hover:border-primary",
-  uploadIconWrapper: "flex justify-center mb-4",
+  uploadArea: "flex  items-center position: relative  justify-center border-2 border-dashed border-[#cbd5e1] p-2 rounded-xl text-center cursor-pointer  bg-[#f8fafc] transition-colors hover:border-primary",
+  uploadIconWrapper: "flex justify-center mb-2",
   uploadTitle: "mb-2 text-text-main font-bold",
   uploadSubtext: "text-sm text-text-muted",
 
@@ -316,36 +316,36 @@ export const addPropertyStyles = {
   addMoreText: "text-xs font-bold text-[#64748b] mt-1.5",
 
   // Footer buttons
-  footerButtons: "mt-12 flex justify-center flex-wrap gap-5 border-t border-[#f1f5f9] pt-10",
-  cancelButton: "btn btn-outline py-3.5 px-10 font-bold min-w-[140px]",
-  submitButton: "btn btn-primary py-3.5 px-12 font-bold min-w-[180px]",
+  footerButtons: "mt-2 flex justify-center flex-wrap gap-2 border-t border-[#f1f5f9] pt-2",
+  cancelButton: "btn btn-outline py-2 px-4 font-bold min-w-[180px]",
+  submitButton: "btn btn-primary py-2 px-4 font-bold min-w-[180px]",
 };
 
 export const editPropertyStyles = {
-  pageContainer: "fade-in px-4 py-8 md:py-12 w-full mx-auto dashboard-content",
-  innerContainer: "max-w-[900px] w-full mx-auto",
-  headerWrapper: "mb-12 text-center",
-  pageTitle: "text-[clamp(1.75rem,5vw,2.5rem)] mb-4 text-text-main font-extrabold",
+  pageContainer: "fade-in px-2 py-8 md:py-12 w-full mx-auto dashboard-content bg-green-50 ",
+  innerContainer: "max-w-[700px] w-full mx-auto mt-0",
+  headerWrapper: "mb-4 text-center",
+  pageTitle: "text-xl mb-2 text-text-main font-extrabold",
   pageSubtitle: "text-text-muted text-base",
-  formContainer: "card-premium p-6 md:p-10",
-  section: "mb-12",
+  formContainer: "card-premium  rounded-sm p-6 md:p-10 ",
+  section: "mb-1",
   sectionHeader: "flex items-center gap-4 mb-8",
   sectionIndicator: "w-1 h-6 bg-primary rounded-sm",
   sectionTitle: "text-xl font-extrabold text-text-main",
   sectionContent: "flex flex-col gap-6",
-  label: "block mb-2.5 text-sm font-bold text-text-main",
-  input: "w-full py-3.5 px-4 rounded-xl border border-[#e2e8f0] outline-none bg-white text-[0.9375rem] focus:border-primary transition-colors",
-  textarea: "w-full h-[120px] py-3.5 px-4 rounded-xl border border-[#e2e8f0] outline-none resize-none bg-white text-[0.9375rem] leading-relaxed focus:border-primary transition-colors",
-  select: "w-full p-3.5 rounded-xl border border-[#e2e8f0] outline-none bg-white cursor-pointer focus:border-primary transition-colors",
-  twoColumnGrid: "grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-8 mb-12",
+  label: "block mb-1 text-sm font-bold text-text-main",
+  input: "w-full py-1 px-2 rounded-sm border border-[#e2e8f0] outline-none bg-white text-[0.9375rem] focus:border-primary transition-colors",
+  textarea: "w-full h-[120px] py-1 px-4 rounded-sm border border-[#e2e8f0] outline-none resize-none bg-white text-[0.9375rem] leading-relaxed focus:border-primary transition-colors",
+  select: "w-full p-1 rounded-xl border border-[#e2e8f0] outline-none bg-white cursor-pointer focus:border-primary transition-colors",
+  twoColumnGrid: "grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-8 mb-2",
   threeColumnGrid: "grid grid-cols-1 sm:grid-cols-3 gap-4",
   twoColumnGridInner: "grid grid-cols-1 sm:grid-cols-2 gap-4",
   amenitiesGrid: "grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4",
   amenityLabel: (isSelected) => `flex items-center gap-3 cursor-pointer p-3 rounded-xl border transition-all duration-200 ${isSelected ? 'bg-primary-light border-primary' : 'bg-[#f8fafc] border-[#e2e8f0]'}`,
   amenityCheckbox: "accent-primary w-4 h-4",
   amenityText: (isSelected) => `text-sm font-semibold ${isSelected ? 'text-primary' : 'text-text-main'}`,
-  imageGrid: "grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-4",
-  imageCard: "relative aspect-square rounded-xl overflow-hidden border-2 border-[#f1f5f9]",
+  imageGrid: "grid grid-cols-[repeat(auto-fill,minmax(100px,1fr))] gap-2",
+  imageCard: "relative aspect-square rounded-sm overflow-hidden border-2 border-[#f1f5f9]",
   imageCardNew: "relative aspect-square rounded-xl overflow-hidden border-2 border-dashed border-primary",
   imageCardImg: "w-full h-full object-cover",
   removeImageBtn: "absolute top-1 right-1 bg-[#dc2626] text-white border-none rounded-full w-5 h-5 flex items-center justify-center cursor-pointer z-10",
@@ -354,9 +354,9 @@ export const editPropertyStyles = {
   uploadCard: "aspect-square border-2 border-dashed border-[#cbd5e1] rounded-xl flex flex-col items-center justify-center cursor-pointer relative bg-[#f8fafc] transition-colors hover:border-primary",
   uploadInput: "absolute inset-0 opacity-0 cursor-pointer",
   uploadText: "text-xs font-bold text-[#64748b] mt-1.5",
-  formActions: "mt-12 flex justify-center flex-wrap gap-5 border-t border-[#f1f5f9] pt-10",
-  cancelButton: "btn btn-outline py-3.5 px-10 font-bold min-w-[140px]",
-  submitButton: "btn btn-primary py-3.5 px-12 font-bold min-w-[180px]",
+  formActions: "mt-2 flex justify-center flex-wrap gap-5 border-t border-[#f1f5f9] pt-1",
+  cancelButton: "btn btn-outline   font-bold min-w-[140px]",
+  submitButton: "btn btn-primary  font-bold min-w-[140px]",
 };
 
 export const myPropertiesStyles = {
@@ -432,9 +432,9 @@ export const sellerDashboardStyles = {
   headerActions: "flex gap-3 flex-wrap w-full md:w-auto",
   exportButton: "btn btn-outline bg-white flex items-center gap-2 font-bold flex-1 justify-center whitespace-nowrap",
   addButton: "btn btn-primary flex items-center gap-2 font-bold py-3 px-5 flex-1 justify-center whitespace-nowrap",
-  statsGrid: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4 sm:gap-5 mb-12",
-  statCard: "bg-white p-6 rounded-[1.25rem] border border-[#f1f5f9] shadow-[0_4px_20px_rgba(0,0,0,0.02)]",
-  statIconWrapper: "w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center mb-5",
+  statsGrid: "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4 sm:gap-5 mb-2",
+  statCard: "bg-white p-6 rounded-sm border border-[#f1f5f9] shadow-[0_4px_20px_rgba(0,0,0,0.02)]",
+  statIconWrapper: "w-10 h-10 rounded-md bg-[#f1f5f9] flex items-center justify-center ",
   statTitle: "text-[#64748b] text-[0.8125rem] font-semibold mb-1",
   statValue: "text-[1.5rem] font-extrabold text-text-main",
   listingsSection: "mb-12",
@@ -780,7 +780,7 @@ export const landingPageStyles = {
 
 export const propertiesStyles = {
   // Page container
-  pageContainer: "bg-[#f8fafc] min-h-screen pb-16 pt-32 max-lg:pt-28",
+  pageContainer: "bg-[#f8fafc] min-h-screen pb-16 pt-20 max-lg:pt-28",
   container: "container",
 
   // Mobile filter button
@@ -823,7 +823,7 @@ export const propertiesStyles = {
 
   // Main content
   mainContent: "", // no extra classes
-  contentHeader: "content-header bg-white py-5 px-8 rounded-[1.25rem] mb-8 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex justify-between items-center border border-[#f1f5f9] max-[1024px]:p-4 max-[1024px]:flex-col max-[1024px]:gap-4 max-[1024px]:items-start",
+  contentHeader: "content-header bg-white py-2 px-8 rounded-[1.25rem] mb-4 shadow-[0_4px_20px_rgba(0,0,0,0.03)] flex justify-between items-center border border-[#f1f5f9] max-[1024px]:p-4 max-[1024px]:flex-col max-[1024px]:gap-4 max-[1024px]:items-start",
   resultCount: "text-[#64748b] text-[0.9375rem]",
   resultCountStrong: "text-text-main",
   headerControls: "view-controls flex items-center gap-6 max-[1024px]:w-full max-[1024px]:justify-between",
@@ -863,7 +863,7 @@ export const propertiesStyles = {
 };
 
 export const propertyDetailsStyles = {
-  pageContainer: "bg-[#fdfdfd] min-h-screen pb-24 pt-20 max-lg:pt-4",
+pageContainer: "bg-[#fdfdfd] min-h-screen pb-24 pt-20 max-lg:pt-4 px-4 md:px-20",
   mainContainer: "container fade-in pt-4",
   breadcrumbs: "flex items-center flex-wrap gap-2 text-sm text-[#64748b] mb-2",
   breadcrumbLink: "text-inherit no-underline",
@@ -879,7 +879,7 @@ export const propertyDetailsStyles = {
     "[&:has(>div:nth-child(4):last-child)>div:nth-child(2)]:!col-span-2",
   galleryMainItem: (hasMultiple) => `gallery-item main-image relative overflow-hidden bg-[#f1f5f9] cursor-pointer ${hasMultiple ? "col-span-2 row-span-2" : "col-span-1 row-span-1"}`,
   gallerySideItem: "gallery-item relative overflow-hidden bg-[#f1f5f9] cursor-pointer",
-  galleryImage: "w-full h-full object-cover transition-transform duration-400 ease",
+  galleryImage: "h-96 w-192 object-fill transition-transform duration-400 ease rounded",
   galleryMoreOverlay: "absolute inset-0 bg-black/50 text-white flex items-center justify-center text-2xl font-bold pointer-events-none",
   mobileSliderContainer: "mobile-gallery-wrapper block md:hidden -mx-4 mb-6",
   mobileSliderTrack: "mobile-slider flex overflow-x-auto snap-x snap-mandatory scroll-smooth p-0 whitespace-nowrap [&::-webkit-scrollbar]:hidden",
@@ -900,7 +900,7 @@ export const propertyDetailsStyles = {
   titleWrapper: "min-w-0 flex-1",
   badgeWrapper: "flex gap-2 flex-wrap",
   premiumBadge: "py-1.5 px-4 rounded-lg border border-primary text-primary text-xs font-bold uppercase inline-block mb-3",
-  propertyTitle: "property-title text-[2.5rem] font-extrabold text-text-main mb-2 tracking-tight max-[768px]:text-[2rem] max-[480px]:text-[1.75rem] break-words whitespace-normal leading-tight",
+  propertyTitle: "property-title text-[1.5rem]  text-text-main  tracking-tight max-[768px]:text-[2rem] max-[480px]:text-[1.75rem] break-words whitespace-normal leading-tight",
   propertyLocation: "flex items-center gap-2 text-[#64748b] text-base break-words whitespace-normal max-w-full",
   locationIcon: "text-primary text-lg shrink-0",
   locationText: "break-words whitespace-normal",
@@ -911,8 +911,8 @@ export const propertyDetailsStyles = {
   statIcon: "text-primary mb-1.5 mx-auto",
   statValue: "font-extrabold text-[0.9rem] text-text-main capitalize break-words whitespace-normal leading-snug",
   statLabel: "text-[0.6rem] text-[#94a3b8] uppercase font-bold tracking-widest",
-  descriptionSection: "mb-10 min-w-0",
-  sectionTitle: "text-xl font-bold mb-4",
+  descriptionSection: "mb-5 min-w-0",
+  sectionTitle: " font-bold mb-1",
   descriptionText: "text-[#475569] text-base leading-relaxed break-words whitespace-pre-wrap",
   amenitiesSection: "mb-10 min-w-0",
   amenitiesGrid: "amenities-grid grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4",
@@ -929,17 +929,17 @@ export const propertyDetailsStyles = {
   rentDetailLabel: "opacity-80 min-w-0 break-words",
   rentDetailValue: "font-bold text-right break-words whitespace-normal",
   priceCardAvailability: "text-[0.8125rem] opacity-90 break-words whitespace-normal",
-  sellerCard: "bg-white p-6 rounded-[1.5rem] border border-[#f1f5f9] shadow-[0_4px_20px_rgba(0,0,0,0.03)] min-w-0",
-  sellerInfo: "flex items-center gap-4 mb-6 min-w-0",
-  sellerAvatar: "w-[50px] h-[50px] rounded-full overflow-hidden bg-[#f1f5f9] shrink-0",
+  sellerCard: "flex  items-center justify-between bg-white p-4  mt-2 rounded-[0.5rem]  outline outline-gray-300  shadow-[0_4px_20px_rgba(0,0,0,0.03)] w-165",
+  sellerInfo: "flex items-center gap-2 mb-4 min-w-0",
+  sellerAvatar: "w-[30px] h-[30px] rounded-full overflow-hidden bg-[#f1f5f9] shrink-0",
   sellerAvatarImage: "w-full h-full object-cover",
   sellerDetails: "min-w-0",
   sellerNameLink: "no-underline",
-  sellerName: "text-base font-extrabold m-0 text-text-main transition-colors duration-200 hover:text-primary break-words whitespace-normal leading-snug",
-  sellerVerifiedBadge: "flex items-center gap-1 text-[0.75rem] text-primary font-bold mt-2",
+  sellerName: "text-base  m-0 text-text-main transition-colors duration-200 hover:text-primary break-words whitespace-normal leading-snug",
+  sellerVerifiedBadge: "flex items-center gap-1 text-[0.75rem] text-primary font-bold ",
   verifiedIcon: "shrink-0",
-  chatButtonWrapper: "flex gap-3 mb-6",
-  chatButton: "btn btn-outline flex-1 p-2.5 text-[0.875rem] flex items-center justify-center gap-2",
+  chatButtonWrapper: "flex gap-2 mb-4",
+  chatButton: "btn btn-outline  p-2 text-[0.875rem] flex items-center justify-center gap-2 w-40",
   inquiryFormTitle: "text-[0.9375rem] font-bold mb-4",
   inquiryTextarea: "w-full h-[100px] p-3 rounded-xl border border-[#e2e8f0] mb-4 outline-none resize-none text-[0.875rem] break-words whitespace-pre-wrap",
   inquirySubmitButton: "btn btn-primary w-full p-3.5 rounded-xl font-bold",
@@ -1231,7 +1231,7 @@ export const navbarStyles = {
 
 export const propertyCardStyles = {
   // Card container
-  card: "fade-in group flex flex-col bg-white rounded-[1.25rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border border-[#e2e8f0] relative w-full hover:-translate-y-2 hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] max-sm:max-w-[420px] max-sm:mx-auto",
+  card: "fade-in group flex flex-col bg-white rounded-[0.5rem] overflow-hidden shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] border border-[#e2e8f0] relative w-full hover:-translate-y-2 hover:shadow-[0_12px_30px_rgba(0,0,0,0.1)] max-sm:max-w-[420px] max-sm:mx-auto",
   link: "no-underline text-inherit flex flex-col w-full",
 
   // Image section
@@ -1252,17 +1252,17 @@ export const propertyCardStyles = {
   content: "p-5 flex flex-col flex-1",
   propertyType: "text-[0.75rem] font-bold text-primary uppercase tracking-[0.05em]",
   views: "flex items-center gap-[0.3rem] color-[#64748b] text-[0.8125rem] font-semibold",
-  title: "text-[1.125rem] font-bold mt-1 mb-2 text-text-main whitespace-nowrap overflow-hidden text-ellipsis min-h-[1.5rem]",
+  title: "text-[1.125rem] font-bold mt-1 mb-1 text-text-main whitespace-nowrap overflow-hidden text-ellipsis min-h-[1.5rem]",
   location: "flex items-center gap-[0.4rem] text-text-muted text-[0.875rem] mb-4",
   locationIcon: "text-[#94a3b8] shrink-0",
-  specsGrid: "grid grid-cols-[1fr_1fr_1fr] py-4 border-t border-[#f1f5f9] gap-2 mt-auto",
+  specsGrid: "grid grid-cols-[1fr_1fr_1fr]  border-t border-[#f1f5f9] gap-1 mt-auto",
   specItem: "flex items-center justify-center gap-2 text-left",
   specIcon: "text-[#64748b] mb-1 flex justify-center",
   specValue: "font-bold text-[0.9375rem] text-text-main",
   specLabel: "text-[0.625rem] text-[#94a3b8] uppercase font-bold",
   specDivider: "border-l border-r border-[#f1f5f9]",
   viewDetailsButton: "mt-5",
-  viewDetailsBtn: "btn btn-primary w-full p-3 rounded-xl font-bold text-[0.9375rem]",
+  viewDetailsBtn: "btn btn-primary w-full p-1 rounded-xl font-bold text-[0.9375rem]",
 
   
   // Custom actions container

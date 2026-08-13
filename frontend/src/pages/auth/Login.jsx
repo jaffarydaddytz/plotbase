@@ -1,138 +1,324 @@
-import  { useState } from 'react'
-import { loginStyles as s } from '../../assets/dummyStyles'
-import { useAuth } from '../../context/AuthContext'
-import Navbar from '../../components/common/Navbar'
-import { Link, useNavigate } from 'react-router-dom'
-import { HiEye, HiEyeOff } from 'react-icons/hi'
+import { useState } from "react";
+import { loginStyles as s } from "../../assets/dummyStyles";
+import { useAuth } from "../../context/AuthContext";
+import Navbar from "../../components/common/Navbar";
+import { Link, useNavigate } from "react-router-dom";
+import { HiEye, HiEyeOff } from "react-icons/hi";
+
 
 const Login = () => {
+
     const [formData, setFormData] = useState({
-        email:"",
-        password:"",
-    })
+        email: "",
+        password: "",
+    });
 
-const [error, setError] = useState("");
-const [isLoading, setIsLoading] = useState(false)
-const [showPassword, setShowPassword] = useState(false);
 
-const {login} = useAuth();
-const navigate = useNavigate();
+    const [error, setError] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
-//to handle input value
-const handleChange = (e) => {
-    setFormData({...formData, [e.target.name] : e.target.value});
-    setError("")
 
-}
+    const { login } = useAuth();
+    const navigate = useNavigate();
 
-//to submit data
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
 
-    const result = await login(formData.email, formData.password);
+    // handle input change
+    const handleChange = (e) => {
 
-    if(result.success){
-        const storeUser = JSON.parse(
-           localStorage.getItem("user") || sessionStorage.getItem("user"), 
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+
+        setError("");
+
+    };
+
+
+
+
+    // submit login
+    const handleSubmit = async (e) => {
+
+        e.preventDefault();
+
+        setIsLoading(true);
+        setError("");
+
+
+        const result = await login(
+            formData.email,
+            formData.password
         );
-        if(storeUser?.role === "admin"){
-            navigate("/admin-dashboard")
-        } else if(storeUser?.role === "seller"){
-            navigate("/dashboard");
+
+
+        console.log("API Results:", result);
+
+
+
+        if (result.success) {
+
+
+            const storeUser = JSON.parse(
+                localStorage.getItem("user") ||
+                sessionStorage.getItem("user")
+            );
+
+
+
+            if (storeUser?.role === "admin") {
+
+                navigate("/admin-dashboard");
+
+            } else if (storeUser?.role === "seller") {
+
+                navigate("/dashboard");
+
+            } else {
+
+                navigate("/");
+
+            }
+
+
+
         } else {
-            navigate("/")
+
+
+
+            if (result.code === "EMAIL_VERIFY") {
+
+
+                sessionStorage.setItem(
+                    "verifyEmail",
+                    formData.email
+                );
+
+
+                navigate("/verify-email");
+
+
+
+            } else {
+
+
+                setError(result.message);
+
+
+            }
+
         }
-    } else {
-        setError(result.message)
-    }
-    setIsLoading(false);
-
-}
 
 
-  return (
-    <div className={s.pageContainer}>
-        <Navbar />
+        setIsLoading(false);
 
-        <div className={s.containerCenter}>
-            <div className={s.card}>
-                <h2 className={s.title}>Welcome Back</h2>
-                <p className={s.subtitle}>Please enter your details to sign in </p>
-                {error && <div className={s.errorAlert}>{error}</div>}
+    };
 
-                <form onSubmit={handleSubmit} className={s.form}>
-                    <div>
-                        <label className={s.label}>Email Address</label>
-                        <input type="email"  name="email" placeholder='name@company.com' value={formData.email} onChange={handleChange} required className={s.input}/>
-                    </div>
 
-                    <div>
-                        <div className={s.passwordHeader}>
-                            <label className={s.label}>Password</label>
-                            <Link to='/forgot-password' className={s.forgotLink}>
-                            Forgot Password
-                            </Link>
 
+
+
+    return (
+
+        <div className={s.pageContainer}>
+
+            <Navbar />
+
+
+            <div className={s.containerCenter}>
+
+                <div className={s.card}>
+
+
+                    <h2 className={s.title}>
+                        Welcome Back
+                    </h2>
+
+
+                    <p className={s.subtitle}>
+                        Please enter your details to sign in
+                    </p>
+
+
+
+                    {error && (
+                        <div className={s.errorAlert}>
+                            {error}
                         </div>
+                    )}
 
-                        <div style={{position: "relative"}}> 
-                            <input type={showPassword ? "text" : "password"}  name="password" placeholder="********"  value={formData.password} onChange={handleChange} required  className={s.input}
-                            style={{paddingRight: "40px"}}
+
+
+
+                    <form 
+                        onSubmit={handleSubmit}
+                        className={s.form}
+                    >
+
+
+                        <div>
+
+                            <label className={s.label}>
+                                Email Address
+                            </label>
+
+
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="name@company.com"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                                className={s.input}
                             />
 
-                            <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: "absolute",
-                    right: "12px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    color: "#6b7280",
-                    display: "flex",
-                    alignItems: "center",
-                    padding: 0
-                  }}
-                >
-                  {showPassword ? <HiEyeOff size={20} /> : <HiEye size={20} />}
-                </button>
 
+                        </div>
+
+
+
+
+
+                        <div>
+
+
+                            <div className={s.passwordHeader}>
+
+                                <label className={s.label}>
+                                    Password
+                                </label>
+
+
+                                <Link
+                                    to="/forgot-password"
+                                    className={s.forgotLink}
+                                >
+                                    Forgot Password
+                                </Link>
+
+
+                            </div>
+
+
+
+
+
+                            <div style={{position:"relative"}}>
+
+
+                                <input
+                                    type={
+                                        showPassword
+                                        ? "text"
+                                        : "password"
+                                    }
+                                    name="password"
+                                    placeholder="********"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    className={s.input}
+                                    style={{
+                                        paddingRight:"40px"
+                                    }}
+                                />
+
+
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        setShowPassword(!showPassword)
+                                    }
+                                    style={{
+                                        position:"absolute",
+                                        right:"12px",
+                                        top:"50%",
+                                        transform:"translateY(-50%)",
+                                        background:"none",
+                                        border:"none",
+                                        cursor:"pointer",
+                                        color:"#6b7280",
+                                        display:"flex",
+                                        alignItems:"center",
+                                        padding:0
+                                    }}
+                                >
+
+                                    {
+                                        showPassword
+                                        ? <HiEyeOff size={20}/>
+                                        : <HiEye size={20}/>
+                                    }
+
+
+                                </button>
+
+
+                            </div>
 
 
                         </div>
-                    </div>
-
-                    <button className={s.submitButton} type="submit" disabled={isLoading}>
-                        {isLoading ? " Signing In..." : "Sign In"}
-
-                    </button>
 
 
 
 
 
-                </form>
+                        <button
+                            className={s.submitButton}
+                            type="submit"
+                            disabled={isLoading}
+                        >
 
-                <p className={s.footerText}>
-                    Dont have an Account? {" "}
-                    <Link to='/register' className={s.registerLink}>
-                    Create an Account
-                    </Link>
+                            {
+                                isLoading
+                                ? "Signing In..."
+                                : "Sign In"
+                            }
 
-                </p>
+
+                        </button>
+
+
+
+                    </form>
+
+
+
+
+
+
+                    <p className={s.footerText}>
+
+                        Don't have an Account?{" "}
+
+
+                        <Link
+                            to="/register"
+                            className={s.registerLink}
+                        >
+                            Create an Account
+                        </Link>
+
+
+                    </p>
+
+
+
+                </div>
+
 
             </div>
 
+
         </div>
 
-    </div>
-  )
-}
+    );
 
-export default Login
+};
+
+
+export default Login;

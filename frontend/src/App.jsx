@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
-import LandingPage from "./pages/shared/LandingPage";
+//import LandingPage from "./pages/shared/LandingPage";
 import Properties from "./pages/shared/Properties";
 import PropertyDetails from "./pages/shared/PropertyDetails";
 import Register from "./pages/auth/Register";
@@ -19,6 +19,7 @@ import SellerDashboard from "./pages/seller/SellerDashboard";
 import AddProperty from "./pages/seller/AddProperty";
 import EditProperty from "./pages/seller/EditProperty";
 import { FaChevronUp } from "react-icons/fa";
+import PropertyDetailPage from "./pages/shared/propertyDetailPage";
 import {
   ProtectedRoute,
   PublicRoute,
@@ -89,7 +90,8 @@ const App = () => {
         </Route>
 
         {/* PUBLIC PAGES */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<Properties />} />
+        <Route path="/propertydetailpage" element={<PropertyDetailPage />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
         

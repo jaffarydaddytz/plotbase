@@ -33,16 +33,7 @@ const EditProperty = () => {
     maintenance: "",
   });
 
-  const commonAmenities = [
-    "Parking",
-    "Pool",
-    "Gym",
-    "Security",
-    "Wifi",
-    "Power Backup",
-    "Club House",
-    "Garden",
-  ];
+ 
 
   // to fetch property
   useEffect(() => {
@@ -84,27 +75,52 @@ const EditProperty = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAmenityChange = (amenity) => {
-    setFormData((prev) => {
-      const current = prev.amenities || [];
-      if (current.includes(amenity)) {
-        return { ...prev, amenities: current.filter((a) => a !== amenity) };
-      } else {
-        return { ...prev, amenities: [...current, amenity] };
-      }
-    });
-  };
+
+  // const handleNewImageChange = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   if (existingImages.length + newImages.length + files.length > 10) {
+  //     setError("Total images cannot exceed 10");
+  //     return;
+  //   }
+  //   setNewImages((prev) => [...prev, ...files]);
+  //   const previews = files.map((file) => URL.createObjectURL(file));
+  //   setNewImagePreviews((prev) => [...prev, ...previews]);
+  // };
+
 
   const handleNewImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (existingImages.length + newImages.length + files.length > 10) {
-      setError("Total images cannot exceed 10");
-      return;
-    }
-    setNewImages((prev) => [...prev, ...files]);
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setNewImagePreviews((prev) => [...prev, ...previews]);
-  };
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  if (existingImages.length > 0) {
+    setError("Please remove the existing image before uploading a new one.");
+    e.target.value = "";
+    return;
+  }
+
+  setNewImages([file]);
+
+  const preview = URL.createObjectURL(file);
+  setNewImagePreviews([preview]);
+
+  setError(null);
+};
+
+
+
+
+  
+//   const handleNewImageChange = (e) => {
+//   const file = e.target.files[0];
+
+//   if (!file) return;
+
+//   setNewImages([file]);
+
+//   const preview = URL.createObjectURL(file);
+//   setNewImagePreviews([preview]);
+// };
 
   const removeExistingImage = (url) => {
     setExistingImages((prev) => prev.filter((img) => img !== url));
@@ -152,13 +168,10 @@ const EditProperty = () => {
 
   return (
     <div className={s.pageContainer}>
+      
       <div className={s.innerContainer}>
-        <div className={s.headerWrapper}>
-          <h1 className={s.pageTitle}> Edit Property </h1>
-          <p className={s.pageSubtitle}>
-            Update your property details and manage images
-          </p>
-        </div>
+        <h4 className="justify-center flex mb-1">Edit Property</h4>
+
 
         <form onSubmit={handleSubmit} className={s.formContainer}>
           {error && (
@@ -176,11 +189,7 @@ const EditProperty = () => {
           )}
 
           <div className={s.section}>
-            <div className={s.sectionHeader}>
-              <div className={s.sectionIndicator}></div>
-
-              <h3 className={s.sectionTitle}>Content & Description</h3>
-            </div>
+     
 
             <div className={s.sectionContent}>
               <div>
@@ -190,7 +199,7 @@ const EditProperty = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="e.g. Lxury apartment"
+                  placeholder="e.g. Mkuranga Plots"
                   className={s.input}
                   required
                 />
@@ -215,10 +224,7 @@ const EditProperty = () => {
           <div className={s.twoColumnGrid}>
             {/* Section 2: Property Details */}
             <div>
-              <div className={s.sectionHeader}>
-                <div className={s.sectionIndicator}></div>
-                <h3 className={s.sectionTitle}>Property Details</h3>
-              </div>
+          
               <div className={s.sectionContent}>
                 <div>
                   <label className={s.label}>Property Type</label>
@@ -228,87 +234,36 @@ const EditProperty = () => {
                     onChange={handleInputChange}
                     className={s.select}
                   >
-                    <option value="flat">Flat/Apartment</option>
-                    <option value="villa">Independent House/Villa</option>
-                    <option value="penthouse">Penthouse</option>
-                    <option value="commercial">Commercial</option>
+                    <option value="residential">Residential Plot</option>
+                    <option value="farm">Farm Plot</option>
+               
                   </select>
                 </div>
-                <div className={s.threeColumnGrid}>
+     
+         
+              
                   <div>
-                    <label className={s.label}>BHK</label>
-                    <input
-                      type="number"
-                      name="bhk"
-                      value={formData.bhk}
-                      onChange={handleInputChange}
-                      placeholder="e.g. 3"
-                      className={s.input}
-                    />
+                   <label className={s.label}>Area (SQM)</label>
+                  <input
+                    type="text"
+                    name="area"
+                    value={formData.area}
+                    onChange={handleInputChange}
+                    placeholder="e.g. Worli"
+                    className={s.input}
+                    required
+                  />
                   </div>
-                  <div>
-                    <label className={s.label}>Bathrooms</label>
-                    <input
-                      type="number"
-                      name="bathrooms"
-                      value={formData.bathrooms || ""}
-                      onChange={handleInputChange}
-                      placeholder="e.g. 2"
-                      className={s.input}
-                    />
-                  </div>
-                  <div>
-                    <label className={s.label}>Area (Sq.Ft)</label>
-                    <input
-                      type="number"
-                      name="areaSize"
-                      value={formData.areaSize}
-                      onChange={handleInputChange}
-                      placeholder="e.g. 1500"
-                      className={s.input}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className={s.twoColumnGridInner}>
-                  <div>
-                    <label className={s.label}>Furnishing</label>
-                    <select
-                      name="furnishing"
-                      value={formData.furnishing}
-                      onChange={handleInputChange}
-                      className={s.select}
-                    >
-                      <option value="unfurnished">Unfurnished</option>
-                      <option value="semi-furnished">Semi-Furnished</option>
-                      <option value="furnished">Fully Furnished</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={s.label}>Listing Status</label>
-                    <select
-                      name="status"
-                      value={formData.status}
-                      onChange={handleInputChange}
-                      className={s.select}
-                    >
-                      <option value="sale">For Sale</option>
-                      <option value="sold">Sold</option>
-                    </select>
-                  </div>
-                </div>
+        
               </div>
             </div>
 
               {/* Section 3: Pricing & Location */}
             <div>
-              <div className={s.sectionHeader}>
-                <div className={s.sectionIndicator}></div>
-                <h3 className={s.sectionTitle}>Pricing & Location</h3>
-              </div>
+        
               <div className={s.sectionContent}>
                 <div>
-                  <label className={s.label}>Price (₹)</label>
+                  <label className={s.label}>Price (TZS)</label>
                   <input
                     type="number"
                     name="price"
@@ -320,7 +275,7 @@ const EditProperty = () => {
                   />
                 </div>
 
-                <div className={s.twoColumnGridInner}>
+               
                   <div>
                     <label className={s.label}>City</label>
                     <input
@@ -333,72 +288,21 @@ const EditProperty = () => {
                       required
                     />
                   </div>
-                  <div>
-                    <label className={s.label}>Pincode</label>
-                    <input
-                      type="text"
-                      name="pincode"
-                      value={formData.pincode}
-                      onChange={handleInputChange}
-                      placeholder="e.g. 400001"
-                      className={s.input}
-                      required
-                    />
-                  </div>
-                </div>
+           
                 <div>
-                  <label className={s.label}>Specific Area</label>
-                  <input
-                    type="text"
-                    name="area"
-                    value={formData.area}
-                    onChange={handleInputChange}
-                    placeholder="e.g. Worli"
-                    className={s.input}
-                    required
-                  />
+         
                 </div>
               </div>
             </div>
           
           </div>
 
-          <div className={s.section}>
-            <div className={s.sectionHeader}>
-              <div className={s.sectionIndicator}></div>
-
-              <h3 className={s.sectionTitle}>Amenities</h3>
-            </div>
-
-            <div className={s.amenitiesGrid}>
-              {commonAmenities.map((amenity) => (
-                <label
-                  key={amenity}
-                  className={s.amenityLabel(
-                    formData.amenities.includes(amenity),
-                  )}
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.amenities.includes(amenity)}
-                    onChange={() => handleAmenityChange(amenity)}
-                    className={s.amenityCheckbox}
-                  />
-                  <span className={s.amenityText(formData.amenities.includes(amenity))}>
-                    {amenity}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
+      
 
 
             {/* Section 5: Image Management */}
           <div className={s.section}>
-            <div className={s.sectionHeader}>
-              <div className={s.sectionIndicator}></div>
-              <h3 className={s.sectionTitle}>Image Management</h3>
-            </div>
+   
 
             <div className={s.imageGrid}>
               {/* Existing Images */}
@@ -436,7 +340,7 @@ const EditProperty = () => {
                 <div className={s.uploadCard}>
                   <input
                     type="file"
-                    multiple
+                    
                     onChange={handleNewImageChange}
                     className={s.uploadInput}
                     accept="image/*"

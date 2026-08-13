@@ -20,7 +20,7 @@ const AddProperty = () => {
     city: "",
     area: "",
     pincode: "",
-    propertyType: "flat",
+    propertyType: "farm",
     bhk: "",
     bathrooms: "",
     areaSize: "",
@@ -31,44 +31,40 @@ const AddProperty = () => {
     maintenance: "",
   });
 
-  const commonAmenities = [
-    "Parking",
-    "Pool",
-    "Gym",
-    "Security",
-    "Wifi",
-    "Power Backup",
-    "Club House",
-    "Garden",
-  ];
+
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleAmenityChange = (amenity) => {
-    setFormData((prev) => {
-      const current = prev.amenities || [];
-      if (current.includes(amenity)) {
-        return { ...prev, amenities: current.filter((a) => a !== amenity) };
-      } else {
-        return { ...prev, amenities: [...current, amenity] };
-      }
-    });
-  };
+ 
 
   // image handling
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    if (images.length + files.length > 10) {
-      setError("You can onyl upload up to 10 images");
-      return;
-    }
+  // const handleImageChange = (e) => {
+  //   const files = Array.from(e.target.files);
+  //   if (images.length + files.length > 10) {
+  //     setError("You can onyl upload up to 1 images");
+  //     return;
+  //   }
 
-    setImages((prev) => [...prev, ...files]);
-    const previews = files.map((file) => URL.createObjectURL(file));
-    setImagePreviews((prev) => [...prev, ...previews]);
-  };
+  //   setImages((prev) => [...prev, ...files]);
+  //   const previews = files.map((file) => URL.createObjectURL(file));
+  //   setImagePreviews((prev) => [...prev, ...previews]);
+  // };
+
+
+
+
+  const handleImageChange = (e) => {
+  const file = e.target.files[0];
+
+  if (!file) return;
+
+  setImages([file]);
+
+  const preview = URL.createObjectURL(file);
+  setImagePreviews([preview]);
+};
 
   // to remove image
   const removeImage = (index) => {
@@ -79,6 +75,10 @@ const AddProperty = () => {
   // to submit and create a new llisting
 
   const handleSubmit = async (e) => {
+    if (formData.description.trim().length < 300) {
+      alert("Description must be at least 300 characters.");
+      return; // stop submission
+    }
     e.preventDefault();
     setLoading(true);
     setError(null);
@@ -94,7 +94,7 @@ const AddProperty = () => {
 
     images.forEach((img) => data.append("images", img));
 
-    console.log("submitted data", formData)
+    console.log("submitted data", formData);
 
     try {
       await axios.post(`${API_URL}/api/property`, data, {
@@ -137,7 +137,7 @@ const AddProperty = () => {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  placeholder="e.g Luxury apartmenment"
+                  placeholder="e.g Mkuranga Residential Plots"
                   className={s.input}
                   required
                 />
@@ -149,7 +149,7 @@ const AddProperty = () => {
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  placeholder="Describe the property highlight"
+                  placeholder="Describe the property highlights"
                   className={`${s.input} ${s.textarea}`}
                   required
                 ></textarea>
@@ -157,109 +157,45 @@ const AddProperty = () => {
             </div>
           </div>
 
-          <div className={s.twoColumnGrid}>
+          <div className={s.gridTwoCol}>
             <div>
-              <div
-                className={`${s.sectionHeader} ${s.sectionHeaderSmallMargin}`}
-              >
-                <div className={s.sectionBar}></div>
-                <h3 className={s.sectionTitle}>Property Detail</h3>
-              </div>
+
 
               <div className={s.contentGroupMedium}>
                 <div>
-                  <label className={s.labelSmallMargin}>Property type</label>
+                  <label className={s.labelSmallMargin}>Property Type</label>
                   <select
                     name="propertyType"
                     value={formData.propertyType}
                     onChange={handleInputChange}
                     className={`${s.input} ${s.select}`}
                   >
-                    <option value="flat">Flat/Apartment</option>
-                    <option value="villa">Independent House/Villa</option>
-                    <option value="penthouse">Penthouse</option>
-                    <option value="commercial">Commercial</option>
+                    <option value="residential">Residential Plot</option>
+                    <option value="farm">Farm Plot</option>
                   </select>
                 </div>
 
-                <div className={s.gridThreeCol}>
+                <div className={s.twoColumnGrid}>
                   <div>
-                    <label className={s.labelSmallMargin}>BHK</label>
-                    <input
-                      type="number"
-                      name="bhk"
-                      value={formData.bhk}
-                      onChange={handleInputChange}
-                      placeholder="e.g 3"
-                      className={s.input}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={s.labelSmallMargin}>Bathrooms</label>
-                    <input
-                      type="number"
-                      name="bathrooms"
-                      value={formData.bathrooms || ""}
-                      onChange={handleInputChange}
-                      placeholder="e.g 2"
-                      className={s.input}
-                    />
-                  </div>
-
-                  <div>
-                    <label className={s.labelSmallMargin}>Area (sq.Ft)</label>
+                    <label className={s.labelSmallMargin}>Area (SQM)</label>
                     <input
                       type="number"
                       name="area"
                       value={formData.area}
                       onChange={handleInputChange}
-                      placeholder="e.g 1"
+                      placeholder="e.g 400 SQM"
                       className={s.input}
                       required
                     />
                   </div>
 
-                  {/* <div className={s.gridThreeCol}>
-  <div className={s.inputGroup}>
-    <label className={s.labelSmallMargin}>Furnishing</label>
-    <select
-      name="furnishing"
-      value={formData.furnishing}
-      onChange={handleInputChange}
-      className={`${s.input} ${s.select}`}
-    >
-      <option value="unfurnished">Unfurnished</option>
-      <option value="semi-furnished">Semi-Furnished</option>
-      <option value="furnished">Fully Furnished</option>
-    </select>
-  </div>
 
-  <div className={s.inputGroup}>
-    <label className={s.labelSmallMargin}>Listing Status</label>
-    <select
-      name="status"
-      value={formData.status}
-      onChange={handleInputChange}
-      className={`${s.input} ${s.select}`}
-    >
-      <option value="sale">For Sale</option>
-      <option value="sold">Sold</option>
-    </select>
-  </div>
-</div>
-               */}
                 </div>
               </div>
             </div>
 
-            <div>
-              <div
-                className={`${s.sectionHeader} ${s.sectionHeaderSmallMargin}`}
-              >
-                <div className={s.sectionBar}></div>
-                <h3 className={s.sectionTitle}>Pricing & Location</h3>
-              </div>
+     
+   
 
               <div className={s.contentGroupSmall}>
                 <div>
@@ -275,9 +211,9 @@ const AddProperty = () => {
                   />
                 </div>
 
-                <div className={s.gridTwoCol}>
+            
                   <div>
-                    <label className={s.labelSmallMargin}>City</label>
+                    <label className={s.labelSmallMargin}>Location</label>
                     <input
                       type="text"
                       name="city"
@@ -288,65 +224,37 @@ const AddProperty = () => {
                       required
                     />
                   </div>
-                </div>
+               
               </div>
-            </div>
+
+
+
+              
+      
+
+            
           </div>
 
+          
           <div className={s.section}>
-            <div className={`${s.sectionHeader} ${s.sectionHeaderSmallMargin}`}>
-              <div className={s.sectionBar}></div>
-              <h3 className={s.sectionTitle}>Amenities</h3>
-            </div>
-
-            <div className={s.amenitiesGrid}>
-              {commonAmenities.map((amenity) => (
-                <label
-                  key={amenity}
-                  className={`${s.amenityLabelBase} ${
-                    formData.amenities.includes(amenity)
-                      ? s.amenityLabelActive
-                      : s.amenityLabelInactive
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.amenities.includes(amenity)}
-                    onChange={() => handleAmenityChange(amenity)}
-                    className={s.amenityCheckbox}
-                  />
-                  <span className={s.amenityTextBase}>{amenity}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className={s.section}>
-            <div
-              className={`${s.sectionHeader} ${s.sectionHeaderSmallMargin} `}
-            >
-              <div className={s.sectionBar}></div>
-
-              <h3 className={s.sectionTitle}>Property Images</h3>
-            </div>
+      
 
             <div className={s.uploadArea}>
               <input
                 type="file"
+              
                 onChange={handleImageChange}
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 accept="image/*"
               />
 
               <div className={s.uploadIconWrapper}>
-                <HiUpload size={40} color="#64748b" />
+                <HiUpload size={20} color="#64748b" />
               </div>
               <h4 className={s.uploadTitle}>
-                Click to upload or drag and drop
+                Click to upload or drag and drop up to 10 images
               </h4>
-              <p className={s.uploadSubtext}>
-                Upload upto 10 high-quality images (PNG, JPG)
-              </p>
+          
             </div>
 
             {imagePreviews.length > 0 && (
@@ -374,7 +282,7 @@ const AddProperty = () => {
                   <div className={s.addMoreBox}>
                     <input
                       type="file"
-                      multiple
+                      
                       onChange={handleImageChange}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                       accept="image/*"
@@ -386,6 +294,9 @@ const AddProperty = () => {
               </div>
             )}
           </div>
+
+    
+
 
           <div className={s.footerButtons}>
             <button
