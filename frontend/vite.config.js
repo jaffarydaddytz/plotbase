@@ -6,8 +6,8 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss(),],
 
-  esbuild: {
-    // This removes console.log and console.info, but keeps console.warn and console.error
-    drop: ['console', 'debugger'], 
-  },
+  // esbuild: {
+  //   // This removes console.log and console.info, but keeps console.warn and console.error
+  //   drop: ['console', 'debugger'], 
+  // },
 })
