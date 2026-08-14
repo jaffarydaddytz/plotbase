@@ -28,6 +28,7 @@ connectDB();
 const allowedOrigins = [
      //"http://localhost:5173",
      "https://plotbase-usyn.vercel.app",
+     "https://plotbase.co.tz",
      //" http://192.168.0.7:5173/"
      
 ].filter(Boolean);
