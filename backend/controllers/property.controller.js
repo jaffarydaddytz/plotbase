@@ -69,7 +69,6 @@ export const getMyProperties = async (req, res) => {
     const properties = await Property.find({
       seller: req.user._id,
     });
-
     res.json({ success: true, properties });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
