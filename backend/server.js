@@ -21,6 +21,8 @@ import adminRouter from './routes/admin.routes.js';
 import wishlistRouter from './routes/wishlist.routes.js';
 
 
+app.set('trust proxy', true);
+
 //DB
 connectDB();
 
