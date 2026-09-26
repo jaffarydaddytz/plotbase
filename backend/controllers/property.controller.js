@@ -362,6 +362,7 @@ export const getPropertyDetails = async (req, res) => {
 
     res.json({
       success: true,
+      visitorId,
       property,
       similarProperties,
     });
