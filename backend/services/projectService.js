@@ -1,5 +1,5 @@
 import Project from "../models/project.models.js";
-import Plot from "../models/";
+import Plot from "../models/plot.model.js";
 import readGeoJsonFile from "./geojsonService.js";
 
 const createProject = async ({
