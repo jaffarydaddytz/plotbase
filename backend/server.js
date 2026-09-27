@@ -19,6 +19,7 @@ import { Socket } from 'socket.io';
 import inquiryRouter from './routes/inquiry.routes.js';
 import adminRouter from './routes/admin.routes.js';
 import wishlistRouter from './routes/wishlist.routes.js';
+import projectRouter from './routes/project.routes.js';
 
 
 app.set('trust proxy', true);
@@ -62,6 +63,7 @@ app.use("/api/inquiry", inquiryRouter)
 app.use("/api/chat", chatRouter)
 app.use("/api/admin", adminRouter)
 app.use("/api/wishlist", wishlistRouter)
+app.use("/api/project", projectRouter)
 
 
 
