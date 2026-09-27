@@ -105,7 +105,8 @@ const Properties = () => {
       const res = await axios.get(
         `${API_URL}/api/property?${params.toString()}`,
       );
-      setProperties(res.data.properties);
+ 
+      setProperties(res.data.properties || []);
       setError(null);
     } catch (err) {
       setError("Failed to load properties. Please try again later.");
