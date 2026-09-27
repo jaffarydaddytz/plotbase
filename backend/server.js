@@ -28,7 +28,8 @@ connectDB();
 
 //middlewares
 const allowedOrigins = [
-     //"http://localhost:5173",
+     "http://localhost:5173",
+     "https://plotbase-usyn-git-config-env-mongodb-jaffary-daddys-projects.vercel.app",
      "https://plotbase-usyn.vercel.app",
      "https://plotbase.co.tz",
       "https://www.plotbase.co.tz",
