@@ -444,47 +444,7 @@ setProjectGeoJson(projectRes.data.plots);
 )}
 
 
-{project && projectGeoJson && (
-  <div className="mt-4 rounded-lg bg-white p-5 shadow">
-    <h3 className="text-xl font-semibold">
-      {project.title}
-    </h3>
 
-    <p className="mt-1 text-gray-600">
-      {project.description}
-    </p>
-
-    <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-
-      <div>
-        <p className="text-sm text-gray-500">Location</p>
-        <p className="font-medium">{project.location}</p>
-      </div>
-
-      <div>
-        <p className="text-sm text-gray-500">Price / sqm</p>
-        <p className="font-medium">
-          TZS {project.pricePerSqm.toLocaleString()}
-        </p>
-      </div>
-
-      <div>
-        <p className="text-sm text-gray-500">Total Plots</p>
-        <p className="font-medium">
-          {projectGeoJson.features.length}
-        </p>
-      </div>
-
-      <div>
-        <p className="text-sm text-gray-500">Status</p>
-        <p className="font-medium">
-          {project.status}
-        </p>
-      </div>
-
-    </div>
-  </div>
-)}
 
       <div className="bg-white shadow-md border border-gray-200 rounded-lg mt-11">
         <div className=" p-2">
