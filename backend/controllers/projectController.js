@@ -1,4 +1,7 @@
-import createProject from "../services/projectService.js";
+import {
+    createProject,
+    getProjectById
+} from "../services/projectService.js";
 
 const createProjectController = async (req, res) => {
     try {
@@ -46,4 +49,39 @@ const createProjectController = async (req, res) => {
     }
 };
 
-export default createProjectController;
+const getProjectController = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        if (!projectId) {
+            return res.status(400).json({
+                message: "Project ID is required"
+            });
+        }
+
+        const result = await getProjectById(projectId);
+
+        return res.status(200).json(result);
+
+    } catch (error) {
+        console.error("Get project error:", error);
+
+        if (error.message === "Project not found") {
+            return res.status(404).json({
+                message: "Project not found"
+            });
+        }
+
+        return res.status(500).json({
+            message: "Failed to retrieve project"
+        });
+    }
+};
+
+
+
+
+export {
+    createProjectController,
+    getProjectController
+};

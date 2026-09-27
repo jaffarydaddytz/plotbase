@@ -1,13 +1,22 @@
 import express from "express";
 import geoJsonUploadMiddleware from "../middlewares/geoJsonUploadMiddleware.js";
-import uploadGeoJson from "../controllers/projectController.js";
 
-const projectRouter = express.Router();
+import {
+    createProjectController,
+    getProjectController
+} from "../controllers/projectController.js";
 
-projectRouter.post(
+const router = express.Router();
+
+router.post(
     "/",
     geoJsonUploadMiddleware.single("geojson"),
-    uploadGeoJson
+    createProjectController
 );
 
-export default projectRouter;
+router.get(
+    "/:projectId",
+    getProjectController
+);
+
+export default router;
