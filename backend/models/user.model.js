@@ -24,9 +24,9 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     address: {
-  type: String,
-  trim: true,
-  default: "",
+      type: String,
+      trim: true,
+      default: "",
 },
     isBlocked: {
       type: Boolean,

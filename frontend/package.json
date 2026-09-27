@@ -13,9 +13,11 @@
     "@fontsource/comfortaa": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.16.1",
+    "leaflet": "^1.9.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-icons": "^5.6.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.15.0",
     "socket.io-client": "^4.8.3",
     "tailwindcss": "^4.3.0"

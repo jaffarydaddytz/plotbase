@@ -42,7 +42,6 @@ export const addWishlist = async (req,res) => {
 
 
 // to get the property that is in wishlist
-
 export const getWishlist = async (req, res) => {
     try {
         const data = await Wishlist.find({

@@ -104,10 +104,24 @@ export const login = async (req, res) => {
       },
     );
 
+
+    console.log("USER OBJECT FROM DB", user);
+// formating + selecting what to send back to the client
+   const userResponse = {
+    id:user.id,
+    name:user.name,
+    email:user.email,
+    role:user.role,
+    isApproved:user.isApproved,
+    isVerified:user.isVerified
+   }
+
+   console.log("user sent to frontend", userResponse)
+
     res.json({
       message: "login success",
       token,
-      user,
+      user:userResponse,
     });
   } catch (err) {
     res.status(500).json({

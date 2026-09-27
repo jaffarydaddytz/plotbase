@@ -7,6 +7,7 @@ export const getProfile = async (req, res) => {
     try {
 
         const user = await User.findById(req.user._id).select("-password")
+        console.log("user object sent to client:", user)
         res.status(200).json({
             success: true,
             user

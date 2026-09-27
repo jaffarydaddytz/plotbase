@@ -784,7 +784,7 @@ export const propertiesStyles = {
   container: "container",
 
   // Mobile filter button
-  mobileFilterButtonWrapper: "mobile-filter-btn hidden mb-6 max-[1024px]:block",
+  mobileFilterButtonWrapper: "mobile-filter-btn hidden mb-2 max-[1024px]:block",
   mobileFilterButton: "btn btn-outline w-full flex justify-center gap-3 bg-white py-4",
 
   // Layout grid

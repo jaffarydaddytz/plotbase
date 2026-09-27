@@ -10,12 +10,14 @@ export const addProperty = async (req, res) => {
   try {
     let imageUrls = [];
 
-    if (req.files && req.files.length > 0) {
+    //closing claudinary for local dev, for local just use local path to store
+    // for frontend use image placeholder eg avatar
+     if (req.files && req.files.length > 0) {
       for (let file of req.files) {
-        const result = await uploadToCloudinary(file.buffer);
-        imageUrls.push(result.secure_url);
-      }
-    }
+         const result = await uploadToCloudinary(file.buffer);
+         imageUrls.push(result.secure_url);
+       }
+     }
 
     // clean amenities parsing
     let amenities = [];
@@ -58,7 +60,7 @@ export const addProperty = async (req, res) => {
     console.log("add property error:", error);
     res.status(500).json({
       success: false,
-      message: error.message || "internal server error",
+      message: "error adding property", // return meaningfull error to user i think throwing error on each step is a good option u know what error expected than waiting for generic error that cud happen from any part
     });
   }
 };
@@ -71,7 +73,7 @@ export const getMyProperties = async (req, res) => {
     });
     res.json({ success: true, properties });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });  //IT is good practice to return defined error message to client other than sending  the error object
   }
 };
 
@@ -338,6 +340,7 @@ export const getPropertyDetails = async (req, res) => {
         const token = authHeader.split(" ")[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         visitorId = decoded.id;
+        console.log("VISITOR IP", visitorId)
       } catch {}
     }
 

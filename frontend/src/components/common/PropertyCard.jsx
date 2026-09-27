@@ -14,7 +14,7 @@ const PropertyCard = ({
   isWishlisted,
   onToggleWishlist,
 }) => {
-  console.log("porperty", property);
+  console.log("Property", property);
   if (!property) return null;
 
   const { user } = useAuth();

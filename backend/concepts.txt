@@ -1,0 +1,3 @@
+--script to switch image storage
+-if client is in development then use local storage for images/videos
+-else use cloudinary

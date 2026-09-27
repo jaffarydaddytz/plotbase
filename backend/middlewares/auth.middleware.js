@@ -6,9 +6,10 @@ import User from '../models/user.model.js'
 //protect
 
 export const protect = async (req, res, next) => {
+
     const authHeader = req.headers.authorization;
 
-           console.log("header:", authHeader);
+    //console.log("header:", authHeader);
 
 
     try {
@@ -34,8 +35,8 @@ export const protect = async (req, res, next) => {
         req.user = await User.findById(decoded.id).select("-password");
 
 
-              console.log("REQ USER FULL:", req.user);
-        console.log("REQ USER ROLE:", req.user?.role);
+        //console.log("REQ USER FULL:", req.user);
+        //console.log("REQ USER ROLE:", req.user?.role);
 
         if(req.user && req.user.isBlocked) {
             return res.status(403).json({

@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { propertiesStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
@@ -10,10 +11,13 @@ import {
   HiViewList,
   HiX,
 } from "react-icons/hi";
+
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API_URL from "../../config";
 import PropertyCard from "../../components/common/PropertyCard";
+
+
 
 const Properties = () => {
   const navigate = useNavigate();
@@ -425,6 +429,10 @@ const Properties = () => {
                         onToggleWishlist={handleToggleWishlist}
                       />
                     ))}
+
+
+                  
+
                 </div>
               )}
             </main>
@@ -438,7 +446,15 @@ const Properties = () => {
           className={s.mobileOverlay}
         ></div>
       )}
+
+
+
+      
     </div>
+
+
+
+
   );
 };
 
