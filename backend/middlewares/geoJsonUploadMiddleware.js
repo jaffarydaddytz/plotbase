@@ -1,8 +1,11 @@
 import multer from "multer";
 
-const storage = multer.diskStorage({
-    destination: "uploads/geojson",
+const destination = process.env.VERCEL
+    ? "/tmp"
+    : "uploads/geojson";
 
+const storage = multer.diskStorage({
+    destination,
     filename: (req, file, cb) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
