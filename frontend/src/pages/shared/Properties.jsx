@@ -28,6 +28,7 @@ const Properties = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [viewMode, setViewMode] = useState("grid");
+  
 
   const [filters, setFilters] = useState({
     city: "",
