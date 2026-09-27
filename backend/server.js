@@ -28,30 +28,26 @@ app.set('trust proxy', true);
 connectDB();
 
 //middlewares
-const allowedOrigins = [
-     "http://localhost:5173",
-     "https://plotbase-usyn-git-config-env-mongodb-jaffary-daddys-projects.vercel.app",
-     "https://plotbase-usyn.vercel.app",
-     "https://plotbase.co.tz",
-      "https://www.plotbase.co.tz",
-     //" http://192.168.0.7:5173/"
-     
-].filter(Boolean);
+
+
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+    .split(",")
+    .map(origin => origin.trim())
+    .filter(Boolean);
 
 app.use(morgan("dev"));
 
-app.use(cors({
-    origin: function (origin, callback){
-        if(!origin || allowedOrigins.includes(origin)){
-            callback(null, true);
-        } else {
-            callback(new Error("not allowed by CORS"))
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
         }
-    },
-    credentials: true
-}
-));
-
+    })
+);
 app.use(express.json());
 
 
