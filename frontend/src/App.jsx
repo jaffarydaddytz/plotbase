@@ -29,6 +29,9 @@ import MyInquiries from "./pages/buyer/MyInquiries";
 import ChatMessages from "./pages/shared/ChatMessages";
 import Contact from "./pages/shared/Contact";
 import Wishlist from "./pages/buyer/Wishlist";
+// Company Project Management
+import CompanyProjects from "./pages/company/projects/CompanyProjects";
+import CreateProject from "./pages/company/projects/CreateProject";
 
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
@@ -58,7 +61,7 @@ const ScrollTopButton = () => {
   return (
     <button
       onClick={handleClick}
-      className={`fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all duration-300 ${visible ? "scale-100 opacity-100 bg-emerald-500 text-white hover:bg-green-400" : "pointer-events-none scale-0 opacity-0 "}`}
+      className={`fixed bottom-6 right-6 z-50 flex h-12w-12 items-center justify-center rounded-full shadow-lg transition-all duration-300 ${visible ? "scale-100 opacity-100 bg-emerald-500 text-white hover:bg-green-400" : "pointer-events-none scale-0 opacity-0 "}`}
     >
       <FaChevronUp size={22} />
     </button>
@@ -94,17 +97,13 @@ const App = () => {
         <Route path="/propertydetailpage" element={<PropertyDetailPage />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
-        
-
-
-      
 
         {/* BUYER ONLY */}
         <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>
           <Route path="/profile" element={<Profile />} />
           <Route path="/messages" element={<ChatMessages />} />
           <Route path="/inquiries" element={<MyInquiries />} />
-          <Route path="/wishlist" element={<Wishlist/>} />
+          <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/contact" element={<Contact />} />
         </Route>
 
@@ -120,6 +119,13 @@ const App = () => {
             <Route path="/add-property" element={<AddProperty />} />
             <Route path="/seller/my-properties" element={<MyProperties />} />
             <Route path="/edit-property/:id" element={<EditProperty />} />
+            {/* Company Project Management — Temporary Development Routes */}
+            <Route path="/company/projects" element={<CompanyProjects />} />
+
+            <Route
+              path="/company/projects/create"
+              element={<CreateProject />}
+            />
           </Route>
         </Route>
 
