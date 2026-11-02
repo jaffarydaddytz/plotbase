@@ -49,13 +49,23 @@ const userSchema = new mongoose.Schema(
     verificationTokenExpires: {
       type: Date,
     },
+    verificationAttempts: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     verificationLastSentAt: {
       type: Date,
       default: null,
     },
     resetPasswordExpires: {
       type: Date,
+      select: false,
     },
+    // Password-reset token expiration
+resetPasswordExpires: {
+  type: Date,
+},
   },
   {
     timestamps: true,

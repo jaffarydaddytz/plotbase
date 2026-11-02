@@ -117,18 +117,35 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password) {
+
+    // Validate login credentials
+    if (
+      typeof email !== "string" ||
+      !email.trim() ||
+      typeof password !== "string" ||
+      !password
+    ) {
       return res.status(400).json({
-        message: "email and password required",
+        success: false,
+        message: "Email and password are required",
       });
     }
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        message: "invalid email or password",
-      });
-    }
+    // Normalize email before database lookup
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Find user
+    const user = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    // Reject nonexistent accounts
+if (!user) {
+  return res.status(400).json({
+    success: false,
+    message: "Invalid email or password",
+  });
+}
 
     // Verify password first
     const isMatch = await bcrypt.compare(password, user.password);
@@ -210,66 +227,108 @@ export const getMe = async (req, res) => {
 };
 
 //verify the email
+// Verify user email
 export const verifyEmail = async (req, res) => {
-
   try {
-    const { email, code } = req.body;
-    if (!email || !code) {
-      return res.status(400).json({ message: "email and code are required" });
-    }
+    const { email, code } = req.body ?? {};
 
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(404).json({
-        message: "user not found",
-      });
-    }
-
-    if (user.isVerified) {
-      return res.status(400).json({
-        message: "email already verified",
-      });
-    }
-
-    // Reject expired or missing verification expiration
+    // Validate input
     if (
-      !user.verificationTokenExpires ||
-      user.verificationTokenExpires.getTime() <= Date.now()
+      typeof email !== "string" ||
+      !email.trim() ||
+      (typeof code !== "string" && typeof code !== "number")
     ) {
       return res.status(400).json({
         success: false,
-        message: "Verification code has expired. Please request a new code.",
+        message: "Email and verification code are required",
       });
     }
 
-
-
+    const normalizedEmail = email.trim().toLowerCase();
     const submittedCode = String(code).trim();
 
-    if (
-      !user.verificationToken ||
-      !/^\d{6}$/.test(submittedCode) ||
-      user.verificationToken !== submittedCode
-    ) {
+    if (!/^\d{6}$/.test(submittedCode)) {
       return res.status(400).json({
-        message: "invalid verification code",
+        success: false,
+        message: "Invalid verification code",
       });
     }
 
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpires = undefined;
-    await user.save();
-    res.status(200).json({
-      message: "email verified successfully",
-      success: true,
+    const now = new Date();
+    const MAX_ATTEMPTS = 5;
+
+    // Conditions required for verification attempts
+const eligibleUser = {
+  email: normalizedEmail,
+  isVerified: { $ne: true },
+  isBlocked: { $ne: true },
+  verificationTokenExpires: { $gt: now },
+
+  $or: [
+    { verificationAttempts: { $lt: MAX_ATTEMPTS } },
+    { verificationAttempts: { $exists: false } },
+  ],
+};
+
+    // Atomically verify a correct code
+    const verifiedUser = await User.findOneAndUpdate(
+      {
+        ...eligibleUser,
+        verificationToken: submittedCode,
+      },
+      {
+        $set: {
+          isVerified: true,
+          verificationAttempts: 0,
+        },
+        $unset: {
+          verificationToken: "",
+          verificationTokenExpires: "",
+        },
+      },
+      { new: true }
+    );
+
+    if (verifiedUser) {
+      return res.status(200).json({
+        success: true,
+        message: "Email verified successfully",
+      });
+    }
+
+    // Atomically count incorrect verification attempts
+    const failedAttempt = await User.updateOne(
+      {
+        ...eligibleUser,
+        verificationToken: { $ne: submittedCode },
+      },
+      {
+        $inc: {
+          verificationAttempts: 1,
+        },
+      }
+    );
+
+    if (failedAttempt.modifiedCount > 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid verification code",
+      });
+    }
+
+    // Expired code, exhausted attempts, or ineligible account
+    return res.status(400).json({
+      success: false,
+      message:
+        "Verification failed. The code may have expired or the maximum attempts have been reached. Request a new code if needed.",
     });
 
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
+    console.error("Email verification failed");
+
+    return res.status(500).json({
       success: false,
+      message: "Unable to verify email",
     });
   }
 };
@@ -314,6 +373,7 @@ export const resendVerification = async (req, res) => {
         $set: {
           verificationToken,
           verificationTokenExpires: new Date(now.getTime() + 10 * 60 * 1000),
+          verificationAttempts: 0,
           verificationLastSentAt: now,
         },
       },
@@ -359,100 +419,214 @@ export const resendVerification = async (req, res) => {
 
 //forgot password
 
-/* 
+// Request password reset
 export const forgotPassword = async (req, res) => {
-    try {
-        const {email} = req.body;
-        const user = await User.findOne({email});
-
-        if(!user){
-            return res.status(404).json({message: "no user found with that email"})
-        }
-
-        const resetToken = crypto.randomBytes(20).toString("hex");
-        const resetPasswordExpire = Date.now() + 15*60*1000;
-
-        user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-        user.resetPasswordExpire = resetPasswordExpire;
-        await user.save();
-
-        const clientUrl = "http://localhost:5173";
-        const resetUrl =  ` ${clientUrl}/reset-password/${resetToken} `,
-        const message =   ` 
-        <h2> Password Reset Request</h2>
-        <p>  you requested a password reset. please click on the link below to reset your password</p>
-        <a href="${resetUrl}" clicktracking ="off>${resetUrl} </a>
-        <p> this link will expire in 15 minutes  </p>
-
-        
-         `
-        
-
-         
- try {
-    await sendEmail({
-        email: user.email,
-        subject: "password reset - plotbase platform",
-        message
-    });
-    res.status(200).json({message: "password reset email sent", success: true});
-
-
- } catch (error) {
-
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire= undefined;
-    await user.save();
-    return res.status(500).json({message: "could not send email", success:false})
-    
- }
-
-
-
-
-
-
-
-
-
-
-    } catch (err) {
-        res.status(500).json({message: err.message, success: false});
-        
-    }
-}; 
-*/
-
-//reset password
-export const resetPassword = async (req, res) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
-    const resetPasswordToken = crypto
-      .createHash("sha256")
-      .update(token)
-      .digest("hex");
+    const { email } = req.body ?? {};
+
+    // Validate email
+    if (
+      typeof email !== "string" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Generic response prevents account enumeration
+    const response = {
+      success: true,
+      message:
+        "If an account exists, a password reset link will be sent.",
+    };
+
     const user = await User.findOne({
-      resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() },
+      email: normalizedEmail,
+      isBlocked: { $ne: true },
     });
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "invalid or invalid rest password", success: false });
+      return res.status(200).json(response);
     }
 
-    user.password = await bcrypt.hash(password, 10);
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undifined;
+    // Generate a cryptographically secure reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Store only the token hash
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = new Date(
+      Date.now() + 15 * 60 * 1000
+    );
 
     await user.save();
-    res.status(200).json({
-      message: "password updated successfuly",
-      success: true,
-    });
+
+    // Frontend URL must be configured in the environment
+    const clientUrl = process.env.CLIENT_URL;
+
+    if (!clientUrl) {
+      console.error("CLIENT_URL is not configured");
+
+      await User.updateOne(
+        {
+          _id: user._id,
+          resetPasswordToken: hashedToken,
+        },
+        {
+          $unset: {
+            resetPasswordToken: "",
+            resetPasswordExpires: "",
+          },
+        }
+      );
+
+      return res.status(500).json({
+        success: false,
+        message: "Password recovery is temporarily unavailable",
+      });
+    }
+
+    const resetUrl = new URL(
+      `/reset-password/${resetToken}`,
+      clientUrl
+    ).toString();
+
+    // Send reset email
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "Reset Your Password - Plotbase",
+        message: `
+          <h2>Plotbase Password Reset</h2>
+
+          <p>You requested a password reset.</p>
+
+          <p>
+            <a href="${resetUrl}">Reset Password</a>
+          </p>
+
+          <p>This link expires in 15 minutes.</p>
+
+          <p>If you did not request this, ignore this email.</p>
+        `,
+      });
+    } catch (error) {
+      console.error("Password reset email delivery failed");
+
+      // Clear only the token issued by this request
+      await User.updateOne(
+        {
+          _id: user._id,
+          resetPasswordToken: hashedToken,
+        },
+        {
+          $unset: {
+            resetPasswordToken: "",
+            resetPasswordExpires: "",
+          },
+        }
+      );
+    }
+
+    return res.status(200).json(response);
+
   } catch (error) {
-    res.status(500).json({ message: err.message, success: false });
+    console.error("Password reset request failed");
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process password reset request",
+    });
+  }
+};
+
+
+//reset password
+// Reset password using a valid, unexpired token
+export const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body ?? {};
+
+    // Validate the reset token
+    if (
+      typeof token !== "string" ||
+      !/^[a-f0-9]{64}$/.test(token)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    // Apply the same password requirements as registration
+    if (
+      typeof password !== "string" ||
+      password.length < 8 ||
+      Buffer.byteLength(password, "utf8") > 72
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must contain at least 8 characters and must not exceed 72 bytes",
+      });
+    }
+
+    // Hash the submitted reset token
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Atomically update password and invalidate the reset token
+    const user = await User.findOneAndUpdate(
+      {
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: new Date() },
+        isBlocked: { $ne: true },
+      },
+      {
+        $set: {
+          password: hashedPassword,
+        },
+        $unset: {
+          resetPasswordToken: "",
+          resetPasswordExpires: "",
+        },
+      },
+      {
+        new: false,
+      }
+    );
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired reset token",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+
+  } catch (error) {
+    console.error("Password reset failed");
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to reset password",
+    });
   }
 };

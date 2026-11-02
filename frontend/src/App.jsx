@@ -32,6 +32,8 @@ import Wishlist from "./pages/buyer/Wishlist";
 // Company Project Management
 import CompanyProjects from "./pages/company/projects/CompanyProjects";
 import CreateProject from "./pages/company/projects/CreateProject";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
@@ -90,7 +92,18 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
+
         </Route>
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
 
         {/* PUBLIC PAGES */}
         <Route path="/" element={<Properties />} />

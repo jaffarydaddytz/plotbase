@@ -1,17 +1,32 @@
-import express from 'express'
-import { getMe, login, register, resetPassword, verifyEmail,   resendVerification } from '../controllers/auth.controller.js';
-import { protect } from '../middlewares/auth.middleware.js';
+import express from "express";
+
+import {
+  getMe,
+  login,
+  register,
+  forgotPassword,
+  resetPassword,
+  verifyEmail,
+  resendVerification,
+} from "../controllers/auth.controller.js";
+
+import { protect } from "../middlewares/auth.middleware.js";
 
 const authRouter = express.Router();
 
+// Authentication
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 
-authRouter.get("/me",protect, getMe);
+// Authenticated user
+authRouter.get("/me", protect, getMe);
+
+// Email verification
 authRouter.post("/verify-email", verifyEmail);
 authRouter.post("/resend-verification", resendVerification);
 
-//authRouter.post("/forgot-pasword", forgotPassword);
-authRouter.post("/reset-password/:token", resetPassword)
+// Password recovery
+authRouter.post("/forgot-password", forgotPassword);
+authRouter.post("/reset-password/:token", resetPassword);
 
-export default authRouter
+export default authRouter;
