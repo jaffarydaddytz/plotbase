@@ -23,7 +23,7 @@ export const protect = async (req, res, next) => {
             token = req.headers.authorization.split(" ")[1];
         }
 
-        if (!token){
+        if (!token) {
             return res.status(401).json({
                 success: false,
                 message: "not authorized, token missing"
@@ -33,27 +33,43 @@ export const protect = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
         req.user = await User.findById(decoded.id).select("-password");
+        // Reject tokens belonging to deleted or nonexistent users
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "User account no longer exists",
+            });
+        }
 
 
         //console.log("REQ USER FULL:", req.user);
         //console.log("REQ USER ROLE:", req.user?.role);
 
-        if(req.user && req.user.isBlocked) {
+        if (req.user && req.user.isBlocked) {
             return res.status(403).json({
                 success: false,
                 message: "your account has been blocked by admin"
             })
         }
 
+        // Prevent unverified users from accessing protected routes
+        if (!req.user.isVerified) {
+            return res.status(403).json({
+                success: false,
+                message: "Please verify your email before continuing",
+                code: "EMAIL_VERIFY",
+            });
+        }
+
         next();
-        
+
     } catch (err) {
 
         res.status(401).json({
             success: false,
             message: "token invalid"
         })
-        
+
     }
 }
 
@@ -68,13 +84,7 @@ export const authorize = (...roles) => {
         const userRole = req.user?.role?.trim().toLowerCase();
         const allowedRoles = roles.map(r => r.toLowerCase());
 
-                console.log("Authorize middleware hit");
-console.log("req.user:", req.user);
-console.log("userRole:", JSON.stringify(userRole));
-console.log("allowedRoles:", JSON.stringify(allowedRoles));
 
-        console.log("ROLE CHECK:", userRole);
-        console.log("ALLOWED:", allowedRoles);
 
         if (!req.user || !allowedRoles.includes(userRole)) {
             return res.status(403).json({

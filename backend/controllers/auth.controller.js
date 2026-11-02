@@ -5,58 +5,113 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 
 //register
+// Register a new investor
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
-    const userExists = await User.findOne({ email });
+    const { name, email, password } = req.body;
 
-    if (userExists) {
+    // Validate required fields
+    if (
+      typeof name !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string"
+    ) {
       return res.status(400).json({
-        message: "user already exists",
+        success: false,
+        message: "Name, email and password are required",
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const normalizedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
 
-    const verificationToken = Math.floor(
-      100000 + Math.random() * 900000,
-    ).toString();
+    if (
+      normalizedName.length < 2 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) ||
+      password.length < 8 ||
+      Buffer.byteLength(password, "utf8") > 72
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid name, email or password",
+      });
+    }
 
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-      isApproved: role === "seller" ? false : true,
-      verificationToken,
+    // Check whether user already exists
+    const userExists = await User.findOne({
+      email: normalizedEmail,
     });
 
-    try {
-      await sendEmail({
-        email,
-        subject: "Verify your email - Plotbase Platform",
-        message: `<p> Your email verification code is <strong> ${verificationToken} </strong></p> <p> Please enter this code on the verification page to activate your account</p>`,
+    if (userExists) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists",
       });
-    } catch (emailError) {
-      console.error("failed to send verification email", emailError);
-      //we still create the user
     }
 
-    res.status(201).json({
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Generate secure email verification code
+    const verificationToken = crypto
+      .randomInt(100000, 1000000)
+      .toString();
+
+    // Public registration creates investors only
+    const user = await User.create({
+      name: normalizedName,
+      email: normalizedEmail,
+      password: hashedPassword,
+      role: "buyer",
+      isApproved: true,
+      isVerified: false,
+      verificationToken,
+      verificationTokenExpires: new Date(Date.now() + 10 * 60 * 1000),
+      verificationLastSentAt: new Date()
+    });
+
+    // Send verification email
+    try {
+      await sendEmail({
+        email: normalizedEmail,
+        subject: "Verify your email - Plotbase Platform",
+        message: `
+          <h2>Welcome to Plotbase</h2>
+          <p>Your email verification code is:</p>
+          <h3>${verificationToken}</h3>
+          <p>Enter this code to activate your account.</p>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Failed to send verification email");
+    }
+
+    return res.status(201).json({
+      success: true,
       message:
-        "user registered . Please check your email fo the verification code",
+        "User registered. Please check your email for the verification code.",
       user: {
-        email: user.email,
+        id: user._id,
         name: user.name,
+        email: user.email,
         role: user.role,
       },
     });
-  } catch (err) {
-    res.status(500).json({
-      message: err.message,
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Registration failed",
     });
   }
 };
+
 
 //login
 export const login = async (req, res) => {
@@ -75,17 +130,20 @@ export const login = async (req, res) => {
       });
     }
 
-    if (!user.isVerified) {
-      return res.status(403).json({
-        message: "please verify your email or contact support",
-        code: "EMAIL_VERIFY"
-      });
-    }
-
+    // Verify password first
     const isMatch = await bcrypt.compare(password, user.password);
+
     if (!isMatch) {
       return res.status(400).json({
         message: "invalid email or password",
+      });
+    }
+
+    // Check email verification after password validation
+    if (!user.isVerified) {
+      return res.status(403).json({
+        message: "please verify your email or contact support",
+        code: "EMAIL_VERIFY",
       });
     }
 
@@ -105,23 +163,23 @@ export const login = async (req, res) => {
     );
 
 
-    console.log("USER OBJECT FROM DB", user);
-// formating + selecting what to send back to the client
-   const userResponse = {
-    id:user.id,
-    name:user.name,
-    email:user.email,
-    role:user.role,
-    isApproved:user.isApproved,
-    isVerified:user.isVerified
-   }
 
-   console.log("user sent to frontend", userResponse)
+    // formating + selecting what to send back to the client
+    const userResponse = {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isApproved: user.isApproved,
+      isVerified: user.isVerified
+    }
+
+
 
     res.json({
       message: "login success",
       token,
-      user:userResponse,
+      user: userResponse,
     });
   } catch (err) {
     res.status(500).json({
@@ -153,8 +211,6 @@ export const getMe = async (req, res) => {
 
 //verify the email
 export const verifyEmail = async (req, res) => {
-  console.log("verify email", req.body)
- 
 
   try {
     const { email, code } = req.body;
@@ -163,7 +219,6 @@ export const verifyEmail = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-     console.log("DB code:", user.verificationToken, "Provided code:", code);
 
     if (!user) {
       return res.status(404).json({
@@ -177,14 +232,34 @@ export const verifyEmail = async (req, res) => {
       });
     }
 
-    if (String(user.verificationToken) !== String(code)) {
+    // Reject expired or missing verification expiration
+    if (
+      !user.verificationTokenExpires ||
+      user.verificationTokenExpires.getTime() <= Date.now()
+    ) {
       return res.status(400).json({
-        message: "invalid code",
+        success: false,
+        message: "Verification code has expired. Please request a new code.",
+      });
+    }
+
+
+
+    const submittedCode = String(code).trim();
+
+    if (
+      !user.verificationToken ||
+      !/^\d{6}$/.test(submittedCode) ||
+      user.verificationToken !== submittedCode
+    ) {
+      return res.status(400).json({
+        message: "invalid verification code",
       });
     }
 
     user.isVerified = true;
     user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
     await user.save();
     res.status(200).json({
       message: "email verified successfully",
@@ -195,6 +270,89 @@ export const verifyEmail = async (req, res) => {
     res.status(500).json({
       message: error.message,
       success: false,
+    });
+  }
+};
+
+// Resend email verification code
+export const resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Validate email
+    if (
+      typeof email !== "string" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Valid email is required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const now = new Date();
+    const cooldown = new Date(now.getTime() - 60 * 1000);
+
+    // Generate a secure verification code
+    const verificationToken = crypto.randomInt(100000, 1000000).toString();
+
+    // Atomically enforce cooldown and update verification details
+    const user = await User.findOneAndUpdate(
+      {
+        email: normalizedEmail,
+        isVerified: false,
+        isBlocked: false,
+        $or: [
+          { verificationLastSentAt: { $exists: false } },
+          { verificationLastSentAt: null },
+          { verificationLastSentAt: { $lte: cooldown } },
+        ],
+      },
+      {
+        $set: {
+          verificationToken,
+          verificationTokenExpires: new Date(now.getTime() + 10 * 60 * 1000),
+          verificationLastSentAt: now,
+        },
+      },
+      { new: true }
+    );
+
+    // Use a generic response to prevent account enumeration
+    const response = {
+      success: true,
+      message: "If verification is required, a new code will be sent.",
+    };
+
+    if (!user) {
+      return res.status(200).json(response);
+    }
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "New Verification Code - Plotbase",
+        message: `
+          <h2>Plotbase Email Verification</h2>
+          <p>Your new verification code is:</p>
+          <h3>${verificationToken}</h3>
+          <p>This code expires in 10 minutes.</p>
+        `,
+      });
+    } catch (emailError) {
+      console.error("Verification email delivery failed");
+    }
+
+    return res.status(200).json(response);
+
+  } catch (error) {
+    console.error("Resend verification request failed");
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process verification request",
     });
   }
 };

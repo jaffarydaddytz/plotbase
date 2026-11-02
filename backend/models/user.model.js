@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       default: "",
-},
+    },
     isBlocked: {
       type: Boolean,
       default: false,
@@ -45,6 +45,13 @@ const userSchema = new mongoose.Schema(
     },
     verificationToken: {
       type: String,
+    },
+    verificationTokenExpires: {
+      type: Date,
+    },
+    verificationLastSentAt: {
+      type: Date,
+      default: null,
     },
     resetPasswordExpires: {
       type: Date,
