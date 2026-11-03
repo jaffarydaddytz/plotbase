@@ -52,7 +52,13 @@ export const uploadVerificationDocument = async (req, res) => {
     const company = await Company.findOne({
       _id: companyId,
       createdBy: userId,
-      verificationStatus: "PENDING",
+      $or: [
+  { verificationStatus: "DRAFT" },
+  {
+    verificationStatus: "PENDING",
+    submittedAt: null,
+  },
+],
     });
 
     if (!company) {
@@ -100,7 +106,13 @@ export const uploadVerificationDocument = async (req, res) => {
       {
         _id: companyId,
         createdBy: userId,
-        verificationStatus: "PENDING",
+        $or: [
+  { verificationStatus: "DRAFT" },
+  {
+    verificationStatus: "PENDING",
+    submittedAt: null,
+  },
+],
         "verificationDocuments.documentType": {
           $ne: documentType,
         },

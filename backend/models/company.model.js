@@ -83,11 +83,21 @@ reviewNotes: {
       },
     ],
 
-    verificationStatus: {
-      type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED", "SUSPENDED"],
-      default: "PENDING",
-    },
+verificationStatus: {
+  type: String,
+  enum: [
+    "DRAFT",
+    "PENDING",
+    "APPROVED",
+    "REJECTED",
+    "SUSPENDED",
+  ],
+  default: "PENDING",
+},
+submittedAt: {
+  type: Date,
+  default: null,
+},
 
     reviewedBy: {
       type: mongoose.Schema.Types.ObjectId,

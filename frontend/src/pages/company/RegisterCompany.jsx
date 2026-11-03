@@ -1,11 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 
 import Navbar from "../../components/common/Navbar";
 import CompanyVerificationDocuments from "./CompanyVerificationDocuments";
+import CompanyApplicationPreview from "./CompanyApplicationPreview";
+import CompanyDraftEditor from "./CompanyDraftEditor.jsx";
+import MyCompanyApplications from "./MyCompanyApplications";
 
 import { useAuth } from "../../context/AuthContext";
 import API_URL from "../../config";
+
 
 const initialFormData = {
   name: "",
@@ -23,6 +27,10 @@ const labelClass =
 
 const RegisterCompany = () => {
   const { token } = useAuth();
+  // Existing company applications
+  const [applications, setApplications] = useState([]);
+  const [applicationsLoading, setApplicationsLoading] = useState(true);
+  const [applicationsError, setApplicationsError] = useState("");
 
   const [step, setStep] = useState(1);
 
@@ -34,8 +42,68 @@ const RegisterCompany = () => {
   const [success, setSuccess] = useState("");
 
   const [registeredCompany, setRegisteredCompany] = useState(null);
+const [showPreview, setShowPreview] = useState(false);
+const [showEditor, setShowEditor] = useState(false);
+  // Controls whether the investor explicitly starts a new registration
+  const [showNewRegistration, setShowNewRegistration] = useState(false);
 
-  const activeStep = registeredCompany ? 3 : step;
+  const activeStep = registeredCompany ? (showPreview ? 4 : 3) : step;
+
+  // Load company applications belonging to the logged-in investor
+  useEffect(() => {
+    if (!token) {
+      setApplications([]);
+      setApplicationsLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+
+    const fetchApplications = async () => {
+      try {
+        setApplicationsLoading(true);
+        setApplicationsError("");
+
+        const response = await axios.get(
+          `${API_URL}/api/companies/my-applications`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
+          }
+        );
+
+        if (!response.data.success || !Array.isArray(response.data.applications)) {
+          throw new Error("Unable to retrieve company applications.");
+        }
+
+        setApplications(response.data.applications);
+      } catch (err) {
+        if (controller.signal.aborted) return;
+        setApplicationsError(
+          err.response?.data?.message ||
+            err.message ||
+            "Unable to retrieve company applications."
+        );
+      } finally {
+        if (!controller.signal.aborted) {
+          setApplicationsLoading(false);
+        }
+      }
+    };
+
+    fetchApplications();
+    return () => controller.abort();
+  }, [token]);
+
+  const handleRegisterAnother = () => {
+    setShowNewRegistration(true);
+    setRegisteredCompany(null);
+    setShowPreview(false);
+    setStep(1);
+    setFormData(initialFormData);
+    setError("");
+    setSuccess("");
+  };
 
   // Handle input changes
   const handleChange = (e) => {
@@ -147,6 +215,7 @@ const RegisterCompany = () => {
 
       if (response.data.success) {
         setRegisteredCompany(response.data.company);
+        setShowPreview(false);
 
         setSuccess(
           response.data.message ||
@@ -180,6 +249,45 @@ const RegisterCompany = () => {
     }
   };
 
+  // Final submission: DRAFT -> PENDING after backend validation
+  const handleFinalSubmit = async () => {
+    if (isSubmitting) return;
+
+    const companyId = registeredCompany?.id || registeredCompany?._id;
+
+    if (!companyId || !token) {
+      setError("Company information or authentication is missing.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/companies/${companyId}/submit`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (!response.data.success) {
+        throw new Error(
+          response.data.message || "Unable to submit application."
+        );
+      }
+
+      // Reload applications, showing the newly submitted company as PENDING.
+      window.location.replace("/company/register");
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          "Unable to submit company application."
+      );
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="flex min-h-dvh flex-col bg-zinc-50 pt-[60px]">
 
@@ -188,30 +296,45 @@ const RegisterCompany = () => {
 
       {/* Main Content */}
       <main className="flex flex-1 items-center justify-center px-4 py-4 sm:px-6">
-
-        <div className="w-full max-w-[520px]">
+        {!registeredCompany && !showNewRegistration && applicationsLoading ? (
+          <p role="status" className="text-sm text-zinc-600">
+            Loading your company applications...
+          </p>
+        ) : !registeredCompany && !showNewRegistration && applicationsError ? (
+          <div
+            role="alert"
+            className="w-full max-w-lg rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700"
+          >
+            {applicationsError}
+          </div>
+        ) : !registeredCompany && !showNewRegistration && applications.length > 0 ? (
+          <MyCompanyApplications
+            applications={applications}
+            onRegisterAnother={handleRegisterAnother}
+          />
+        ) : (
+          <div className={showPreview ? "w-full max-w-5xl" : "w-full max-w-[520px]"}>
 
           {/* Heading */}
-          <div className="mb-5 text-center">
-
-            <h1 className="text-2xl font-bold text-zinc-950">
-              Register Your Company
-            </h1>
-
-            <p className="mt-2 text-sm text-zinc-500">
-              Complete the steps to register your
-              real-estate company on Plotbase.
-            </p>
-
-          </div>
+          {!showPreview && (
+            <div className="mb-5 text-center">
+              <h1 className="text-2xl font-bold text-zinc-950">
+                Register Your Company
+              </h1>
+              <p className="mt-2 text-sm text-zinc-500">
+                Complete the steps to apply for company verification.
+              </p>
+            </div>
+          )}
 
           {/* Step Progress */}
-          <div className="mb-5 grid grid-cols-3 gap-2">
+          <div className="mb-5 grid grid-cols-4 gap-2">
 
             {[
               "Company",
               "Contact",
               "Documents",
+              "Preview",
             ].map((label, index) => {
               const stepNumber = index + 1;
               const isActive = activeStep === stepNumber;
@@ -244,14 +367,9 @@ const RegisterCompany = () => {
 
           </div>
 
-          {/* Registration Card */}
-        <div
-  className={
-    registeredCompany
-      ? "hidden"
-      : "rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-7"
-  }
->
+          {/* Company and Contact forms; hidden after the draft is saved */}
+          {!registeredCompany && (
+            <div className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-7">
 
             {/* Error */}
             {error && (
@@ -313,7 +431,7 @@ const RegisterCompany = () => {
                 {/* Registration Number */}
                 <div>
                   <label
-                    htmlFor="Incorporation Number"
+                    htmlFor="registrationNumber"
                     className={labelClass}
                   >
                     Enter your BRELA incorporation number
@@ -450,8 +568,8 @@ const RegisterCompany = () => {
                     className="flex-1 rounded-lg bg-zinc-950 px-5 py-3 text-sm font-semibold text-white hover:bg-zinc-800 disabled:opacity-50"
                   >
                     {isSubmitting
-                      ? "Submitting..."
-                      : "Register Company"}
+                      ? "Saving draft..."
+                      : "Save Draft & Continue"}
                   </button>
 
                 </div>
@@ -460,55 +578,67 @@ const RegisterCompany = () => {
 
             )}
 
-            {/* STEP 3 */}
-            {registeredCompany && (
-
-              <div>
-
-                <div className="mb-4">
-
-                  <h2 className="text-lg font-semibold text-zinc-950">
-                    Company Created Successfully
-                  </h2>
-
-                  <p className="mt-2 text-sm text-zinc-600">
-                    {registeredCompany.name}
-                  </p>
-
-                  <p className="mt-1 text-xs text-zinc-500">
-                    Verification Status:{" "}
-                    <span className="font-semibold">
-                      {registeredCompany.verificationStatus}
-                    </span>
-                  </p>
-
-                </div>
-
-                <p className="text-sm text-zinc-600">
-                  Upload the required documents to continue
-                  your company verification process.
-                </p>
-
-              </div>
-
-            )}
-
-          </div>
+            </div>
+          )}
 
           {/* DOCUMENT UPLOAD STEP */}
-          {registeredCompany && (
+          {registeredCompany && !showPreview && (
             <CompanyVerificationDocuments
-              companyId={
-                registeredCompany.id ||
-                registeredCompany._id
-              }
+              companyId={registeredCompany.id || registeredCompany._id}
+              onContinueToPreview={() => setShowPreview(true)}
             />
           )}
 
+{/* PREVIEW, DRAFT EDITING & FINAL SUBMISSION */}
+{registeredCompany && showPreview && (
+  showEditor ? (
+    <CompanyDraftEditor
+      companyId={
+        registeredCompany.id ||
+        registeredCompany._id
+      }
+      onCancel={() => {
+        setShowEditor(false);
+      }}
+      onSaved={() => {
+        setShowEditor(false);
+        setError("");
+      }}
+    />
+  ) : (
+    <>
+      {error && (
+        <div
+          role="alert"
+          className="mb-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+        >
+          {error}
         </div>
+      )}
 
+      <CompanyApplicationPreview
+        companyId={
+          registeredCompany.id ||
+          registeredCompany._id
+        }
+        onBack={() => {
+          setShowPreview(false);
+          setError("");
+        }}
+        onEdit={() => {
+          setError("");
+          setShowEditor(true);
+        }}
+        onSubmit={handleFinalSubmit}
+        isSubmitting={isSubmitting}
+      />
+    </>
+  )
+)}
+
+          </div>
+        )}
       </main>
-
     </div>
   );
 };
