@@ -2,7 +2,8 @@ import express from "express";
 import { authorize, protect } from "../middlewares/auth.middleware.js";
 import { approveSeller, blockUser, deleteUser, getAllProperties, getAllUsers, getDashboardStats, getPendingSellers } from "../controllers/admin.controller.js";
 import { deleteProperty } from "../controllers/admin.controller.js";
-import { getPendingCompanies } from "../controllers/companyVerification.controller.js";
+import {getPendingCompanies,getCompanyVerificationDetails, viewCompanyVerificationDocument,reviewCompanyDocument,rejectCompany, approveCompany} from "../controllers/companyVerification.controller.js";
+
 
 
 const adminRouter = express.Router();
@@ -19,8 +20,16 @@ adminRouter.get("/properties", getAllProperties);
 adminRouter.get("/pending-sellers", getPendingSellers);
 // New company verification endpoint
 adminRouter.get("/companies/pending", getPendingCompanies);
+// View company application details
+adminRouter.get("/companies/:companyId", getCompanyVerificationDetails, viewCompanyVerificationDocument);
 
+// View a company verification document
+adminRouter.get("/companies/:companyId/documents/:documentId/view",viewCompanyVerificationDocument);
+// Review a company verification document
+adminRouter.patch("/companies/:companyId/documents/:documentId/review", reviewCompanyDocument);
 
+// Reject a pending company application
+adminRouter.patch( "/companies/:companyId/reject",rejectCompany);
 
 // adminRouter.delete("/properties/:id", deleteProperty)
 
@@ -29,6 +38,12 @@ adminRouter.delete("/properties/:id", (req, res, next) => {
   next();
 }, deleteProperty);
 
+// Review a company verification document
+adminRouter.patch("/companies/:companyId/documents/:documentId/review",reviewCompanyDocument);
+
+// Approve a verified real-estate company
+adminRouter.patch("/companies/:companyId/approve",approveCompany);
+
 
 
 adminRouter.get("/stats/", getDashboardStats)
@@ -36,5 +51,6 @@ adminRouter.get("/stats/", getDashboardStats)
 adminRouter.get("/pending-sellers", getPendingSellers);
 
 adminRouter.patch("/approve-seller/:id", approveSeller)
+
 
 export default adminRouter;

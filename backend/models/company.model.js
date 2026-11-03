@@ -58,6 +58,28 @@ const companySchema = new mongoose.Schema(
           type: Date,
           default: Date.now,
         },
+        reviewStatus: {
+  type: String,
+  enum: ["PENDING", "VERIFIED", "REJECTED"],
+  default: "PENDING",
+},
+
+reviewedBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
+
+reviewedAt: {
+  type: Date,
+  default: null,
+},
+
+reviewNotes: {
+  type: String,
+  trim: true,
+  default: "",
+},
       },
     ],
 
