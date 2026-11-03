@@ -32,6 +32,7 @@ import Wishlist from "./pages/buyer/Wishlist";
 // Company Project Management
 import CompanyProjects from "./pages/company/projects/CompanyProjects";
 import CreateProject from "./pages/company/projects/CreateProject";
+import RegisterCompany from "./pages/company/RegisterCompany";
 
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
@@ -97,6 +98,14 @@ const App = () => {
         <Route path="/propertydetailpage" element={<PropertyDetailPage />} />
         <Route path="/properties" element={<Properties />} />
         <Route path="/property/:id" element={<PropertyDetails />} />
+
+        {/* COMPANY REGISTRATION — AUTHENTICATED USERS */}
+<Route element={<ProtectedRoute />}>
+  <Route
+    path="/company/register"
+    element={<RegisterCompany />}
+  />
+</Route>
 
         {/* BUYER ONLY */}
         <Route element={<ProtectedRoute allowedRoles={["buyer"]} />}>

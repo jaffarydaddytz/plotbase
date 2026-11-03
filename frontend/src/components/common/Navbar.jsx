@@ -2,13 +2,17 @@
 import { navbarStyles as s } from "../../assets/dummyStyles";
 import Logo from "./Logo";
 import { useAuth } from "../../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { HiMenuAlt3, HiX,  } from "react-icons/hi";
 import { useState } from "react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { pathname } = useLocation();
+
+const isLoginPage = pathname === "/login";
+const isRegisterPage = pathname === "/register";
 
   // to toggle the menu for menu mobile
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -16,7 +20,7 @@ const Navbar = () => {
   // navlinks
   const navLinks = (
     <>
-      {(!user || user.role !== "buyer") && (
+      {user && user.role !== "buyer" && (
         <Link
           to="/properties"
           className={s.navLink}
@@ -66,17 +70,40 @@ const Navbar = () => {
         </>
       )}
 
-      {!user && (
-        <>
-          <Link to="/login" onClick={() => setIsOpen(false)}>
-            Login
-          </Link>
 
-          <Link to="/register" onClick={() => setIsOpen(false)}>
-            Register
-          </Link>
-        </>
-      )}
+      {!user && (
+  <>
+    <Link
+      to="/properties"
+      className={s.navLink}
+      onClick={() => setIsOpen(false)}
+    >
+      {isLoginPage || isRegisterPage ? "Back to Plots" : "Plots"}
+    </Link>
+
+    {!isLoginPage && (
+      <Link
+        to="/login"
+        className={s.navLink}
+        onClick={() => setIsOpen(false)}
+      >
+        {isRegisterPage ? "Sign In" : "Login"}
+      </Link>
+    )}
+
+    {!isRegisterPage && (
+      <Link
+        to="/register"
+        className={s.navLink}
+        onClick={() => setIsOpen(false)}
+      >
+        {isLoginPage ? "Create Account" : "Register"}
+      </Link>
+    )}
+  </>
+)}
+
+   
 
       {/* For Seller */}
       {user && user.role === "seller" && (

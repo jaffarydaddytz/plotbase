@@ -1012,20 +1012,60 @@ export const forgotPasswordStyles = {
 };
 
 export const loginStyles = {
-  pageContainer: "bg-bg-alt min-h-screen pt-32 max-lg:pt-28",
-  containerCenter: "container flex justify-center items-center pt-16 sm:pt-8",
-  card: "glass fade-in w-full max-w-[450px] p-10 sm:p-6 rounded-3xl sm:rounded-2xl shadow-lg",
-  title: "text-[2rem] sm:text-2xl font-bold text-center mb-2 text-primary",
-  subtitle: "text-center text-text-muted mb-8",
-  errorAlert: "p-3 bg-red-100 text-red-600 rounded-lg mb-4 text-sm text-center",
-  form: "flex flex-col gap-5",
-  label: "block mb-2 font-medium",
-  input: "w-full py-3 px-4 rounded-lg border border-border outline-none focus:border-primary transition-colors",
-  passwordHeader: "flex justify-between items-center mb-2",
-  forgotLink: "text-sm text-primary font-medium hover:underline",
-  submitButton: "btn btn-primary p-3.5 text-base mt-2",
-  footerText: "text-center mt-8 text-text-muted",
-  registerLink: "text-primary font-semibold hover:underline",
+  // Page Layout
+  pageContainer:
+    "flex min-h-dvh flex-col bg-zinc-50 pt-[60px]",
+
+  // Centered Container
+  containerCenter:
+    "mx-auto flex w-full max-w-[1280px] flex-1 items-center justify-center px-4 py-5 sm:px-6 sm:py-8",
+
+  // Login Card
+  card:
+    "w-full max-w-[420px] rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-7",
+
+  // Heading
+  title:
+    "mb-1 text-center text-2xl font-bold text-zinc-950",
+
+  subtitle:
+    "mb-5 text-center text-sm text-zinc-500",
+
+  // Error Message
+  errorAlert:
+    "mb-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600",
+
+  // Form
+  form:
+    "flex flex-col gap-4",
+
+  // Labels
+  label:
+    "mb-1.5 block text-sm font-medium text-zinc-800",
+
+  // Input Fields
+  input:
+    "w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-950 focus:ring-2 focus:ring-zinc-200",
+
+  // Password Section
+  passwordHeader:
+    "mb-1.5 flex items-center justify-between gap-2",
+
+  // Forgot Password
+  forgotLink:
+    "text-xs font-medium text-zinc-700 hover:text-black hover:underline sm:text-sm",
+
+  // Login Button
+  submitButton:
+    "mt-1 w-full rounded-lg bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50",
+
+  // Footer
+  footerText:
+    "mt-5 text-center text-sm text-zinc-600",
+
+  // Registration Link
+  registerLink:
+    "font-semibold text-zinc-950 hover:underline",
 };
 
 
@@ -1046,52 +1086,117 @@ export const resetPasswordStyles = {
 };
 
 export const registerStyles = {
-  // Layout
-  pageWrapper: "bg-bg-alt min-h-screen pt-32 max-lg:pt-28",
-  container: "container flex justify-center items-center pt-8 pb-16 sm:pt-4 sm:pb-8",
+  // Page Layout
+pageWrapper:
+  "flex min-h-dvh flex-col justify-center bg-zinc-50 pt-[60px]",
 
-  // Form card
-  formCard: "w-full max-w-[500px] p-10 sm:p-6 rounded-3xl bg-white shadow-lg",
-  heading: "text-[2rem] sm:text-2xl font-bold text-center mb-2 text-primary",
-  subheading: "text-center text-text-muted mb-8",
+  container:
+  "mx-auto flex w-full max-w-[1280px] justify-center px-4 pt-1 pb-6 sm:px-6 sm:pt-2 sm:pb-8",
+
+  // Form Card
+  formCard:
+    "w-full max-w-[440px] rounded-2xl border border-zinc-200 bg-white px-5 py-6 shadow-sm sm:px-7 sm:py-7",
+
+  // Heading
+  heading:
+    "mb-1 text-center text-2xl font-bold text-zinc-950",
+
+  subheading:
+    "mb-5 text-center text-sm text-zinc-500",
 
   // Messages
-  errorMessage: "p-3 bg-red-100 text-red-600 rounded-lg mb-4 text-sm text-center",
-  successMessage: "p-3 bg-green-100 text-green-600 rounded-lg mb-4 text-sm text-center",
+  errorMessage:
+    "mb-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600",
+
+  successMessage:
+    "mb-4 rounded-lg bg-green-50 p-3 text-center text-sm text-green-700",
 
   // Form
-  form: "flex flex-col gap-5 sm:gap-4",
-  label: "block mb-2 font-medium",
-  input: "w-full py-3 px-4 rounded-lg border border-border outline-none focus:border-primary transition-colors",
+  form:
+    "flex flex-col gap-4",
 
-  // Role selection
-  roleContainer: "flex gap-4",
-  roleLabelBase: "flex-1 cursor-pointer p-3 rounded-lg border-2 text-center transition-all duration-200",
-  roleLabelActive: "border-primary bg-secondary",
-  roleLabelInactive: "border-border bg-white",
-  hiddenRadio: "hidden",
+  label:
+    "mb-1.5 block text-sm font-medium text-zinc-800",
 
-  // Submit button
-  submitButton: "btn btn-primary p-3.5 text-base mt-2",
+  input:
+    "w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-950 focus:ring-2 focus:ring-zinc-200",
+
+  // Role Selection — Legacy Registration
+  roleContainer:
+    "flex gap-2",
+
+  roleLabelBase:
+    "flex-1 cursor-pointer rounded-lg border px-3 py-2.5 text-center text-sm transition-colors",
+
+  roleLabelActive:
+    "border-zinc-950 bg-zinc-100 text-zinc-950",
+
+  roleLabelInactive:
+    "border-zinc-300 bg-white text-zinc-600",
+
+  hiddenRadio:
+    "sr-only",
+
+  // Submit Button
+  submitButton:
+    "w-full rounded-lg bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50",
 
   // Footer
-  footerText: "text-center mt-8 text-text-muted",
-  loginLink: "text-primary font-semibold hover:underline",
+  footerText:
+    "mt-5 text-center text-sm text-zinc-600",
+
+  loginLink:
+    "font-semibold text-zinc-950 hover:underline",
 };
 
 export const verifyEmailStyles = {
-  pageContainer: "bg-bg-alt min-h-screen pt-32 max-lg:pt-28",
-  containerCenter: "container flex justify-center items-center pt-16 sm:pt-8",
-  card: "glass fade-in w-full max-w-[450px] p-10 sm:p-6 rounded-3xl sm:rounded-2xl shadow-lg",
-  title: "text-[2rem] sm:text-2xl font-bold text-center mb-2 text-primary",
-  subtitle: "text-center text-text-muted mb-8",
-  errorAlert: "p-3 bg-red-100 text-red-600 rounded-lg mb-4 text-sm text-center",
-  successAlert: "p-3 bg-green-100 text-green-600 rounded-lg mb-4 text-sm text-center",
-  form: "flex flex-col gap-5",
-  label: "block mb-2 font-medium",
-  input: "w-full py-3 px-4 rounded-lg border border-border outline-none focus:border-primary transition-colors",
-  codeInput: "w-full py-3 px-4 rounded-lg border border-border outline-none focus:border-primary transition-colors text-center text-2xl tracking-[0.5em]",
-  submitButton: "btn btn-primary p-3.5 text-base mt-2",
+  // Page Layout
+  pageContainer:
+    "flex min-h-dvh flex-col bg-zinc-50 pt-[60px]",
+
+  // Centered Container
+  containerCenter:
+    "mx-auto flex w-full max-w-[1280px] flex-1 items-center justify-center px-4 py-5 sm:px-6 sm:py-8",
+
+  // Verification Card
+  card:
+    "w-full max-w-[420px] rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-7",
+
+  // Heading
+  title:
+    "mb-1 text-center text-2xl font-bold text-zinc-950",
+
+  // Subtitle
+  subtitle:
+    "mb-5 text-center text-sm text-zinc-500",
+
+  // Error Message
+  errorAlert:
+    "mb-4 rounded-lg bg-red-50 p-3 text-center text-sm text-red-600",
+
+  // Success Message
+  successAlert:
+    "mb-4 rounded-lg bg-green-50 p-3 text-center text-sm text-green-700",
+
+  // Form
+  form:
+    "flex flex-col gap-4",
+
+  // Labels
+  label:
+    "mb-1.5 block text-sm font-medium text-zinc-800",
+
+  // Email Input
+  input:
+    "w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-2.5 text-sm text-zinc-950 outline-none transition-colors focus:border-zinc-950 focus:ring-2 focus:ring-zinc-200",
+
+  // Verification Code Input
+  codeInput:
+    "w-full rounded-lg border border-zinc-300 bg-white px-4 py-3 text-center text-xl font-semibold tracking-[0.3em] text-zinc-950 outline-none transition-colors focus:border-zinc-950 focus:ring-2 focus:ring-zinc-200 sm:text-2xl",
+
+  // Submit Button
+  submitButton:
+    "mt-1 w-full rounded-lg bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50",
 };
 
 export const adminLayoutStyles = {
@@ -1206,11 +1311,11 @@ export const logoStyles = {
 };
 
 export const navbarStyles = {
-  nav: "glass fixed top-0 w-full left-0 z-[1000] py-2 lg:py-4",
+  nav: "fixed top-0 left-0 z-[1000] w-full border-b border-zinc-200 bg-white/95 py-3 backdrop-blur-md",
   container: "container px-6 max-w-[1400px] mx-auto",
   grid: "grid grid-cols-[auto_1fr_auto] items-center gap-4",
-  desktopMenu: "hidden lg:flex justify-self-center items-center bg-white/50 px-3 py-1.5 rounded-full border border-white/30 gap-2 shadow-[0_4px_15px_rgba(0,0,0,0.05)]",
-  navLink: "nav-link text-text-main font-semibold text-[15px] px-4 py-2 rounded-3xl transition-all duration-300 no-underline hover:text-primary hover:bg-primary/10",
+  desktopMenu: "hidden lg:flex justify-self-center items-center gap-2",
+  navLink: "text-zinc-700 font-medium text-sm px-4 py-2 rounded-lg transition-colors duration-200 no-underline hover:text-black hover:bg-zinc-100",
   rightSection: "justify-self-end flex items-center gap-5",
   userSection: "flex items-center gap-5",
   avatar: "w-10 h-10 rounded-full border-2 border-primary-light object-cover",

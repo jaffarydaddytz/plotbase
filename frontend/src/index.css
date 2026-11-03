@@ -1,29 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
-/* Theme variables (Tailwind v4 style) */
+/* Plotbase Global Design System */
 @theme {
+    /* Typography */
+    --font-inter: "Inter", sans-serif;
     --font-comfortaa: "Comfortaa", sans-serif;
 
-    --color-primary: #0d9488;
-    --color-primary-light: #ccfbf1;
-    --color-primary-dark: #0f766e;
-    --color-secondary: #f0fdfa;
-    --color-accent: #f59e0b;
-    --color-border: #e5e7eb;
-}
+    /* Primary Brand Colors */
+    --color-primary: #111111;
+    --color-primary-light: #f4f4f5;
+    --color-primary-dark: #27272a;
 
+    /* Secondary Colors */
+    --color-secondary: #f8fafc;
+    --color-accent: #52525b;
+
+    /* Borders */
+    --color-border: #e4e4e7;
+}
 /* Base styles */
 @layer base {
     * {
         @apply m-0 p-0 box-border;
     }
 
-    body {
-        @apply font-[var(--font-comfortaa)] text-[#111827] bg-[#ffffff] leading-relaxed antialiased overflow-x-hidden;
-    }
+body {
+    @apply font-inter text-[#111827] bg-white leading-relaxed antialiased overflow-x-hidden;
+}
 
     h1, h2, h3, h4 {
         @apply font-bold leading-tight;
@@ -47,9 +53,9 @@
 /* Components */
 @layer components {
 
-    .container {
-        @apply max-w-[1280px] mx-auto px-8;
-    }
+.container {
+    @apply max-w-[1280px] mx-auto px-8;
+}
 
     .glass {
         @apply bg-white/80 backdrop-blur-[12px] border border-white/30;
