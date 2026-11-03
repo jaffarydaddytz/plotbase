@@ -21,22 +21,18 @@ adminRouter.get("/pending-sellers", getPendingSellers);
 // New company verification endpoint
 adminRouter.get("/companies/pending", getPendingCompanies);
 // View company application details
-adminRouter.get("/companies/:companyId", getCompanyVerificationDetails, viewCompanyVerificationDocument);
+adminRouter.get("/companies/:companyId", getCompanyVerificationDetails);
 
 // View a company verification document
 adminRouter.get("/companies/:companyId/documents/:documentId/view",viewCompanyVerificationDocument);
-// Review a company verification document
-adminRouter.patch("/companies/:companyId/documents/:documentId/review", reviewCompanyDocument);
+
 
 // Reject a pending company application
 adminRouter.patch( "/companies/:companyId/reject",rejectCompany);
 
-// adminRouter.delete("/properties/:id", deleteProperty)
+adminRouter.delete("/properties/:id", deleteProperty)
 
-adminRouter.delete("/properties/:id", (req, res, next) => {
-  console.log("Route matched, before controller");
-  next();
-}, deleteProperty);
+
 
 // Review a company verification document
 adminRouter.patch("/companies/:companyId/documents/:documentId/review",reviewCompanyDocument);
@@ -48,7 +44,7 @@ adminRouter.patch("/companies/:companyId/approve",approveCompany);
 
 adminRouter.get("/stats/", getDashboardStats)
 
-adminRouter.get("/pending-sellers", getPendingSellers);
+
 
 adminRouter.patch("/approve-seller/:id", approveSeller)
 
