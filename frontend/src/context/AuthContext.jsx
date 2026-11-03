@@ -146,7 +146,7 @@ const refreshUser = async () => {
     if(!token) return ;
     try {
         const res = await axios.get(`${API_URL}/api/auth/me`, {
-            header: {Authorization: `Bearer ${token}`},
+            headers: {Authorization: `Bearer ${token}`},
 
         });
 
