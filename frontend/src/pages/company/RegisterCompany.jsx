@@ -43,6 +43,7 @@ const RegisterCompany = () => {
 
   const [registeredCompany, setRegisteredCompany] = useState(null);
 const [showPreview, setShowPreview] = useState(false);
+const [submissionStage, setSubmissionStage] = useState(null);
 const [showEditor, setShowEditor] = useState(false);
   // Controls whether the investor explicitly starts a new registration
   const [showNewRegistration, setShowNewRegistration] = useState(false);
@@ -277,7 +278,8 @@ const [showEditor, setShowEditor] = useState(false);
       }
 
       // Reload applications, showing the newly submitted company as PENDING.
-      window.location.replace("/company/register");
+      setSubmissionStage("received");
+      setIsSubmitting(false);
     } catch (err) {
       setError(
         err.response?.data?.message ||
@@ -288,6 +290,24 @@ const [showEditor, setShowEditor] = useState(false);
     }
   };
 
+  useEffect(() => {
+  if (submissionStage === "received") {
+    const timer = setTimeout(() => {
+      setSubmissionStage("redirecting");
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }
+
+  if (submissionStage === "redirecting") {
+    const timer = setTimeout(() => {
+      window.location.replace("/company/register");
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }
+}, [submissionStage]);
+
   return (
     <div className="flex min-h-dvh flex-col bg-zinc-50 pt-[60px]">
 
@@ -296,7 +316,50 @@ const [showEditor, setShowEditor] = useState(false);
 
       {/* Main Content */}
       <main className="flex flex-1 items-center justify-center px-4 py-4 sm:px-6">
-        {!registeredCompany && !showNewRegistration && applicationsLoading ? (
+        {submissionStage ? (
+  <section
+    role="status"
+    aria-live="polite"
+    className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm"
+  >
+    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl font-bold text-green-700">
+      ✓
+    </div>
+
+    {submissionStage === "received" ? (
+      <>
+        <h2 className="text-xl font-bold text-zinc-950">
+          Application Received Successfully!
+        </h2>
+
+        <p className="mt-3 text-sm text-zinc-600">
+          Your company verification application has been
+          successfully submitted to Plotbase.
+        </p>
+
+        <p className="mt-2 text-sm text-zinc-600">
+          Our administration team will review your
+          information and verification documents.
+        </p>
+
+        <div className="mt-5 rounded-lg bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-700">
+          Application Status: PENDING REVIEW
+        </div>
+      </>
+    ) : (
+      <>
+        <h2 className="text-xl font-bold text-zinc-950">
+          Taking You to My Company Applications...
+        </h2>
+
+        <p className="mt-3 text-sm text-zinc-600">
+          You can track your application status and view
+          updates from the Plotbase administration team.
+        </p>
+      </>
+    )}
+  </section>
+) : !registeredCompany && !showNewRegistration && applicationsLoading ? (
           <p role="status" className="text-sm text-zinc-600">
             Loading your company applications...
           </p>

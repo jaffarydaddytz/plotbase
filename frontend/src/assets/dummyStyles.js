@@ -1214,15 +1214,19 @@ backdrop: (isOpen) => `
   ${isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'}
 `
     ,
-sidebar: (isOpen) => `fixed left-0 top-0 w-[260px] h-screen bg-white border-r border-[#f1f5f9] py-8 px-5 flex flex-col z-[1000] transition-transform duration-300 ${
+sidebar: (isOpen) => `fixed left-0 top-0 w-[260px] h-screen bg-zinc-100 border-r border-zinc-200 py-8 px-5 flex flex-col z-[1000] transition-transform duration-300 ${
   isOpen ? 'translate-x-0' : '-translate-x-full'
 } md:translate-x-0`,
   logoContainer: "px-3 mb-10 flex justify-between items-center",
   navContainer: "flex flex-col gap-1.5 flex-1",
-  navLink: (isActive) => `flex items-center gap-4 py-3.5 px-4 rounded-xl no-underline text-[0.9375rem] transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${isActive
-    ? 'font-bold text-primary bg-primary-light'
-    : 'font-medium text-[#64748b] hover:bg-gray-50'
-    }`,
+navLink: (isActive) =>
+  `flex items-center gap-3 px-3 py-2.5 rounded-lg border
+   no-underline text-sm transition-colors duration-150
+   ${
+     isActive
+       ? "bg-white text-zinc-950 font-semibold border-zinc-200 shadow-sm"
+       : "border-transparent text-zinc-600 font-medium hover:bg-zinc-200/70 hover:text-zinc-950"
+   }`,
   logoutContainer: "border-t border-[#f1f5f9] pt-6 mt-auto",
   logoutButton: "w-full flex items-center gap-4 py-3.5 px-4 rounded-xl border-none bg-transparent text-[0.9375rem] font-semibold text-[#dc2626] cursor-pointer transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] hover:bg-red-50",
 };
@@ -1286,7 +1290,7 @@ export const sellerSidebarStyles = {
   backdropHidden: "opacity-0 invisible hidden md:block",
 
   // Sidebar container
-  sidebar: "fixed left-0 top-0 w-[260px] h-screen bg-white border-r border-[#f1f5f9] py-8 px-5 flex flex-col z-[1000] transition-transform duration-300",
+ sidebar: "fixed left-0 top-0 w-[260px] h-screen bg-zinc-100 border-r border-zinc-200 py-8 px-5 flex flex-col z-[1000] transition-transform duration-300",
   sidebarOpen: "translate-x-0",
   sidebarClosed: "-translate-x-full md:translate-x-0",
 
@@ -1294,10 +1298,17 @@ export const sellerSidebarStyles = {
   logoContainer: "px-3 mb-10 flex justify-between items-center",
 
   // Navigation
-  nav: "flex flex-col gap-1.5 flex-1",
-  navLink: "flex items-center gap-4 py-3.5 px-4 rounded-xl no-underline text-[0.9375rem] transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)]",
-  navLinkActive: "font-bold text-primary bg-primary-light",
-  navLinkInactive: "font-medium text-[#64748b] hover:bg-gray-50",
+// Navigation
+nav: "flex flex-col gap-1.5 flex-1",
+
+navLink:
+  "flex items-center gap-3 px-3 py-2.5 rounded-lg border border-transparent no-underline text-sm transition-colors duration-150",
+
+navLinkActive:
+  "bg-white text-zinc-950 font-semibold border-zinc-200 shadow-sm",
+
+navLinkInactive:
+  "text-zinc-600 font-medium hover:bg-zinc-200/70 hover:text-zinc-950",
 
   // Logout
   logoutContainer: "border-t border-[#f1f5f9] pt-6 mt-auto",

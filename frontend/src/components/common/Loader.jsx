@@ -1,14 +1,25 @@
-
-
 const Loader = () => {
   return (
-       <div className=" flex flex-col items-center justify-center min-h-screen">
-      <div className="w-10 h-10 border-4 border-gray-300 border-t-green-500 rounded-full animate-spin"></div>
-      <p className="font-comfortaa  mt-3 text-gray-600 font-semibold tracking-wide">
-        plotbase
-      </p>
-    </div>
-  )
-}
+    <div
+      role="status"
+      className="flex min-h-screen items-center justify-center"
+    >
+      <div className="flex items-center gap-1.5" aria-hidden="true">
+        {[0, 1, 2].map((dot) => (
+          <span
+            key={dot}
+            className="h-2 w-2 animate-bounce rounded-full bg-zinc-700"
+            style={{
+              animationDelay: `${dot * 150}ms`,
+              animationDuration: "900ms",
+            }}
+          />
+        ))}
+      </div>
 
-export default Loader
+      <span className="sr-only">Loading Plotbase...</span>
+    </div>
+  );
+};
+
+export default Loader;

@@ -67,11 +67,15 @@ export const getCompanyVerificationDetails = async (req, res) => {
         createdBy: company.createdBy,
         createdAt: company.createdAt,
 
-        documents: company.verificationDocuments.map((doc) => ({
-          id: doc._id,
-          documentType: doc.documentType,
-          uploadedAt: doc.uploadedAt,
-        })),
+documents: company.verificationDocuments.map((doc) => ({
+  id: doc._id,
+  documentType: doc.documentType,
+  uploadedAt: doc.uploadedAt,
+
+  reviewStatus: doc.reviewStatus,
+  reviewedAt: doc.reviewedAt,
+  reviewNotes: doc.reviewNotes,
+})),
       },
     });
   } catch (error) {

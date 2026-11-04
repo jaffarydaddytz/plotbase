@@ -2,7 +2,16 @@ import React from 'react'
 import { adminSidebarStyles as s } from '../../assets/dummyStyles'
 import { useAuth } from '../../context/AuthContext'
 import Logo from '../common/Logo';
-import { HiOutlineChatAlt2, HiOutlineLibrary, HiOutlineLogout, HiOutlineMail, HiOutlineUserCircle, HiOutlineUsers, HiOutlineViewGrid } from 'react-icons/hi';
+import {
+  HiOutlineChatAlt2,
+  HiOutlineLibrary,
+  HiOutlineLogout,
+  HiOutlineMail,
+  HiOutlineOfficeBuilding,
+  HiOutlineUserCircle,
+  HiOutlineUsers,
+  HiOutlineViewGrid,
+} from "react-icons/hi";
 import { NavLink } from 'react-router-dom';
 
 
@@ -16,6 +25,11 @@ const navItems = [
     icon: HiOutlineUserCircle,
     path: "/admin/seller-requests",
   },
+  {
+  name: "Company Verification",
+  icon: HiOutlineOfficeBuilding,
+  path: "/admin/company-verification",
+},
   { name: "Properties", icon: HiOutlineLibrary, path: "/admin/properties" },
   { name: "Inquiries", icon: HiOutlineChatAlt2, path: "/admin/inquiries" },
   { name: "Contact Inbox", icon: HiOutlineMail, path: "/admin/contacts" },
