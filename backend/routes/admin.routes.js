@@ -4,6 +4,10 @@ import { approveSeller, blockUser, deleteUser, getAllProperties, getAllUsers, ge
 import { deleteProperty } from "../controllers/admin.controller.js";
 import {getPendingCompanies,getCompanyVerificationDetails, viewCompanyVerificationDocument,reviewCompanyDocument,rejectCompany, approveCompany} from "../controllers/companyVerification.controller.js";
 
+import {
+  getCompanyVerificationOverview,
+  getCompanyApplications,
+} from "../controllers/companyVerificationDashboard.controller.js";
 
 
 const adminRouter = express.Router();
@@ -20,6 +24,16 @@ adminRouter.get("/properties", getAllProperties);
 adminRouter.get("/pending-sellers", getPendingSellers);
 // New company verification endpoint
 adminRouter.get("/companies/pending", getPendingCompanies);
+
+// Search, filter, sort and paginate company applications
+adminRouter.get("/companies", getCompanyApplications);
+
+// Company verification dashboard statistics
+adminRouter.get(
+  "/companies/overview",
+  getCompanyVerificationOverview
+);
+
 // View company application details
 adminRouter.get("/companies/:companyId", getCompanyVerificationDetails);
 
