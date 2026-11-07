@@ -26,20 +26,18 @@ const VerifyEmail = () => {
         setSuccess("");
 
         try {
-            console.log("Sending:", { email, code });
+           
             const res = await axios.post(`${API_URL}/api/auth/verify-email`, {
                 email,
                 code
             });
-
-            console.log("verify email response", res)
             
             if(res.data.success){
                 setSuccess("email verified successfuly!");
                 setTimeout(() => navigate("/login"), 2000);
             }
         } catch (err) {
-            console.log("failed", err)
+            
             setError(
                 err.response?.data?.message || " verification failed try again"
             )

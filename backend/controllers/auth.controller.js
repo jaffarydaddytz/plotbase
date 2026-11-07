@@ -57,17 +57,17 @@ export const register = async (req, res) => {
       .randomInt(100000, 1000000)
       .toString();
 
-    // Public registration creates investors only
+    // Every new public user registers as an investor.
     const user = await User.create({
       name: normalizedName,
       email: normalizedEmail,
       password: hashedPassword,
-      role: "buyer",
+      role: "investor",
       isApproved: true,
       isVerified: false,
       verificationToken,
       verificationTokenExpires: new Date(Date.now() + 10 * 60 * 1000),
-      verificationLastSentAt: new Date()
+      verificationLastSentAt: new Date(),
     });
 
     // Send verification email
@@ -189,22 +189,44 @@ export const login = async (req, res) => {
 };
 
 //to get profile
+// Get the currently authenticated user's safe profile
 export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await User.findById(req.user._id)
+      .select(
+        "name email role phone address profilePic isVerified isApproved"
+      )
+      .lean();
+
     if (!user) {
       return res.status(404).json({
-        message: "user not found",
+        success: false,
+        message: "User not found",
       });
     }
 
-    res.json({
+    // Return only explicitly permitted fields
+    return res.status(200).json({
       success: true,
-      user,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        phone: user.phone || "",
+        address: user.address || "",
+        profilePic: user.profilePic || "",
+        isVerified: user.isVerified,
+        isApproved: user.isApproved,
+      },
     });
+
   } catch (error) {
-    res.status(500).json({
-      message: err.message,
+    console.error("Get user profile error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to retrieve user profile",
     });
   }
 };

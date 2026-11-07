@@ -122,38 +122,7 @@ const Register = () => {
               </div>
             </div>
 
-            <div>
-              <label className="block mb-3 font-medium">Select Role</label>
-              <div className={s.roleContainer}>
-                <label
-                  className={`${s.roleLabelBase} ${formData.role === "buyer" ? s.roleLabelActive : s.roleLabelInactive}`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="buyer"
-                    checked={formData.role === "buyer"}
-                    onChange={handleChange}
-                    className={s.hiddenRadio}
-                  />
-                  Buyer
-                </label>
-
-                <label
-                  className={`${s.roleLabelBase} ${formData.role === "seller" ? s.roleLabelActive : s.roleLabelInactive}`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="seller"
-                    checked={formData.role === "seller"}
-                    onChange={handleChange}
-                    className={s.hiddenRadio}
-                  />
-                  Seller
-                </label>
-              </div>
-            </div>
+         
 
             <button className={s.submitButton} type="submit" disabled={isLoading}>
                 {isLoading ? "Creating Account": "Create Acccount"}
