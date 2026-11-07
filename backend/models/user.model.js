@@ -15,11 +15,16 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    role: {
-      type: String,
-      enum: ["buyer", "seller", "admin"],
-      default: "buyer",
-    },
+role: {
+  type: String,
+  enum: [
+    "investor",
+    "buyer",  // Legacy: temporary
+    "seller", // Legacy: temporary
+    "admin",
+  ],
+  default: "investor",
+},
     phone: {
       type: String,
     },

@@ -17,7 +17,7 @@ import {
 import API_URL from "../../config";
 import Loader from "../../components/common/Loader";
 
-const PropertyDetails = () => {
+const PropertyDetails = ({ insideAdmin = false }) => {
   const { id } = useParams();
   const { user, token } = useAuth();
   const navigate = useNavigate();
@@ -208,20 +208,66 @@ setProjectGeoJson(projectRes.data.plots);
     }
   };
 
-  if (loading) {
-  return <Loader />;
+// =====================================================
+// LOADING STATE
+// =====================================================
+
+// Always keep the Navbar visible.
+// The loader occupies only the content area.
+
+if (loading) {
+  return (
+    <div
+      className={
+        insideAdmin
+          ? "min-h-0 bg-zinc-50"
+          : "min-h-dvh bg-zinc-50 pt-[60px]"
+      }
+    >
+      {!insideAdmin && <Navbar />}
+      <Loader />
+    </div>
+  );
 }
 
+// =====================================================
+// ERROR STATE
+// =====================================================
 
-  if (error || !property)
-    return (
-      <div
-        className="container"
-        style={{ padding: "4rem", textAlign: "center" }}
-      >
-        {error || "property not found"}
-      </div>
-    );
+// Keep the Navbar visible even when loading fails.
+
+if (error || !property) {
+  return (
+    <div
+      className={
+        insideAdmin
+          ? "min-h-0 bg-zinc-50"
+          : "min-h-dvh bg-zinc-50 pt-[60px]"
+      }
+    >
+      {!insideAdmin && <Navbar />}
+
+      <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 text-center">
+          <h1 className="text-lg font-semibold text-zinc-950">
+            Project Details
+          </h1>
+
+          <p className="mt-3 text-sm text-zinc-600">
+            {error || "Project not found."}
+          </p>
+
+<Link
+  to={insideAdmin ? "/admin/marketplace" : "/projects"}
+            className="mt-5 inline-flex rounded-lg bg-zinc-950 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-800"
+          >
+            Back to Projects
+          </Link>
+        </div>
+      </main>
+    </div>
+  );
+}
 
   const formattedPrice = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -229,9 +275,15 @@ setProjectGeoJson(projectRes.data.plots);
     maximumFractionDigits: 0,
   }).format(property.price);
 
-  return (
-    <div className={s.pageContainer}>
-      <Navbar />
+return (
+  <div
+    className={
+      insideAdmin
+        ? "min-w-0 bg-white px-2 pb-8 pt-2 sm:px-4"
+        : s.pageContainer
+    }
+  >
+    {!insideAdmin && <Navbar />}
 
 {/* Project Map */}
 {projectGeoJson && (

@@ -8,6 +8,12 @@ import { registerCompany , getMyCompanyApplications,submitCompanyApplication, up
 import { uploadVerificationDocument } from "../controllers/companyDocument.controller.js";
 
 import companyDocumentUpload from "../middlewares/companyDocumentUpload.middleware.js";
+import { requireCompanyMembership } from "../middlewares/companyAccess.middleware.js";
+
+import { getCompanyWorkspace } from "../controllers/companyWorkspace.controller.js";
+import { getMyWorkspaces } from "../controllers/companyWorkspaces.controller.js";
+
+
 
 const router = express.Router();
 
@@ -19,6 +25,23 @@ router.get(
   "/my-applications",
   protect,
   getMyCompanyApplications,
+);
+
+// Get approved companies where the authenticated user
+// has an ACTIVE company membership.
+router.get(
+  "/my-workspaces",
+  protect,
+  getMyWorkspaces
+);
+
+// Company Workspace
+// Accessible only to active members of approved companies.
+router.get(
+  "/:companyId/workspace",
+  protect,
+  requireCompanyMembership(),
+  getCompanyWorkspace
 );
 
 // Submit a completed company application for admin review

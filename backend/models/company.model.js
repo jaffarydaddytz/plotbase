@@ -42,6 +42,54 @@ const companySchema = new mongoose.Schema(
       required: true,
     },
 
+    // Personal details of the individual applying
+// on behalf of the real-estate company.
+applicantInfo: {
+  fullName: {
+    type: String,
+    trim: true,
+  },
+
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+  },
+
+  phone: {
+    type: String,
+    trim: true,
+  },
+
+  // Applicant's position within the company.
+  // Example: Managing Director, CEO, General Manager.
+  positionTitle: {
+    type: String,
+    trim: true,
+  },
+
+  // Example: Founder, Employee, Authorized Representative.
+  relationshipToCompany: {
+    type: String,
+    trim: true,
+  },
+
+  // Applicant confirms they are authorized
+  // to represent the company.
+  authorizedToApply: {
+    type: Boolean,
+    default: false,
+  },
+},
+
+// User who submitted the completed application.
+// May differ from the user who originally created the draft.
+submittedBy: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null,
+},
+
     verificationDocuments: [
       {
         documentType: {
