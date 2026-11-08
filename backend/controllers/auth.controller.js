@@ -379,102 +379,220 @@ export const resendVerification = async (req, res) => {
   }
 };
 
-//forgot password
-
-/* 
+// Forgot Password
 export const forgotPassword = async (req, res) => {
-    try {
-        const {email} = req.body;
-        const user = await User.findOne({email});
+  const successMessage =
+    "If an account exists with this email, a password reset link has been sent.";
 
-        if(!user){
-            return res.status(404).json({message: "no user found with that email"})
-        }
+  try {
+    const { email } = req.body ?? {};
 
-        const resetToken = crypto.randomBytes(20).toString("hex");
-        const resetPasswordExpire = Date.now() + 15*60*1000;
-
-        user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-        user.resetPasswordExpire = resetPasswordExpire;
-        await user.save();
-
-        const clientUrl = "http://localhost:5173";
-        const resetUrl =  ` ${clientUrl}/reset-password/${resetToken} `,
-        const message =   ` 
-        <h2> Password Reset Request</h2>
-        <p>  you requested a password reset. please click on the link below to reset your password</p>
-        <a href="${resetUrl}" clicktracking ="off>${resetUrl} </a>
-        <p> this link will expire in 15 minutes  </p>
-
-        
-         `
-        
-
-         
- try {
-    await sendEmail({
-        email: user.email,
-        subject: "password reset - plotbase platform",
-        message
-    });
-    res.status(200).json({message: "password reset email sent", success: true});
-
-
- } catch (error) {
-
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire= undefined;
-    await user.save();
-    return res.status(500).json({message: "could not send email", success:false})
-    
- }
-
-
-
-
-
-
-
-
-
-
-    } catch (err) {
-        res.status(500).json({message: err.message, success: false});
-        
+    // Validate email
+    if (
+      typeof email !== "string" ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a valid email address.",
+      });
     }
-}; 
-*/
 
-//reset password
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // Find user
+    const user = await User.findOne({
+      email: normalizedEmail,
+    });
+
+    // Prevent account enumeration
+    if (!user) {
+      return res.status(200).json({
+        success: true,
+        message: successMessage,
+      });
+    }
+
+    // Use the configured frontend URL.
+    // Localhost fallback is permitted only during development.
+    const frontendUrl =
+      process.env.FRONTEND_URL?.trim() ||
+      (process.env.NODE_ENV !== "production"
+        ? "http://localhost:5173"
+        : "");
+
+    if (!frontendUrl) {
+      console.error("FRONTEND_URL is not configured");
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to process password reset request.",
+      });
+    }
+
+    // Generate secure reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Store only the hashed token
+    user.resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
+
+    // Token expires after 15 minutes
+    user.resetPasswordExpires = new Date(
+      Date.now() + 15 * 60 * 1000
+    );
+
+    await user.save();
+
+    // Construct reset URL
+    const resetUrl = `${frontendUrl.replace(/\/+$/, "")}/reset-password/${resetToken}`;
+
+    const message = `
+      <h2>Reset Your Plotbase Password</h2>
+
+      <p>
+        We received a request to reset your Plotbase password.
+      </p>
+
+      <p>
+        Click the button below to create a new password.
+      </p>
+
+      <p>
+        <a href="${resetUrl}">
+          Reset My Password
+        </a>
+      </p>
+
+      <p>
+        This link will expire in 15 minutes.
+      </p>
+
+      <p>
+        If you did not request this password reset,
+        you can safely ignore this email.
+      </p>
+
+      <p>
+        Plotbase Tanzania
+      </p>
+    `;
+
+    try {
+      await sendEmail({
+        email: user.email,
+        subject: "Reset Your Password - Plotbase",
+        message,
+      });
+    } catch (emailError) {
+      // Invalidate the token if delivery fails
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+
+      await user.save();
+
+      console.error(
+        "Password reset email delivery failed:",
+        emailError.message
+      );
+
+      // Preserve a generic response to avoid exposing accounts
+      return res.status(200).json({
+        success: true,
+        message: successMessage,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: successMessage,
+    });
+  } catch (error) {
+    console.error("Forgot password request failed:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to process password reset request.",
+    });
+  }
+};
+
+
+// Reset Password
 export const resetPassword = async (req, res) => {
   try {
     const { token } = req.params;
-    const { password } = req.body;
-    const resetPasswordToken = crypto
+    const { password } = req.body ?? {};
+
+    // Validate password using the same rules as registration
+    if (
+      typeof password !== "string" ||
+      password.length < 8 ||
+      Buffer.byteLength(password, "utf8") > 72
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters and at most 72 bytes.",
+      });
+    }
+
+    // Validate reset token format
+    if (
+      typeof token !== "string" ||
+      !/^[a-f0-9]{64}$/i.test(token)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired password reset link.",
+      });
+    }
+
+    // Hash the incoming token
+    const hashedToken = crypto
       .createHash("sha256")
       .update(token)
       .digest("hex");
-    const user = await User.findOne({
-      resetPasswordToken,
-      resetPasswordExpire: { $gt: Date.now() },
-    });
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Atomically update password and invalidate reset token
+    const user = await User.findOneAndUpdate(
+      {
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: new Date() },
+      },
+      {
+        $set: {
+          password: hashedPassword,
+        },
+        $unset: {
+          resetPasswordToken: "",
+          resetPasswordExpires: "",
+        },
+      }
+    );
 
     if (!user) {
-      return res
-        .status(400)
-        .json({ message: "invalid or invalid rest password", success: false });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired password reset link.",
+      });
     }
 
-    user.password = await bcrypt.hash(password, 10);
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undifined;
-
-    await user.save();
-    res.status(200).json({
-      message: "password updated successfuly",
+    return res.status(200).json({
       success: true,
+      message: "Password updated successfully. You can now log in.",
     });
+
   } catch (error) {
-    res.status(500).json({ message: err.message, success: false });
+    console.error("Reset password failed:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Unable to reset password. Please try again.",
+    });
   }
 };

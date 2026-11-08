@@ -23,6 +23,8 @@ import PropertyDetailPage from "./pages/shared/propertyDetailPage";
 import Register from "./pages/auth/Register";
 import VerifyEmail from "./pages/auth/VerifyEmail";
 import Login from "./pages/auth/Login";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 import {
   ProtectedRoute,
@@ -185,6 +187,18 @@ const App = () => {
             element={<VerifyEmail />}
           />
         </Route>
+
+        {/* PASSWORD RECOVERY */}
+
+<Route
+  path="/forgot-password"
+  element={<ForgotPassword />}
+/>
+
+<Route
+  path="/reset-password/:token"
+  element={<ResetPassword />}
+/>
 
         {/* ============================================
             PUBLIC PAGES

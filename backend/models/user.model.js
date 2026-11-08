@@ -58,9 +58,17 @@ role: {
       type: Date,
       default: null,
     },
-    resetPasswordExpires: {
-      type: Date,
-    },
+// Password recovery
+resetPasswordToken: {
+  type: String,
+  select: false,
+  default: undefined,
+},
+
+resetPasswordExpires: {
+  type: Date,
+  default: undefined,
+},
   },
   {
     timestamps: true,
