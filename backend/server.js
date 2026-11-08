@@ -22,9 +22,10 @@ import adminRouter from './routes/admin.routes.js';
 import wishlistRouter from './routes/wishlist.routes.js';
 import projectRouter from './routes/project.routes.js';
 import companyRouter from './routes/company.routes.js';
+import mtaalamuRouter from './routes/mtaalamu.routes.js';
 
 
-app.set('trust proxy', true);
+app.set('trust proxy', false);
 
 //DB
 connectDB();
@@ -63,6 +64,8 @@ app.use("/api/admin", adminRouter)
 app.use("/api/wishlist", wishlistRouter)
 app.use("/api/project", projectRouter)
 app.use("/api/companies", companyRouter);
+// Mtaalamu AI Assistant
+app.use("/api/mtaalamu", mtaalamuRouter);
 
 
 

@@ -17,16 +17,15 @@ const footerSections = [
       { label: "How It Works", to: "/how-it-works" },
     ],
   },
-  {
-    title: "Support",
-    links: [
-      { label: "Contact Us", to: "/contact" },
-      { label: "Help Center", to: "/help" },
-      { label: "Ask About Plotbase", to: "/ask-plotbase" },
-      { label: "Privacy Policy", to: "/privacy-policy" },
-      { label: "Terms & Conditions", to: "/terms" },
-    ],
-  },
+{
+  title: "Support",
+  links: [
+    { label: "Contact Us", to: "/contact" },
+    { label: "Help Center", to: "/help" },
+    { label: "Privacy Policy", to: "/privacy-policy" },
+    { label: "Terms & Conditions", to: "/terms" },
+  ],
+},
 ];
 
 const Footer = () => {

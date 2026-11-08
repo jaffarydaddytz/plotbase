@@ -108,9 +108,9 @@ export const retrieveMtaalamuKnowledge = async (
     },
     embeddingModel: MTAALAMU_EMBEDDING_MODEL,
   })
-    .select(
-      "documentId chunkIndex text pageStart pageEnd sectionTitle embedding"
-    )
+.select(
+  "documentId chunkIndex text pageStart pageEnd sectionTitle embedding"
+)
     .limit(MAX_CHUNKS + 1)
     .lean();
 
