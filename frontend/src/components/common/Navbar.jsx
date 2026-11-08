@@ -52,7 +52,6 @@ const NavigationLink = ({
     </Link>
   );
 };
-
 // =====================================================
 // ACCOUNT MENU LINK
 // =====================================================
@@ -220,15 +219,20 @@ const Navbar = () => {
       const isLoginPage = pathname === "/login";
       const isRegisterPage = pathname === "/register";
 
-      const items = [
-        {
-          label:
-            isLoginPage || isRegisterPage
-              ? "Back to Projects"
-              : "Projects",
-          to: "/projects",
-        },
-      ];
+const items = [
+  {
+    label: "Viwanja",
+    to: "/viwanja",
+  },
+  {
+    label: "Mashamba",
+    to: "/mashamba",
+  },
+  {
+    label: "Maarifa",
+    to: "/maarifa",
+  },
+];
 
       if (!isLoginPage) {
         items.push({
@@ -249,22 +253,24 @@ const Navbar = () => {
 
     // INVESTOR
 
-    if (isInvestor) {
-      return [
-        {
-          label: "Projects",
-          to: "/projects",
-        },
-        {
-          label: "Wishlist",
-          to: "/wishlist",
-        },
-        {
-          label: "Contact",
-          to: "/contact",
-        },
-      ];
-    }
+// INVESTOR
+
+if (isInvestor) {
+  return [
+    {
+      label: "Viwanja",
+      to: "/viwanja",
+    },
+    {
+      label: "Mashamba",
+      to: "/mashamba",
+    },
+    {
+      label: "Maarifa",
+      to: "/maarifa",
+    },
+  ];
+}
 
     // LEGACY BUYER
 
@@ -445,10 +451,11 @@ const Navbar = () => {
           <div className="hidden min-w-0 flex-1 items-center justify-center gap-1 lg:flex">
             {!authLoading &&
               navigationItems.map((item) => (
-                <NavigationLink
-                  key={item.to}
-                  to={item.to}
-                  pathname={pathname}
+             <NavigationLink
+  key={item.to ?? item.label}
+  to={item.to}
+  
+  pathname={pathname}
                 >
                   {item.label}
                 </NavigationLink>
