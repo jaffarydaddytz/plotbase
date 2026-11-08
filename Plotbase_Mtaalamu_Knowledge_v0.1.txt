@@ -1,0 +1,227 @@
+# PLOTBASE — MTAALAMU KNOWLEDGE BASE
+
+Version: 0.1  
+Date: November 2026  
+Language: Kiswahili and English  
+Status: Development Draft — Pending Administrator Approval
+
+## 1. PLOTBASE NI NINI?
+
+Plotbase ni jukwaa la kidijitali linalolenga kurahisisha upatikanaji wa taarifa za miradi ya viwanja, usimamizi wa viwanja, na uwekezaji wa ardhi nchini Tanzania.
+
+Plotbase inalenga kuwaunganisha wawekezaji na kampuni za mali isiyohamishika zilizohakikiwa.
+
+**English:**
+
+Plotbase is a digital real-estate platform designed to simplify land discovery, plot management, and land investment in Tanzania.
+
+It aims to connect investors with verified real-estate companies.
+
+## 2. NANI ANAWEZA KUTUMIA PLOTBASE?
+
+Plotbase inalenga makundi yafuatayo:
+
+**Wawekezaji (Investors)**
+
+Watu wanaotafuta taarifa kuhusu miradi ya viwanja na fursa za uwekezaji wa ardhi.
+
+**Kampuni za Mali Isiyohamishika**
+
+Kampuni zilizosajiliwa na kuidhinishwa kupitia mfumo wa uhakiki wa Plotbase.
+
+**Investment Partners**
+
+Washirika wa uwekezaji ambao ni kundi tofauti na kampuni za mali isiyohamishika.
+
+Investment Partners hawapewi moja kwa moja ruhusa za kusimamia au kuchapisha miradi ya kampuni.
+
+## 3. USAJILI WA KAMPUNI
+
+Plotbase inakusudia kuruhusu kampuni za mali isiyohamishika zilizohakikiwa pekee kuchapisha miradi.
+
+Mchakato wa uhakiki unajumuisha:
+
+1. Kampuni kuwasilisha taarifa za usajili.
+2. Kupakia nyaraka zinazohitajika.
+3. Wasimamizi wa Plotbase kupitia nyaraka.
+4. Kampuni kuidhinishwa au kukataliwa.
+
+Kampuni haiwezi kuchukuliwa kuwa imeidhinishwa kwa sababu tu imewasilisha maombi.
+
+Uhakiki wa kampuni kwenye Plotbase si uthibitisho wa mwisho wa umiliki wa kila kiwanja kinachohusishwa nayo.
+
+## 4. JINSI YA KUPATA KIWANJA
+
+Kwa mfumo unaolengwa, mwekezaji ataweza:
+
+1. Kutembelea Plotbase.
+2. Kuchunguza miradi ya viwanja iliyochapishwa.
+3. Kuchagua mradi anaoupenda.
+4. Kufungua ukurasa wa maelezo ya mradi.
+5. Kuangalia taarifa za viwanja na ramani zinazopatikana.
+6. Kuwasiliana na kampuni husika kupitia huduma zinazopatikana.
+
+Taarifa muhimu kama bei, ukubwa wa kiwanja, na upatikanaji zinapaswa kuthibitishwa kabla ya kufanya malipo.
+
+## 5. RAMANI ZA GEOJSON
+
+Plotbase inatumia au inapanga kutumia taarifa za GeoJSON katika usimamizi wa ramani za miradi.
+
+GeoJSON inaweza kuwa na:
+
+- Mipaka ya mradi.
+- Namba za viwanja.
+- Ukubwa wa viwanja.
+- Maumbo ya viwanja.
+- Taarifa nyingine zinazohusiana na ramani.
+
+GeoJSON haimaanishi kuwa taarifa za bei lazima ziwepo.
+
+Ramani inayopatikana mtandaoni si mbadala wa hati miliki au uthibitisho rasmi wa mipaka ya ardhi.
+
+## 6. BEI ZA VIWANJA
+
+Kampuni zinatarajiwa kusanidi utaratibu wa bei kwa miradi yao.
+
+Mfano wa utaratibu wa bei ni bei kwa kila mita ya mraba.
+
+Backend ya Plotbase imepangwa kuhakiki utaratibu wa bei na kufanya mahesabu ya bei za viwanja.
+
+Bei zinazoonekana kwenye faili ya GeoJSON hazipaswi kuchukuliwa kuwa bei rasmi bila uthibitisho wa mfumo.
+
+## 7. MAJUKUMU YA WAFANYAKAZI WA KAMPUNI
+
+Plotbase imepanga mfumo wa majukumu ya wafanyakazi unaojumuisha:
+
+**Company Admin:** Kusimamia kampuni na ruhusa za wafanyakazi.
+
+**Manager:** Kusimamia miradi na shughuli za kampuni.
+
+**Sales Officer:** Kusimamia wateja, mauzo na mawasiliano.
+
+**Accountant:** Kusimamia taarifa za malipo na miamala.
+
+**Field Officer:** Kuratibu shughuli zinazohusiana na maeneo ya viwanja.
+
+**Title Deed Officer:** Kufuatilia michakato inayohusiana na hati miliki.
+
+Majukumu haya yanahusishwa na kampuni husika kupitia CompanyMembership.
+
+Ruhusa za kampuni moja hazimaanishi kuwa mtumiaji ana ruhusa sawa katika kampuni nyingine.
+
+## 8. HUDUMA ZA PLOTBASE
+
+### FikaSite
+
+FikaSite ni huduma inayolenga kurahisisha uratibu na ufuatiliaji wa ziara za kutembelea maeneo ya viwanja.
+
+### Hati Day
+
+Hati Day ni huduma inayohusiana na ufuatiliaji wa michakato ya hati miliki.
+
+Huduma hii haimaanishi kwamba hati miliki imetolewa au imehakikishwa.
+
+### Kiwanja Changu
+
+Kiwanja Changu ni sehemu inayolengwa kumsaidia mwekezaji kufuatilia taarifa zinazohusiana na viwanja vyake.
+
+### Jirani Yangu
+
+Jirani Yangu ni huduma inayolenga kujenga jumuiya inayowaunganisha wawekezaji wa Plotbase.
+
+**Muhimu:** Huduma hizi ziko kwenye mipango ya bidhaa. Upatikanaji wake wa sasa unapaswa kuthibitishwa kabla ya kumweleza mtumiaji kwamba tayari zinatumika.
+
+## 9. MTAALAMU NI NINI?
+
+Mtaalamu ni msaidizi wa kidijitali wa Plotbase unaolenga kujibu maswali ya watumiaji.
+
+Mtaalamu imepangwa kutumia teknolojia ya Retrieval-Augmented Generation (RAG).
+
+Mfumo huu unalenga kupata taarifa kutoka kwenye nyaraka za maarifa zilizoidhinishwa kabla ya kutoa majibu.
+
+Mtaalamu anatarajiwa kusaidia maswali kuhusu:
+
+- Plotbase na huduma zake.
+- Miradi ya viwanja.
+- Usajili na uhakiki wa kampuni.
+- Utafutaji wa viwanja.
+- Taarifa za jumla kuhusu uwekezaji wa ardhi.
+
+Mtaalamu inapaswa kujibu kwa Kiswahili au Kiingereza kulingana na lugha ya mtumiaji.
+
+Ikiwa taarifa haijathibitishwa, Mtaalamu haipaswi kubuni majibu.
+
+## 10. MASWALI NA MAJIBU
+
+**Swali: Plotbase ni nini?**
+
+Jibu: Plotbase ni jukwaa la kidijitali linalolenga kurahisisha upatikanaji wa taarifa za miradi ya viwanja na kuwaunganisha wawekezaji na kampuni za mali isiyohamishika zilizohakikiwa nchini Tanzania.
+
+**Swali: Nani anaruhusiwa kutangaza miradi kwenye Plotbase?**
+
+Jibu: Kwa mfumo uliopangwa, kampuni za mali isiyohamishika zilizoidhinishwa pekee ndizo zinaruhusiwa kuchapisha miradi. Wawekezaji binafsi hawapewi moja kwa moja ruhusa za kampuni.
+
+**Swali: Kampuni zinahakikiwaje?**
+
+Jibu: Kampuni huwasilisha taarifa na nyaraka za uhakiki. Wasimamizi wa Plotbase hupitia taarifa hizo kabla ya kuidhinisha au kukataa maombi.
+
+**Swali: Ninawezaje kupata kiwanja?**
+
+Jibu: Unaweza kuchunguza miradi iliyochapishwa kwenye Plotbase, kufungua maelezo ya mradi, na kuangalia taarifa za viwanja zinazopatikana. Hakikisha unathibitisha bei, ukubwa na upatikanaji kabla ya kufanya malipo.
+
+**Swali: Je, ramani ya Plotbase ni hati miliki?**
+
+Jibu: Hapana. Ramani ni nyenzo ya kuonyesha taarifa za eneo. Hati miliki na mipaka ya kisheria vinahitaji uthibitisho rasmi.
+
+**Swali: FikaSite ni nini?**
+
+Jibu: FikaSite ni huduma inayolenga kurahisisha uratibu wa ziara za kutembelea maeneo ya viwanja.
+
+**Swali: Hati Day ni nini?**
+
+Jibu: Hati Day ni huduma inayohusiana na ufuatiliaji wa michakato ya hati miliki.
+
+**Swali: Kiwanja Changu ni nini?**
+
+Jibu: Kiwanja Changu ni sehemu inayolengwa kwa wawekezaji kufuatilia taarifa zinazohusiana na viwanja vyao.
+
+**Swali: Jirani Yangu ni nini?**
+
+Jibu: Jirani Yangu ni huduma inayolenga kuunganisha wawekezaji kupitia jumuiya ya Plotbase.
+
+**Question: How does Plotbase work?**
+
+Answer: Plotbase is designed to help investors discover real-estate projects, explore plot information and maps, and engage with verified real-estate companies.
+
+**Question: Can anyone list land projects?**
+
+Answer: Under the intended Plotbase model, only approved real-estate companies are permitted to publish projects. Individual investors do not automatically receive company publishing permissions.
+
+**Question: Is my land investment guaranteed?**
+
+Answer: Plotbase knowledge materials do not establish guaranteed investment returns or land ownership. Investors should verify relevant documents, ownership, project details, and applicable terms before making investment decisions.
+
+**Question: What is the price of a particular plot?**
+
+Answer: This knowledge document does not contain live plot prices. Please refer to current project information and confirm details with the relevant company.
+
+## 11. MTAALAMU ANSWERING GUIDELINES
+
+Mtaalamu should follow these principles:
+
+1. Respond using verified Plotbase knowledge whenever available.
+2. Answer in Kiswahili or English based on the user's question.
+3. Do not invent property prices, locations, availability, or company approvals.
+4. Distinguish planned functionality from currently available features.
+5. Do not promise guaranteed investment returns.
+6. Do not claim that an online map constitutes legal proof of land ownership.
+7. Do not disclose confidential company or personal information.
+8. If approved knowledge does not support an answer, clearly communicate that limitation.
+9. If current project information is unavailable, do not fabricate it.
+10. Encourage appropriate verification of important land and investment information.
+
+## END OF DOCUMENT
+
+Document: Plotbase Mtaalamu Knowledge Base  
+Version: 0.1  
+Status: Draft — Pending Administrator Approval

@@ -60,6 +60,21 @@ const INITIAL_FILTERS = {
   maxSize: "",
   sort: "latest",
   availableOnly: false,
+  sizeUnit: "sqm",
+};
+
+const SIZE_UNITS = [
+  { label: "Square metres (sqm)", value: "sqm" },
+  { label: "Square feet (sqft)", value: "sqft" },
+  { label: "Acres", value: "acre" },
+  { label: "Hectares", value: "hectare" },
+];
+
+const SIZE_TO_SQM = {
+  sqm: 1,
+  sqft: 0.09290304,
+  acre: 4046.8564224,
+  hectare: 10000,
 };
 
 /* =====================================================
@@ -555,6 +570,206 @@ const RangeDropdown = ({
                 text-xs font-medium text-white
                 hover:bg-zinc-800 disabled:opacity-50
               "
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const SizeDropdown = ({
+  minValue,
+  maxValue,
+  unit,
+  onApply,
+}) => {
+  const { open, setOpen, ref } = useDropdown();
+
+  const [draftMin, setDraftMin] = useState("");
+  const [draftMax, setDraftMax] = useState("");
+  const [draftUnit, setDraftUnit] = useState("sqm");
+
+  const active = minValue !== "" || maxValue !== "";
+
+  const invalidNumber = (value) =>
+    value !== "" &&
+    (!Number.isFinite(Number(value)) || Number(value) < 0);
+
+  const invalid =
+    invalidNumber(draftMin) ||
+    invalidNumber(draftMax) ||
+    (draftMin !== "" &&
+      draftMax !== "" &&
+      Number(draftMin) > Number(draftMax));
+
+  const toggle = () => {
+    if (!open) {
+      setDraftMin(minValue);
+      setDraftMax(maxValue);
+      setDraftUnit(unit);
+    }
+
+    setOpen(!open);
+  };
+
+  const apply = () => {
+    if (invalid) return;
+
+    onApply({
+      min: draftMin,
+      max: draftMax,
+      unit: draftUnit,
+    });
+
+    setOpen(false);
+  };
+
+  const reset = () => {
+    setDraftMin("");
+    setDraftMax("");
+    setDraftUnit("sqm");
+
+    onApply({
+      min: "",
+      max: "",
+      unit: "sqm",
+    });
+
+    setOpen(false);
+  };
+
+  return (
+    <div ref={ref} className="relative shrink-0">
+      <button
+        type="button"
+        onClick={toggle}
+        aria-expanded={open}
+        aria-label="Size"
+        className={`
+          flex h-9 items-center gap-2 rounded-md border
+          px-3 text-xs font-medium transition-colors
+          focus:outline-none focus:ring-2 focus:ring-zinc-900/10
+          ${
+            active || open
+              ? "border-zinc-900 bg-zinc-100 text-zinc-950"
+              : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+          }
+        `}
+      >
+        Size
+
+        {active && (
+          <span className="h-1.5 w-1.5 rounded-full bg-zinc-950" />
+        )}
+
+        <HiChevronDown
+          className={`h-3.5 w-3.5 transition-transform ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute right-0 top-full z-[60] mt-2 w-[290px] max-w-[calc(100vw-2rem)] rounded-xl border border-zinc-200 bg-white p-4 shadow-xl sm:left-0 sm:right-auto">
+          <h3 className="text-sm font-semibold text-zinc-950">
+            Size Range
+          </h3>
+
+          <p className="mt-1 text-[11px] text-zinc-500">
+            Select your preferred land size.
+          </p>
+
+          {/* MEASUREMENT */}
+          <div className="mt-4">
+            <label className="mb-1.5 block text-[11px] font-medium text-zinc-600">
+              Measurement
+            </label>
+
+            <select
+              value={draftUnit}
+              onChange={(event) => {
+                setDraftUnit(event.target.value);
+                setDraftMin("");
+                setDraftMax("");
+              }}
+              className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-xs text-zinc-800 outline-none focus:border-zinc-900"
+            >
+              {SIZE_UNITS.map((option) => (
+                <option
+                  key={option.value}
+                  value={option.value}
+                >
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* SIZE INPUTS */}
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1.5 block text-[11px] font-medium text-zinc-600">
+                Minimum
+              </label>
+
+              <input
+                type="number"
+                min="0"
+                step="any"
+                inputMode="decimal"
+                placeholder="Min size"
+                value={draftMin}
+                onChange={(event) =>
+                  setDraftMin(event.target.value)
+                }
+                className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-xs outline-none focus:border-zinc-900"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-[11px] font-medium text-zinc-600">
+                Maximum
+              </label>
+
+              <input
+                type="number"
+                min="0"
+                step="any"
+                inputMode="decimal"
+                placeholder="Max size"
+                value={draftMax}
+                onChange={(event) =>
+                  setDraftMax(event.target.value)
+                }
+                className="h-9 w-full rounded-md border border-zinc-200 bg-white px-3 text-xs outline-none focus:border-zinc-900"
+              />
+            </div>
+          </div>
+
+          {invalid && (
+            <p className="mt-2 text-[11px] text-red-600">
+              Enter a valid size range.
+            </p>
+          )}
+
+          {/* ACTIONS */}
+          <div className="mt-4 flex gap-2 border-t border-zinc-100 pt-3">
+            <button
+              type="button"
+              onClick={reset}
+              className="h-9 flex-1 rounded-md border border-zinc-200 text-xs font-medium text-zinc-700 hover:bg-zinc-50"
+            >
+              Reset
+            </button>
+
+            <button
+              type="button"
+              onClick={apply}
+              disabled={invalid}
+              className="h-9 flex-1 rounded-md bg-zinc-950 text-xs font-medium text-white hover:bg-zinc-800 disabled:opacity-50"
             >
               Apply
             </button>
@@ -1205,29 +1420,40 @@ const Properties = ({ insideAdmin = false }) => {
 
     // SIZE
 
-    if (filters.minSize !== "" || filters.maxSize !== "") {
-      results = results.filter((property) => {
-        const size = getProjectSize(property);
+// SIZE
 
-        if (size === null) return false;
+if (filters.minSize !== "" || filters.maxSize !== "") {
+  const factor = SIZE_TO_SQM[filters.sizeUnit] ?? 1;
 
-        if (
-          filters.minSize !== "" &&
-          size < Number(filters.minSize)
-        ) {
-          return false;
-        }
+  const minimumSqm =
+    filters.minSize === ""
+      ? null
+      : Number(filters.minSize) * factor;
 
-        if (
-          filters.maxSize !== "" &&
-          size > Number(filters.maxSize)
-        ) {
-          return false;
-        }
+  const maximumSqm =
+    filters.maxSize === ""
+      ? null
+      : Number(filters.maxSize) * factor;
 
-        return true;
-      });
+  results = results.filter((property) => {
+    // Only use fields explicitly identified as square metres.
+    const size = getValidNumber(
+      property?.areaSqm ?? property?.plotSizeSqm
+    );
+
+    if (size === null) return false;
+
+    if (minimumSqm !== null && size < minimumSqm) {
+      return false;
     }
+
+    if (maximumSqm !== null && size > maximumSqm) {
+      return false;
+    }
+
+    return true;
+  });
+}
 
     // AVAILABILITY
 
@@ -1338,15 +1564,6 @@ return (
             xl:flex-nowrap
           "
         >
-          {/* LAND USE */}
-
-          <PlotbaseDropdown
-            label="Land Use"
-            value={filters.category}
-            options={LAND_USE_OPTIONS}
-            onChange={(value) => updateFilter("category", value)}
-            width="min-w-[136px]"
-          />
 
           {/* LOCATION */}
 
@@ -1373,54 +1590,26 @@ return (
             }
           />
 
-          {/* SIZE */}
+{/* SIZE */}
 
-          <RangeDropdown
-            title="Size Range (m²)"
-            label="Size (m²)"
-            values={sizeOptions}
-            minValue={filters.minSize}
-            maxValue={filters.maxSize}
-            formatValue={formatSize}
-            onApply={(min, max) =>
-              applyRange("minSize", "maxSize", min, max)
-            }
-          />
+<SizeDropdown
+  minValue={filters.minSize}
+  maxValue={filters.maxSize}
+  unit={filters.sizeUnit}
+  onApply={({ min, max, unit }) => {
+    setFilters((previous) => ({
+      ...previous,
+      minSize: min,
+      maxSize: max,
+      sizeUnit: unit,
+    }));
 
-          {/* FILTERS */}
+    setVisibleCount(INITIAL_VISIBLE);
+  }}
+/>
 
-          <button
-            type="button"
-            onClick={() => setShowFilters(true)}
-            className="
-              flex h-9 shrink-0 items-center gap-1.5
-              rounded-md border border-zinc-200 bg-white
-              px-3 text-xs font-medium text-zinc-700
-              transition-colors hover:bg-zinc-50
-              focus:outline-none focus:ring-2 focus:ring-zinc-900/10
-            "
-          >
-            <HiAdjustments className="h-4 w-4" />
 
-            Filters
 
-            {activeFilterCount > 0 && (
-              <span className="rounded-full bg-zinc-950 px-1.5 py-0.5 text-[10px] text-white">
-                {activeFilterCount}
-              </span>
-            )}
-          </button>
-
-          {/* SORT */}
-
-          <PlotbaseDropdown
-            label="Sort projects"
-            value={filters.sort}
-            options={SORT_OPTIONS}
-            onChange={(value) => updateFilter("sort", value)}
-            width="min-w-[135px]"
-            align="right"
-          />
 
           {/* SEARCH — ALWAYS LAST */}
 

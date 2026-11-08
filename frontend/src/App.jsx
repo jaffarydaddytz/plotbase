@@ -19,7 +19,10 @@ import Mashamba from "./pages/shared/Mashamba";
 import Maarifa from "./pages/shared/Maarifa";
 import Footer from "./components/common/Footer";
 
+
 import About from "./pages/shared/About";
+import AskPlotbase from "./pages/shared/AskPlotbase";
+import MtaalamuWidget from "./components/common/MtaalamuWidget";
 
 // ============================================
 // AUTHENTICATION
@@ -140,7 +143,7 @@ const ScrollTopButton = () => {
       onClick={handleClick}
       aria-label="Scroll to top"
       title="Back to top"
-      className={`fixed bottom-6 right-6 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-white shadow-lg transition-all duration-300 hover:bg-zinc-800 ${
+      className={`fixed bottom-5 left-5 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-white shadow-lg transition-all duration-300 hover:bg-zinc-800 ${
         visible
           ? "scale-100 opacity-100"
           : "pointer-events-none scale-0 opacity-0"
@@ -182,12 +185,15 @@ const showFooter =
     };
   }, []);
 
-  return (
-    <div className="min-h-screen w-full overflow-x-hidden">
-      <ScrollToTopOnRouteChange />
-      <ScrollTopButton />
+return (
+  <div className="min-h-screen w-full overflow-x-hidden">
+    <ScrollToTopOnRouteChange />
+    <ScrollTopButton />
 
-      <Routes>
+    {/* GLOBAL MTAALAMU AI ASSISTANT */}
+    <MtaalamuWidget />
+
+    <Routes>
         {/* ============================================
             PUBLIC AUTHENTICATION
         ============================================ */}
@@ -257,6 +263,12 @@ const showFooter =
 <Route
   path="/about"
   element={<About />}
+/>
+
+{/* ASK PLOTBASE — MTAALAMU */}
+<Route
+  path="/ask-plotbase"
+  element={<AskPlotbase />}
 />
 
 {/* LEGACY PROJECTS URL — PRESERVED */}
