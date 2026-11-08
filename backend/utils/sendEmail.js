@@ -8,7 +8,7 @@ const sendEmail = async (options) => {
 
     const data = {
       sender: {
-        name: " Plotbase ",
+        name: " Plotbase Tanzania",
         email: process.env.EMAIL_USER,
       },
       to: [{ email: options.email }],
@@ -16,7 +16,7 @@ const sendEmail = async (options) => {
       htmlContent: options.message,
     };
 
-    const response = await fetch(" https://api.brevo.com/v3/smtp/email ", {
+    const response = await fetch("https://api.brevo.com/v3/smtp/email ", {
       method: "POST",
       headers: {
         "api-key": BREVO_API_KEY,
