@@ -15,6 +15,11 @@ import { FaChevronUp } from "react-icons/fa";
 import Properties from "./pages/shared/Properties";
 import PropertyDetails from "./pages/shared/PropertyDetails";
 import PropertyDetailPage from "./pages/shared/propertyDetailPage";
+import Mashamba from "./pages/shared/Mashamba";
+import Maarifa from "./pages/shared/Maarifa";
+import Footer from "./components/common/Footer";
+
+import About from "./pages/shared/About";
 
 // ============================================
 // AUTHENTICATION
@@ -151,6 +156,22 @@ const ScrollTopButton = () => {
 ===================================================== */
 
 const App = () => {
+
+  const { pathname } = useLocation();
+
+const publicFooterRoutes = [
+  "/viwanja",
+  "/projects",
+  "/mashamba",
+  "/maarifa",
+  "/about",
+  "/propertydetailpage",
+];
+
+const showFooter =
+  publicFooterRoutes.includes(pathname) ||
+  /^\/property\/[^/]+\/?$/.test(pathname);
+
   useEffect(() => {
     document.body.style.overflowX = "hidden";
     document.documentElement.style.overflowX = "hidden";
@@ -206,12 +227,43 @@ const App = () => {
 
         {/* DEFAULT LANDING PAGE */}
 
-        <Route
-          path="/"
-          element={<Navigate to="/projects" replace />}
-        />
+<Route
+  path="/"
+  element={<Navigate to="/viwanja" replace />}
+/>
 
         {/* PUBLIC PROJECT LISTING */}
+
+        {/* VIWANJA MARKETPLACE */}
+<Route
+  path="/viwanja"
+  element={<Properties />}
+/>
+
+{/* MASHAMBA — COMING SOON */}
+
+<Route
+  path="/mashamba"
+  element={<Mashamba />}
+/>
+
+{/* MAARIFA — COMING SOON */}
+<Route
+  path="/maarifa"
+  element={<Maarifa />}
+/>
+
+{/* ABOUT PLOTBASE */}
+<Route
+  path="/about"
+  element={<About />}
+/>
+
+{/* LEGACY PROJECTS URL — PRESERVED */}
+<Route
+  path="/projects"
+  element={<Properties />}
+/>
 
         <Route
           path="/projects"
@@ -503,6 +555,10 @@ const App = () => {
           element={<Navigate to="/" replace />}
         />
       </Routes>
+
+      {/* PUBLIC WEBSITE FOOTER */}
+      {showFooter && <Footer />}
+
     </div>
   );
 };

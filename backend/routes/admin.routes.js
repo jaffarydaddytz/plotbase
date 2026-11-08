@@ -9,11 +9,46 @@ import {
   getCompanyApplications,
 } from "../controllers/companyVerificationDashboard.controller.js";
 
+import mtaalamuDocumentUpload from "../middlewares/mtaalamuDocumentUpload.middleware.js";
+
+import {
+  uploadMtaalamuKnowledgeDocument,
+  approveMtaalamuKnowledgeDocument,
+  listMtaalamuKnowledgeDocuments,
+  deleteMtaalamuKnowledgeDocument,
+} from "../controllers/mtaalamuAdmin.controller.js";
 
 const adminRouter = express.Router();
 
 
 adminRouter.use(protect, authorize("admin"));
+
+// Mtaalamu — Upload official Plotbase knowledge documents
+// Only authenticated platform administrators can access this endpoint.
+adminRouter.post(
+  "/mtaalamu/documents",
+  mtaalamuDocumentUpload.single("document"),
+  uploadMtaalamuKnowledgeDocument
+);
+
+// Mtaalamu — Approve a processed knowledge document
+adminRouter.patch(
+  "/mtaalamu/documents/:id/approve",
+  approveMtaalamuKnowledgeDocument
+);
+
+
+// Mtaalamu — List knowledge documents (Admin only)
+adminRouter.get(
+  "/mtaalamu/documents",
+  listMtaalamuKnowledgeDocuments
+);
+
+// Mtaalamu — Delete a draft knowledge document (Admin only)
+adminRouter.delete(
+  "/mtaalamu/documents/:id",
+  deleteMtaalamuKnowledgeDocument
+);
 
 adminRouter.get("/users", getAllUsers);
 adminRouter.patch("/users/:id/block", blockUser);
