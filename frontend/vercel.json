@@ -1,7 +1,219 @@
 {
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/" }
+{
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/viwanja",
+      "permanent": false
+    },
+    {
+      "source": "/projects",
+      "destination": "/viwanja",
+      "permanent": false
+    },
+    {
+      "source": "/properties",
+      "destination": "/viwanja",
+      "permanent": false
+    }
   ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
+  ],
+"headers": [
+  {
+    "source": "/mashamba",
+    "headers": [
+      {
+        "key": "X-Robots-Tag",
+        "value": "noindex, nofollow"
+      }
+    ]
+  },
+  {
+    "source": "/maarifa",
+    "headers": [
+      {
+        "key": "X-Robots-Tag",
+        "value": "noindex, nofollow"
+      }
+    ]
+  },
+  {
+  "source": "/property/:id",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/login",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/register",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/verify-email",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/forgot-password",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/reset-password/:token",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/company/:path*",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/admin-dashboard",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/admin/:path*",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/profile",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/messages",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/inquiries",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/wishlist",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/contact",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/seller/:path*",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/seller-dashboard",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/add-property",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/edit-property/:id",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, nofollow"
+    }
+  ]
+},
+{
+  "source": "/viwanja",
+  "headers": [
+    {
+      "key": "X-Robots-Tag",
+      "value": "noindex, follow"
+    }
+  ]
+}
+],
   "cleanUrls": true,
   "trailingSlash": false
 }

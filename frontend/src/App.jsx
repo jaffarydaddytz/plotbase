@@ -162,6 +162,146 @@ const App = () => {
 
   const { pathname } = useLocation();
 
+    // ============================================
+  // PUBLIC PAGE SEO METADATA
+  // ============================================
+
+  useEffect(() => {
+    const defaultSEO = {
+      title: "Plotbase Tanzania | Viwanja, Mashamba & Land Investment",
+      description:
+        "Discover viwanja, mashamba and land projects in Tanzania with Plotbase.",
+    };
+
+    const seoPages = {
+      "/viwanja": {
+        title: "Viwanja Tanzania | Explore Land Projects - Plotbase",
+        description:
+          "Explore viwanja and land projects across Tanzania. Discover locations, compare plot prices and find land investment opportunities with Plotbase.",
+      },
+
+      "/projects": {
+        title: "Viwanja Tanzania | Explore Land Projects - Plotbase",
+        description:
+          "Explore viwanja and land projects across Tanzania. Discover locations, compare plot prices and find land investment opportunities with Plotbase.",
+      },
+
+      "/mashamba": {
+        title: "Mashamba Tanzania | Plotbase",
+        description:
+          "Discover the upcoming Mashamba experience on Plotbase, focused on agricultural land and farming opportunities in Tanzania.",
+      },
+
+      "/maarifa": {
+        title: "Maarifa | Land Investment Knowledge - Plotbase",
+        description:
+          "Explore land investment knowledge, property information and educational resources through Plotbase Maarifa.",
+      },
+
+      "/about": {
+        title: "About Plotbase | Land Investment Platform Tanzania",
+        description:
+          "Learn about Plotbase, a platform designed to help people explore land projects and real estate investment opportunities in Tanzania."
+      },
+
+      "/ask-plotbase": {
+        title: "Ask Mtaalamu | Plotbase Tanzania",
+        description:
+          "Ask questions about land, property and real estate investment through Plotbase Mtaalamu.",
+      },
+    };
+
+    const seo = seoPages[pathname] || defaultSEO;
+
+    // Update browser title
+    document.title = seo.title;
+
+    // Create or update metadata
+    const updateMeta = (attribute, key, content) => {
+      let element = document.head.querySelector(
+        `meta[${attribute}="${key}"]`
+      );
+
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attribute, key);
+        document.head.appendChild(element);
+      }
+
+      element.setAttribute("content", content);
+    };
+    // Search engine description
+    updateMeta("name", "description", seo.description);
+
+    // Social-sharing metadata
+    updateMeta("property", "og:title", seo.title);
+    updateMeta("property", "og:description", seo.description);
+
+    // ============================================
+    // SEARCH ENGINE INDEXING CONTROL
+    // ============================================
+
+   // ============================================
+// SEARCH ENGINE INDEXING CONTROL
+// ============================================
+
+// Public pages currently ready for indexing
+const indexablePages = new Set([
+  "/about",
+]);
+
+const shouldIndex = indexablePages.has(pathname);
+
+// Temporarily prevent indexing the unfinished marketplace
+const robots =
+  pathname === "/viwanja"
+    ? "noindex, follow"
+    : shouldIndex
+      ? "index, follow"
+      : "noindex, nofollow";
+
+updateMeta("name", "robots", robots);
+
+// ============================================
+// CANONICAL URL MANAGEMENT
+// ============================================
+
+const SITE_URL = "https://plotbase.co.tz";
+
+const canonicalRoutes = {
+  "/": "/viwanja",
+  "/viwanja": "/viwanja",
+  "/projects": "/viwanja",
+  "/properties": "/viwanja",
+  "/about": "/about",
+};
+
+const canonicalPath = canonicalRoutes[pathname];
+
+let canonicalLink = document.querySelector(
+  'link[rel="canonical"]'
+);
+
+if (canonicalPath) {
+  if (!canonicalLink) {
+    canonicalLink = document.createElement("link");
+    canonicalLink.setAttribute("rel", "canonical");
+    document.head.appendChild(canonicalLink);
+  }
+
+  canonicalLink.setAttribute(
+    "href",
+    `${SITE_URL}${canonicalPath}`
+  );
+} else {
+  // Prevent stale canonical URLs on other routes
+  canonicalLink?.remove();
+}
+
+  }, [pathname]);
+
+  
+
 const publicFooterRoutes = [
   "/viwanja",
   "/projects",
