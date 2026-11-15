@@ -1,10 +1,25 @@
+import fs from "node:fs/promises";
+import mongoose from "mongoose";
+
 import {
     createProject,
     getProjectById
 } from "../services/projectService.js";
 
+// ==========================================
+// CREATE PROJECT
+// ==========================================
+
 const createProjectController = async (req, res) => {
     try {
+        // Require authenticated user and authorized company.
+        if (!req.user?._id || !req.company?._id) {
+            return res.status(403).json({
+                message: "Authorized company access is required"
+            });
+        }
+
+        // GeoJSON file is required.
         if (!req.file) {
             return res.status(400).json({
                 message: "GeoJSON file is required"
@@ -12,25 +27,40 @@ const createProjectController = async (req, res) => {
         }
 
         const {
-            userId,
             title,
             description,
             location,
             pricePerSqm
         } = req.body;
 
-        if (!userId || !title || !description || !pricePerSqm) {
+        const price = Number(pricePerSqm);
+
+        // Validate project information.
+        if (
+            typeof title !== "string" ||
+            !title.trim() ||
+            typeof description !== "string" ||
+            !description.trim() ||
+            pricePerSqm === undefined ||
+            pricePerSqm === null ||
+            String(pricePerSqm).trim() === "" ||
+            !Number.isFinite(price) ||
+            price < 0
+        ) {
             return res.status(400).json({
-                message: "userId, title, description and pricePerSqm are required"
+                message:
+                    "Valid title, description and pricePerSqm are required"
             });
         }
 
+        // Ownership comes from authenticated company context.
         const result = await createProject({
-            userId,
-            title,
-            description,
+            companyId: req.company._id,
+            createdBy: req.user._id,
+            title: title.trim(),
+            description: description.trim(),
             location,
-            pricePerSqm: Number(pricePerSqm),
+            pricePerSqm: price,
             geoJsonFilePath: req.file.path
         });
 
@@ -41,13 +71,40 @@ const createProjectController = async (req, res) => {
         });
 
     } catch (error) {
+        // Return validation errors.
+        if (error.statusCode === 400) {
+            return res.status(400).json({
+                message: error.message
+            });
+        }
+
+        // Handle unexpected server errors.
         console.error("Project creation error:", error);
 
         return res.status(500).json({
             message: "Failed to create project"
         });
+
+    } finally {
+        // Always remove temporary uploaded GeoJSON files.
+        if (req.file?.path) {
+            try {
+                await fs.rm(req.file.path, {
+                    force: true
+                });
+            } catch (cleanupError) {
+                console.error(
+                    "Failed to remove temporary GeoJSON file:",
+                    cleanupError
+                );
+            }
+        }
     }
 };
+
+// ==========================================
+// GET PUBLIC PROJECT DETAILS
+// ==========================================
 
 const getProjectController = async (req, res) => {
     try {
@@ -56,6 +113,13 @@ const getProjectController = async (req, res) => {
         if (!projectId) {
             return res.status(400).json({
                 message: "Project ID is required"
+            });
+        }
+
+        // Validate MongoDB ObjectId.
+        if (!mongoose.isValidObjectId(projectId)) {
+            return res.status(400).json({
+                message: "Invalid project ID"
             });
         }
 
@@ -77,9 +141,6 @@ const getProjectController = async (req, res) => {
         });
     }
 };
-
-
-
 
 export {
     createProjectController,
