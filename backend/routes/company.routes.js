@@ -12,7 +12,9 @@ import { requireCompanyMembership } from "../middlewares/companyAccess.middlewar
 
 import { getCompanyWorkspace } from "../controllers/companyWorkspace.controller.js";
 import { getMyWorkspaces } from "../controllers/companyWorkspaces.controller.js";
+import geoJsonUploadMiddleware from "../middlewares/geoJsonUploadMiddleware.js";
 
+import { createProjectController } from "../controllers/projectController.js";
 
 
 const router = express.Router();
@@ -92,6 +94,68 @@ router.patch(
   "/:companyId/draft",
   protect,
   updateCompanyDraft
+);
+
+// ==========================================
+// COMPANY PROJECT MANAGEMENT
+// ==========================================
+// Handle GeoJSON upload errors.
+const handleGeoJsonUpload = (req, res, next) => {
+  geoJsonUploadMiddleware.single("geojson")(
+    req,
+    res,
+    (error) => {
+      if (!error) {
+        return next();
+      }
+
+      if (error instanceof multer.MulterError) {
+        let message = "Invalid GeoJSON upload";
+
+        if (error.code === "LIMIT_FILE_SIZE") {
+          message = "GeoJSON file exceeds the 10 MB limit";
+        }
+
+        if (error.code === "LIMIT_UNEXPECTED_FILE") {
+          message = "Unexpected upload field. Use 'geojson'";
+        }
+
+        return res.status(400).json({
+          success: false,
+          message,
+        });
+      }
+
+      if (
+        error.message ===
+        "Only GeoJSON (.geojson or .json) files are allowed"
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: error.message,
+        });
+      }
+
+      console.error("GeoJSON upload error:", error);
+
+      return res.status(500).json({
+        success: false,
+        message: "Unable to process GeoJSON upload",
+      });
+    }
+  );
+};
+
+
+
+// Create a project under an approved company.
+// Only COMPANY_ADMIN and MANAGER can create projects.
+router.post(
+  "/:companyId/projects",
+  protect,
+  requireCompanyMembership("COMPANY_ADMIN", "MANAGER"),
+  handleGeoJsonUpload,
+  createProjectController
 );
 
 

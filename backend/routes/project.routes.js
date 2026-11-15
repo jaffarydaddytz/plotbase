@@ -1,22 +1,16 @@
 import express from "express";
-import geoJsonUploadMiddleware from "../middlewares/geoJsonUploadMiddleware.js";
 
 import {
-    createProjectController,
-    getProjectController
+  getProjectController
 } from "../controllers/projectController.js";
 
 const router = express.Router();
 
-router.post(
-    "/",
-    geoJsonUploadMiddleware.single("geojson"),
-    createProjectController
-);
-
+// Public project retrieval.
+// Only ACTIVE projects are returned by the project service.
 router.get(
-    "/:projectId",
-    getProjectController
+  "/:projectId",
+  getProjectController
 );
 
 export default router;
