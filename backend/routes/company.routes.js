@@ -14,8 +14,16 @@ import { getCompanyWorkspace } from "../controllers/companyWorkspace.controller.
 import { getMyWorkspaces } from "../controllers/companyWorkspaces.controller.js";
 import geoJsonUploadMiddleware from "../middlewares/geoJsonUploadMiddleware.js";
 
-import { createProjectController } from "../controllers/projectController.js";
-
+import {
+  createProjectController,
+  getCompanyProjectsController,
+  getCompanyProjectDetailsController,
+  getCompanyProjectPlotsController,
+  getCompanyProjectMapController,
+  updateCompanyProjectController,
+  updateCompanyProjectPricingController,
+  updateCompanyProjectPublicationController,
+} from "../controllers/projectController.js";
 
 const router = express.Router();
 
@@ -145,6 +153,103 @@ const handleGeoJsonUpload = (req, res, next) => {
     }
   );
 };
+
+// ==========================================
+// COMPANY PROJECT PUBLICATION
+// ==========================================
+
+router.patch(
+    "/:companyId/projects/:projectId/publication",
+    protect,
+    requireCompanyMembership(
+        "COMPANY_ADMIN",
+        "MANAGER"
+    ),
+    updateCompanyProjectPublicationController
+);
+
+// ==========================================
+// UPDATE COMPANY PROJECT PRICING
+// ==========================================
+
+router.patch(
+    "/:companyId/projects/:projectId/pricing",
+    protect,
+    requireCompanyMembership(
+        "COMPANY_ADMIN",
+        "MANAGER"
+    ),
+    updateCompanyProjectPricingController
+);
+
+// ==========================================
+// UPDATE COMPANY PROJECT
+// ==========================================
+
+// Only company administrators and managers
+// can update project information.
+
+router.patch(
+    "/:companyId/projects/:projectId",
+    protect,
+    requireCompanyMembership(
+        "COMPANY_ADMIN",
+        "MANAGER"
+    ),
+    updateCompanyProjectController
+);
+
+// ==========================================
+// GET COMPANY PROJECT PLOTS
+// ==========================================
+
+// Active company members can view plots
+// belonging to their company's projects.
+
+router.get(
+    "/:companyId/projects/:projectId/plots",
+    protect,
+    requireCompanyMembership(),
+    getCompanyProjectPlotsController
+);
+
+// ==========================================
+// GET INDIVIDUAL COMPANY PROJECT
+// ==========================================
+
+router.get(
+    "/:companyId/projects/:projectId",
+    protect,
+    requireCompanyMembership(),
+    getCompanyProjectDetailsController
+);
+
+// ==========================================
+// GET COMPANY PROJECTS
+// ==========================================
+
+// All active members of an approved company
+// can view their company's project inventory.
+router.get(
+    "/:companyId/projects",
+    protect,
+    requireCompanyMembership(),
+    getCompanyProjectsController
+);
+
+// ==========================================
+// GET COMPANY PROJECT MAP
+// ==========================================
+
+// Only active members of the approved company
+// can access its saved project geometry.
+
+router.get(
+    "/:companyId/projects/:projectId/map",
+    protect,
+    requireCompanyMembership(),
+    getCompanyProjectMapController
+);
 
 
 

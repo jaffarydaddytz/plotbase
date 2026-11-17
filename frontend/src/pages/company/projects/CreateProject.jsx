@@ -1,17 +1,35 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { HiOutlineArrowLeft } from "react-icons/hi";
 import GeoJsonPreview from "./GeoJsonPreview";
 import PlotInventoryPreview from "./PlotInventoryPreview";
 
+import axios from "axios";
+
+import { useAuth } from "../../../context/AuthContext";
+import API_URL from "../../../config";
+
 const CreateProject = () => {
+  const { companyId } = useParams();
+    const { token } = useAuth();
+
+  const projectsPath = companyId
+    ? `/company/${companyId}/projects`
+    : "/company/projects";
   // Project form state
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    location: "",
-    pricePerSqm: "",
-  });
+const [formData, setFormData] = useState({
+  title: "",
+  projectType: "",
+  description: "",
+  location: "",
+  pricePerSqm: "",
+});
+
+  // Project submission state
+const [submitting, setSubmitting] = useState(false);
+const [submitError, setSubmitError] = useState("");
+const [submitSuccess, setSubmitSuccess] = useState("");
+const [createdProjectId, setCreatedProjectId] = useState(null);
 
   // GeoJSON upload state
   const [geoJsonFile, setGeoJsonFile] = useState(null);
@@ -162,6 +180,32 @@ if (!validFeatures) {
         "All features must contain Polygon or MultiPolygon geometry."
       );
     }
+
+
+    // Validate the legal area required by the backend.
+for (const [index, feature] of parsed.features.entries()) {
+  const legalArea = feature.properties?.legalArea;
+
+  if (
+    legalArea === undefined ||
+    legalArea === null ||
+    String(legalArea).trim() === ""
+  ) {
+    throw new Error(
+      `Plot ${index + 1} is missing the required legalArea property.`
+    );
+  }
+
+  const areaSqm = Number(
+    String(legalArea).replace(/,/g, "").trim()
+  );
+
+  if (!Number.isFinite(areaSqm) || areaSqm <= 0) {
+    throw new Error(
+      `Plot ${index + 1} must have a valid legalArea greater than zero.`
+    );
+  }
+}
     // Validate unique plot numbers within the uploaded project
 const plotNumbers = new Set();
 
@@ -216,13 +260,135 @@ setGeoJsonData(parsed);
   }
 };
 
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
+// Handle project creation
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // Backend integration will be implemented
-    // after company authentication and authorization.
-  };
+  // Prevent duplicate submissions.
+  if (submitting || createdProjectId) {
+    return;
+  }
+
+  setSubmitError("");
+  setSubmitSuccess("");
+
+  // Require an authenticated company workspace.
+  if (!token || !companyId) {
+    setSubmitError(
+      "You must be signed in to an approved company workspace."
+    );
+    return;
+  }
+
+  // Validate required project information.
+const title = formData.title.trim();
+const description = formData.description.trim();
+const location = formData.location.trim();
+
+const projectType = formData.projectType;
+
+const pricePerSqm = Number(formData.pricePerSqm);
+
+  if (!title) {
+    setSubmitError("Project name is required.");
+    return;
+  }
+
+  if (!description) {
+    setSubmitError("Project description is required.");
+    return;
+  }
+
+  // Validate project type
+if (!["VIWANJA", "MASHAMBA"].includes(projectType)) {
+  setSubmitError(
+    "Please select a project type: Viwanja or Mashamba."
+  );
+  return;
+}
+
+  if (!location) {
+    setSubmitError("Project location is required.");
+    return;
+  }
+
+  if (
+    String(formData.pricePerSqm).trim() === "" ||
+    !Number.isFinite(pricePerSqm) ||
+    pricePerSqm < 0
+  ) {
+    setSubmitError(
+      "Enter a valid price per square metre."
+    );
+    return;
+  }
+
+  // Require a validated GeoJSON file.
+  if (!geoJsonFile || !geoJsonData || geoJsonError) {
+    setSubmitError(
+      "Upload a valid GeoJSON file before saving."
+    );
+    return;
+  }
+
+  // Respect the backend upload limit.
+  const maxFileSize = 10 * 1024 * 1024;
+
+  if (geoJsonFile.size > maxFileSize) {
+    setSubmitError(
+      "GeoJSON file must not exceed 10 MB."
+    );
+    return;
+  }
+
+// Prepare multipart request.
+const payload = new FormData();
+
+payload.append("title", title);
+payload.append("projectType", projectType);
+payload.append("description", description);
+payload.append("location", location);
+payload.append("pricePerSqm", String(pricePerSqm));
+payload.append("geojson", geoJsonFile);
+
+  try {
+    setSubmitting(true);
+
+    const response = await axios.post(
+      `${API_URL}/api/companies/${companyId}/projects`,
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (response.status !== 201 || !response.data?.project) {
+      throw new Error("Unexpected project creation response.");
+    }
+
+    const project = response.data.project;
+
+    // Keep the created draft's identifier.
+    setCreatedProjectId(project._id || project.id || null);
+
+    const plotCount = response.data.plotCount ?? 0;
+
+    setSubmitSuccess(
+      `Project saved as draft successfully. ${plotCount} plots imported.`
+    );
+
+  } catch (error) {
+    setSubmitError(
+      error.response?.data?.message ||
+      error.message ||
+      "Unable to save project. Please try again."
+    );
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   // Reusable input styling
   const inputClass =
@@ -237,13 +403,13 @@ setGeoJsonData(parsed);
       {/* Page Header */}
       <div className="space-y-2 sm:space-y-3">
 
-        <Link
-          to="/company/projects"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 transition hover:text-emerald-600"
-        >
-          <HiOutlineArrowLeft size={16} />
-          Back to Projects
-        </Link>
+<Link
+  to={projectsPath}
+  className="inline-flex items-center gap-2 text-sm text-zinc-500 transition hover:text-zinc-950"
+>
+  <HiOutlineArrowLeft size={16} />
+  Back to Projects
+</Link>
 
         <div>
           <h1 className="text-xl font-bold text-gray-800 sm:text-3xl">
@@ -297,6 +463,38 @@ setGeoJsonData(parsed);
             />
 
           </div>
+
+          {/* Project Type */}
+<div className="min-w-0">
+  <label
+    htmlFor="projectType"
+    className={labelClass}
+  >
+    Project Type <span className="text-red-500">*</span>
+  </label>
+
+  <select
+    id="projectType"
+    name="projectType"
+    value={formData.projectType}
+    onChange={handleChange}
+    required
+    disabled={submitting || Boolean(createdProjectId)}
+    className={`${inputClass} cursor-pointer`}
+  >
+    <option value="" disabled>
+      Select Project Type
+    </option>
+
+    <option value="VIWANJA">
+      Viwanja
+    </option>
+
+    <option value="MASHAMBA">
+      Mashamba
+    </option>
+  </select>
+</div>
 
           {/* Project Location */}
           <div className="min-w-0">
@@ -376,10 +574,12 @@ setGeoJsonData(parsed);
               Upload a GeoJSON file containing your project's land plots.
             </p>
 
-            {/* Selected File */}
-            {geoJsonFile && (
-              <p className="mt-2 break-all text-sm font-medium text-emerald-700">
-                Selected file: {geoJsonFile.name}
+{/* Selected File */}
+{geoJsonFile && (
+  <div className="mt-2">
+    <p className="break-all text-sm font-medium text-zinc-700">
+      Selected file: {geoJsonFile.name}
+    </p>
 
                 {/* GeoJSON Validation Summary */}
             {/* Interactive GeoJSON Map Preview */}
@@ -415,7 +615,7 @@ setGeoJsonData(parsed);
   </div>
 )}
 
-              </p>
+              </div>
             )}
 
             {/* Upload Error */}
@@ -432,24 +632,69 @@ setGeoJsonData(parsed);
 
           </div>
 
+          {/* Project Submission Feedback */}
+{submitError && (
+  <div
+    role="alert"
+    className="col-span-full rounded-lg border border-red-200 bg-red-50 px-4 py-3"
+  >
+    <p className="text-sm font-medium text-red-700">
+      {submitError}
+    </p>
+  </div>
+)}
+
+{submitSuccess && (
+  <div
+    role="status"
+    aria-live="polite"
+    className="col-span-full rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
+  >
+    <p className="text-sm font-semibold text-zinc-950">
+      Project Created Successfully
+    </p>
+
+    <p className="mt-1 text-sm text-zinc-600">
+      {submitSuccess}
+    </p>
+
+    {createdProjectId && (
+      <Link
+        to={projectsPath}
+        className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-zinc-950 underline underline-offset-4"
+      >
+        Back to Company Projects
+        <HiOutlineArrowLeft size={15} className="rotate-180" />
+      </Link>
+    )}
+  </div>
+)}
+
           {/* Form Actions */}
           <div className="col-span-full flex flex-col gap-3 border-t border-gray-200 pt-5 sm:flex-row sm:justify-end">
+<Link
+  to={projectsPath}
+  className="inline-flex items-center justify-center rounded-lg border border-zinc-300 px-6 py-3 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50"
+>
+  Cancel
+</Link>
 
-            <Link
-              to="/company/projects"
-              className="inline-flex items-center justify-center rounded-lg border border-gray-300 px-6 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
-            >
-              Cancel
-            </Link>
-
-            <button
-              type="submit"
-              disabled
-              title="Available after backend integration"
-              className="cursor-not-allowed rounded-lg bg-gray-200 px-6 py-3 text-sm font-medium text-gray-500"
-            >
-              Save Draft — Coming Soon
-            </button>
+<button
+  type="submit"
+  disabled={submitting || Boolean(createdProjectId) || Boolean(submitSuccess) || !companyId}
+  aria-busy={submitting}
+  className={`inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition-colors ${
+    submitting || createdProjectId || submitSuccess || !companyId
+      ? "cursor-not-allowed bg-zinc-200 text-zinc-500"
+      : "bg-zinc-950 text-white hover:bg-zinc-800"
+  }`}
+>
+  {submitSuccess
+    ? "Draft Saved"
+    : submitting
+      ? "Saving Draft..."
+      : "Save Draft"}
+</button>
 
           </div>
 
