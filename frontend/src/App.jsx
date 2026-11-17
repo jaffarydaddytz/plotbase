@@ -1,32 +1,24 @@
 import { useEffect, useState } from "react";
-import {
-  Navigate,
-  Route,
-  Routes,
-  useLocation,
-} from "react-router-dom";
-
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { FaChevronUp } from "react-icons/fa";
 
-// ============================================
+// ==========================================
 // PUBLIC PAGES
-// ============================================
+// ==========================================
 
 import Properties from "./pages/shared/Properties";
 import PropertyDetails from "./pages/shared/PropertyDetails";
 import PropertyDetailPage from "./pages/shared/propertyDetailPage";
 import Mashamba from "./pages/shared/Mashamba";
 import Maarifa from "./pages/shared/Maarifa";
-import Footer from "./components/common/Footer";
-
-
 import About from "./pages/shared/About";
 import AskPlotbase from "./pages/shared/AskPlotbase";
+import Footer from "./components/common/Footer";
 import MtaalamuWidget from "./components/common/MtaalamuWidget";
 
-// ============================================
+// ==========================================
 // AUTHENTICATION
-// ============================================
+// ==========================================
 
 import Register from "./pages/auth/Register";
 import VerifyEmail from "./pages/auth/VerifyEmail";
@@ -39,43 +31,40 @@ import {
   PublicRoute,
 } from "./components/common/ProtectedRoute";
 
-// ============================================
-// SHARED PAGES
-// ============================================
+import CompanyWorkspaceGuard from "./components/common/CompanyWorkspaceGuard";
+import PublicProjectDetails from "./pages/shared/PublicProjectDetails";
+
+// ==========================================
+// SHARED AND INVESTOR PAGES
+// ==========================================
 
 import Profile from "./pages/shared/Profile";
 import ChatMessages from "./pages/shared/ChatMessages";
 import Contact from "./pages/shared/Contact";
 
-// ============================================
-// INVESTOR PAGES
-// ============================================
-
 import MyInquiries from "./pages/buyer/MyInquiries";
 import Wishlist from "./pages/buyer/Wishlist";
 
-// ============================================
-// ADMIN LAYOUT AND PAGES
-// ============================================
+// ==========================================
+// COMPANY PAGES
+// ==========================================
 
-import AdminLayout from "./components/common/AdminLayout";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminUsers from "./pages/admin/AdminUsers";
-import SellerRequests from "./pages/admin/SellerRequests";
+import RegisterCompany from "./pages/company/RegisterCompany";
+import CompanyCenter from "./pages/company/CompanyCenter";
 
-import CompanyVerification from "./pages/admin/CompanyVerification";
+import CompanyProjects from "./pages/company/projects/CompanyProjects";
+import CreateProject from "./pages/company/projects/CreateProject";
+import CompanyProjectDetails from "./pages/company/projects/CompanyProjectDetails";
+import EditProject from "./pages/company/projects/EditProject";
 
-// NEW: Company Verification Details
-import CompanyVerificationDetails from "./pages/admin/CompanyVerificationDetails";
+import {
+  CompanyProjectsLayout,
+  CompanyProjectEditorGuard,
+} from "./components/common/CompanyProjectsLayout";
 
-import AdminProperties from "./pages/admin/AdminProperties";
-import AdminInquiries from "./pages/admin/AdminInquiries";
-import AdminContacts from "./pages/admin/AdminContacts";
-import AdminComingSoon from "./pages/admin/AdminComingSoon";
-
-// ============================================
-// SELLER LAYOUT AND PAGES
-// ============================================
+// ==========================================
+// LEGACY SELLER PAGES
+// ==========================================
 
 import SellerLayout from "./components/common/SellerLayout";
 import SellerDashboard from "./pages/seller/SellerDashboard";
@@ -83,18 +72,24 @@ import AddProperty from "./pages/seller/AddProperty";
 import EditProperty from "./pages/seller/EditProperty";
 import MyProperties from "./pages/seller/MyProperties";
 
-// ============================================
-// COMPANY PAGES
-// ============================================
+// ==========================================
+// ADMIN PAGES
+// ==========================================
 
-import CompanyProjects from "./pages/company/projects/CompanyProjects";
-import CreateProject from "./pages/company/projects/CreateProject";
-import RegisterCompany from "./pages/company/RegisterCompany";
-import CompanyCenter from "./pages/company/CompanyCenter";
+import AdminLayout from "./components/common/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import SellerRequests from "./pages/admin/SellerRequests";
+import CompanyVerification from "./pages/admin/CompanyVerification";
+import CompanyVerificationDetails from "./pages/admin/CompanyVerificationDetails";
+import AdminProperties from "./pages/admin/AdminProperties";
+import AdminInquiries from "./pages/admin/AdminInquiries";
+import AdminContacts from "./pages/admin/AdminContacts";
+import AdminComingSoon from "./pages/admin/AdminComingSoon";
 
-/* =====================================================
-   SCROLL TO TOP ON ROUTE CHANGE
-===================================================== */
+// ==========================================
+// SCROLL TO TOP ON ROUTE CHANGE
+// ==========================================
 
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
@@ -109,9 +104,9 @@ const ScrollToTopOnRouteChange = () => {
   return null;
 };
 
-/* =====================================================
-   SCROLL TO TOP BUTTON
-===================================================== */
+// ==========================================
+// SCROLL TO TOP BUTTON
+// ==========================================
 
 const ScrollTopButton = () => {
   const [visible, setVisible] = useState(false);
@@ -122,7 +117,6 @@ const ScrollTopButton = () => {
     };
 
     window.addEventListener("scroll", handleScroll);
-
     handleScroll();
 
     return () => {
@@ -130,17 +124,15 @@ const ScrollTopButton = () => {
     };
   }, []);
 
-  const handleClick = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
-
   return (
     <button
       type="button"
-      onClick={handleClick}
+      onClick={() =>
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }
       aria-label="Scroll to top"
       title="Back to top"
       className={`fixed bottom-5 left-5 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-zinc-800 bg-zinc-950 text-white shadow-lg transition-all duration-300 hover:bg-zinc-800 ${
@@ -154,17 +146,16 @@ const ScrollTopButton = () => {
   );
 };
 
-/* =====================================================
-   MAIN APPLICATION
-===================================================== */
+// ==========================================
+// MAIN APPLICATION
+// ==========================================
 
 const App = () => {
-
   const { pathname } = useLocation();
 
-    // ============================================
-  // PUBLIC PAGE SEO METADATA
-  // ============================================
+  // ========================================
+  // PUBLIC SEO METADATA
+  // ========================================
 
   useEffect(() => {
     const defaultSEO = {
@@ -173,18 +164,15 @@ const App = () => {
         "Discover viwanja, mashamba and land projects in Tanzania with Plotbase.",
     };
 
-    const seoPages = {
-      "/viwanja": {
-        title: "Viwanja Tanzania | Explore Land Projects - Plotbase",
-        description:
-          "Explore viwanja and land projects across Tanzania. Discover locations, compare plot prices and find land investment opportunities with Plotbase.",
-      },
+    const landSEO = {
+      title: "Viwanja Tanzania | Explore Land Projects - Plotbase",
+      description:
+        "Explore viwanja and land projects across Tanzania. Discover locations, compare plot prices and find land investment opportunities with Plotbase.",
+    };
 
-      "/projects": {
-        title: "Viwanja Tanzania | Explore Land Projects - Plotbase",
-        description:
-          "Explore viwanja and land projects across Tanzania. Discover locations, compare plot prices and find land investment opportunities with Plotbase.",
-      },
+    const seoPages = {
+      "/viwanja": landSEO,
+      "/projects": landSEO,
 
       "/mashamba": {
         title: "Mashamba Tanzania | Plotbase",
@@ -201,7 +189,7 @@ const App = () => {
       "/about": {
         title: "About Plotbase | Land Investment Platform Tanzania",
         description:
-          "Learn about Plotbase, a platform designed to help people explore land projects and real estate investment opportunities in Tanzania."
+          "Learn about Plotbase, a platform designed to help people explore land projects and real estate investment opportunities in Tanzania.",
       },
 
       "/ask-plotbase": {
@@ -213,10 +201,9 @@ const App = () => {
 
     const seo = seoPages[pathname] || defaultSEO;
 
-    // Update browser title
     document.title = seo.title;
 
-    // Create or update metadata
+    // Update metadata
     const updateMeta = (attribute, key, content) => {
       let element = document.head.querySelector(
         `meta[${attribute}="${key}"]`
@@ -230,90 +217,80 @@ const App = () => {
 
       element.setAttribute("content", content);
     };
-    // Search engine description
-    updateMeta("name", "description", seo.description);
 
-    // Social-sharing metadata
+    updateMeta("name", "description", seo.description);
     updateMeta("property", "og:title", seo.title);
     updateMeta("property", "og:description", seo.description);
 
-    // ============================================
-    // SEARCH ENGINE INDEXING CONTROL
-    // ============================================
+    // ======================================
+    // SEARCH ENGINE INDEXING
+    // ======================================
 
-   // ============================================
-// SEARCH ENGINE INDEXING CONTROL
-// ============================================
+    const shouldIndex = new Set(["/about"]).has(pathname);
 
-// Public pages currently ready for indexing
-const indexablePages = new Set([
-  "/about",
-]);
+    const robots =
+      pathname === "/viwanja"
+        ? "noindex, follow"
+        : shouldIndex
+          ? "index, follow"
+          : "noindex, nofollow";
 
-const shouldIndex = indexablePages.has(pathname);
+    updateMeta("name", "robots", robots);
 
-// Temporarily prevent indexing the unfinished marketplace
-const robots =
-  pathname === "/viwanja"
-    ? "noindex, follow"
-    : shouldIndex
-      ? "index, follow"
-      : "noindex, nofollow";
+    // ======================================
+    // CANONICAL URL MANAGEMENT
+    // ======================================
 
-updateMeta("name", "robots", robots);
+    const canonicalRoutes = {
+      "/": "/viwanja",
+      "/viwanja": "/viwanja",
+      "/projects": "/viwanja",
+      "/properties": "/viwanja",
+      "/about": "/about",
+    };
 
-// ============================================
-// CANONICAL URL MANAGEMENT
-// ============================================
+    const canonicalPath = canonicalRoutes[pathname];
 
-const SITE_URL = "https://plotbase.co.tz";
+    let canonicalLink = document.querySelector(
+      'link[rel="canonical"]'
+    );
 
-const canonicalRoutes = {
-  "/": "/viwanja",
-  "/viwanja": "/viwanja",
-  "/projects": "/viwanja",
-  "/properties": "/viwanja",
-  "/about": "/about",
-};
+    if (canonicalPath) {
+      if (!canonicalLink) {
+        canonicalLink = document.createElement("link");
+        canonicalLink.setAttribute("rel", "canonical");
+        document.head.appendChild(canonicalLink);
+      }
 
-const canonicalPath = canonicalRoutes[pathname];
-
-let canonicalLink = document.querySelector(
-  'link[rel="canonical"]'
-);
-
-if (canonicalPath) {
-  if (!canonicalLink) {
-    canonicalLink = document.createElement("link");
-    canonicalLink.setAttribute("rel", "canonical");
-    document.head.appendChild(canonicalLink);
-  }
-
-  canonicalLink.setAttribute(
-    "href",
-    `${SITE_URL}${canonicalPath}`
-  );
-} else {
-  // Prevent stale canonical URLs on other routes
-  canonicalLink?.remove();
-}
-
+      canonicalLink.setAttribute(
+        "href",
+        `https://plotbase.co.tz${canonicalPath}`
+      );
+    } else {
+      canonicalLink?.remove();
+    }
   }, [pathname]);
 
-  
+  // ========================================
+  // PUBLIC FOOTER ROUTES
+  // ========================================
 
-const publicFooterRoutes = [
-  "/viwanja",
-  "/projects",
-  "/mashamba",
-  "/maarifa",
-  "/about",
-  "/propertydetailpage",
-];
+  const publicFooterRoutes = [
+    "/viwanja",
+    "/projects",
+    "/mashamba",
+    "/maarifa",
+    "/about",
+    "/propertydetailpage",
+  ];
 
-const showFooter =
-  publicFooterRoutes.includes(pathname) ||
-  /^\/property\/[^/]+\/?$/.test(pathname);
+  const showFooter =
+    publicFooterRoutes.includes(pathname) ||
+    /^\/property\/[^/]+\/?$/.test(pathname);
+
+  // ========================================
+  // PREVENT HORIZONTAL OVERFLOW
+  // ========================================
 
   useEffect(() => {
     document.body.style.overflowX = "hidden";
@@ -325,29 +302,27 @@ const showFooter =
     };
   }, []);
 
-return (
-  <div className="min-h-screen w-full overflow-x-hidden">
-    <ScrollToTopOnRouteChange />
-    <ScrollTopButton />
+  // ========================================
+  // APPLICATION ROUTES
+  // ========================================
 
-    {/* GLOBAL MTAALAMU AI ASSISTANT */}
-    <MtaalamuWidget />
+  return (
+    <div className="min-h-screen w-full overflow-x-hidden">
+      <ScrollToTopOnRouteChange />
 
-    <Routes>
-        {/* ============================================
-            PUBLIC AUTHENTICATION
-        ============================================ */}
+      <ScrollTopButton />
+
+      <MtaalamuWidget />
+
+      <Routes>
+        {/* ==================================
+            AUTHENTICATION
+        ================================== */}
 
         <Route element={<PublicRoute />}>
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+          <Route path="/login" element={<Login />} />
 
-          <Route
-            path="/register"
-            element={<Register />}
-          />
+          <Route path="/register" element={<Register />} />
 
           <Route
             path="/verify-email"
@@ -355,97 +330,80 @@ return (
           />
         </Route>
 
-        {/* PASSWORD RECOVERY */}
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
 
-<Route
-  path="/forgot-password"
-  element={<ForgotPassword />}
-/>
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
 
-<Route
-  path="/reset-password/:token"
-  element={<ResetPassword />}
-/>
-
-        {/* ============================================
+        {/* ==================================
             PUBLIC PAGES
-        ============================================ */}
+        ================================== */}
 
-        {/* DEFAULT LANDING PAGE */}
+        <Route
+          path="/"
+          element={<Navigate to="/viwanja" replace />}
+        />
 
-<Route
-  path="/"
-  element={<Navigate to="/viwanja" replace />}
-/>
-
-        {/* PUBLIC PROJECT LISTING */}
-
-        {/* VIWANJA MARKETPLACE */}
-<Route
-  path="/viwanja"
-  element={<Properties />}
-/>
-
-{/* MASHAMBA — COMING SOON */}
-
-<Route
-  path="/mashamba"
-  element={<Mashamba />}
-/>
-
-{/* MAARIFA — COMING SOON */}
-<Route
-  path="/maarifa"
-  element={<Maarifa />}
-/>
-
-{/* ABOUT PLOTBASE */}
-<Route
-  path="/about"
-  element={<About />}
-/>
-
-{/* ASK PLOTBASE — MTAALAMU */}
-<Route
-  path="/ask-plotbase"
-  element={<AskPlotbase />}
-/>
-
-{/* LEGACY PROJECTS URL — PRESERVED */}
-<Route
-  path="/projects"
-  element={<Properties />}
-/>
+        <Route
+          path="/viwanja"
+          element={<Properties />}
+        />
 
         <Route
           path="/projects"
           element={<Properties />}
         />
 
-        {/* LEGACY PROPERTIES URL */}
-
         <Route
           path="/properties"
           element={<Navigate to="/projects" replace />}
         />
 
-        {/* LEGACY PROJECT DETAILS PAGE */}
+        <Route
+          path="/mashamba"
+          element={<Mashamba />}
+        />
+
+        <Route
+          path="/maarifa"
+          element={<Maarifa />}
+        />
+
+        <Route
+          path="/about"
+          element={<About />}
+        />
+
+        <Route
+          path="/ask-plotbase"
+          element={<AskPlotbase />}
+        />
 
         <Route
           path="/propertydetailpage"
           element={<PropertyDetailPage />}
         />
 
-        {/* PROJECT DETAILS */}
-
         <Route
           path="/property/:id"
           element={<PropertyDetails />}
         />
 
-        {/* ============================================
-            COMPANY CENTER AND REGISTRATION
-        ============================================ */}
+        {/* PUBLIC COMPANY PROJECT DETAILS */}
+
+<Route
+  path="/project/:projectId"
+  element={<PublicProjectDetails />}
+/>
+
+        {/* ==================================
+            COMPANY WORKSPACE
+        ================================== */}
 
         <Route element={<ProtectedRoute />}>
           {/* COMPANY CENTER */}
@@ -454,6 +412,52 @@ return (
             path="/company/center"
             element={<CompanyCenter />}
           />
+
+          {/* ==================================
+              COMPANY PROJECT MANAGEMENT
+              SHARED SIDEBAR LAYOUT
+          ================================== */}
+
+          <Route
+            path="/company/:companyId/projects"
+            element={<CompanyWorkspaceGuard />}
+          >
+            <Route element={<CompanyProjectsLayout />}>
+              {/* COMPANY PROJECTS LIST */}
+
+              <Route
+                index
+                element={<CompanyProjects />}
+              />
+
+              {/* ==================================
+                  CREATE AND EDIT PROJECT
+                  COMPANY ADMIN / MANAGER
+              ================================== */}
+
+              <Route element={<CompanyProjectEditorGuard />}>
+                <Route
+                  path="create"
+                  element={<CreateProject />}
+                />
+
+                <Route
+                  path=":projectId/edit"
+                  element={<EditProject />}
+                />
+              </Route>
+
+              {/* ==================================
+                  COMPANY PROJECT DETAILS
+                  ALL ACTIVE COMPANY MEMBERS
+              ================================== */}
+
+              <Route
+                path=":projectId"
+                element={<CompanyProjectDetails />}
+              />
+            </Route>
+          </Route>
 
           {/* COMPANY REGISTRATION */}
 
@@ -470,11 +474,9 @@ return (
           />
         </Route>
 
-        {/* ============================================
+        {/* ==================================
             INVESTOR ACCESS
-
-            Legacy buyer accounts supported temporarily.
-        ============================================ */}
+        ================================== */}
 
         <Route
           element={
@@ -509,11 +511,10 @@ return (
           />
         </Route>
 
-        {/* ============================================
+        {/* ==================================
             LEGACY SELLER ACCESS
-
-            Preserve during company architecture migration.
-        ============================================ */}
+            PRESERVED DURING MIGRATION
+        ================================== */}
 
         <Route
           element={
@@ -566,7 +567,7 @@ return (
               element={<EditProperty />}
             />
 
-            {/* TEMPORARY COMPANY PROJECT ROUTES */}
+            {/* LEGACY COMPANY PROJECT ROUTES */}
 
             <Route
               path="/company/projects"
@@ -580,11 +581,9 @@ return (
           </Route>
         </Route>
 
-        {/* ============================================
-            ADMIN ACCESS
-
-            Platform administrators only.
-        ============================================ */}
+        {/* ==================================
+            PLATFORM ADMIN ACCESS
+        ================================== */}
 
         <Route
           element={
@@ -592,26 +591,24 @@ return (
           }
         >
           <Route element={<AdminLayout />}>
-            {/* ADMIN DASHBOARD */}
-
             <Route
               path="/admin-dashboard"
               element={<AdminDashboard />}
             />
 
-            {/* ADMIN MARKETPLACE */}
-<Route
-  path="/admin/marketplace"
-  element={<Properties insideAdmin />}
-/>
+            {/* MARKETPLACE */}
 
-{/* ADMIN MARKETPLACE PROJECT DETAILS */}
-<Route
-  path="/admin/marketplace/:id"
-  element={<PropertyDetails insideAdmin />}
-/>
+            <Route
+              path="/admin/marketplace"
+              element={<Properties insideAdmin />}
+            />
 
-            {/* USER MANAGEMENT */}
+            <Route
+              path="/admin/marketplace/:id"
+              element={<PropertyDetails insideAdmin />}
+            />
+
+            {/* USERS */}
 
             <Route
               path="/admin/users"
@@ -625,27 +622,19 @@ return (
               element={<SellerRequests />}
             />
 
-            {/* ========================================
-                COMPANY VERIFICATION
-            ======================================== */}
-
-            {/* COMPANY APPLICATIONS LIST */}
+            {/* COMPANY VERIFICATION */}
 
             <Route
               path="/admin/company-verification"
               element={<CompanyVerification />}
             />
 
-            {/* NEW: INDIVIDUAL COMPANY REVIEW */}
-
             <Route
               path="/admin/company-verification/:companyId"
               element={<CompanyVerificationDetails />}
             />
 
-            {/* ========================================
-                OTHER ADMIN MODULES
-            ======================================== */}
+            {/* OTHER ADMIN PAGES */}
 
             <Route
               path="/admin/properties"
@@ -662,9 +651,7 @@ return (
               element={<AdminContacts />}
             />
 
-            {/* ========================================
-                PLANNED ADMIN MODULES
-            ======================================== */}
+            {/* PLANNED ADMIN MODULES */}
 
             <Route
               path="/admin/companies"
@@ -698,9 +685,9 @@ return (
           </Route>
         </Route>
 
-        {/* ============================================
+        {/* ==================================
             FALLBACK
-        ============================================ */}
+        ================================== */}
 
         <Route
           path="*"
@@ -708,9 +695,9 @@ return (
         />
       </Routes>
 
-      {/* PUBLIC WEBSITE FOOTER */}
-      {showFooter && <Footer />}
+      {/* PUBLIC FOOTER */}
 
+      {showFooter && <Footer />}
     </div>
   );
 };

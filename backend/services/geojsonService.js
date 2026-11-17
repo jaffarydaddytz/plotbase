@@ -59,8 +59,11 @@ const readGeoJsonFile = async (filePath) => {
         throw error;
     };
 
-    // Process plot features.
-    const plots = geoJson.features.map((feature, index) => {
+// Track imported plot numbers within this project.
+const seenPlotNumbers = new Set();
+
+// Process plot features.
+const plots = geoJson.features.map((feature, index) => {
 
         // Validate feature structure.
         if (
@@ -192,12 +195,49 @@ const readGeoJsonFile = async (filePath) => {
             );
         }
 
-        // Return normalized plot data.
-        return {
-            areaSqm,
-            geometry: feature.geometry.type,
-            coordinates: feature.geometry.coordinates
-        };
+// Extract imported plot number, if provided.
+const rawPlotNumber =
+    feature.properties?.plotNumber ??
+    feature.properties?.plot_number ??
+    feature.properties?.lotNumber;
+
+let plotNumber = null;
+
+if (
+    rawPlotNumber !== undefined &&
+    rawPlotNumber !== null &&
+    String(rawPlotNumber).trim() !== ""
+) {
+    if (
+        typeof rawPlotNumber !== "string" &&
+        typeof rawPlotNumber !== "number"
+    ) {
+        invalidFeature(
+            `Invalid plot number at feature ${index}`
+        );
+    }
+
+    plotNumber = String(rawPlotNumber).trim();
+
+    // Detect duplicates regardless of letter case.
+    const normalizedPlotNumber = plotNumber.toLowerCase();
+
+    if (seenPlotNumbers.has(normalizedPlotNumber)) {
+        invalidFeature(
+            `Duplicate plot number detected: ${plotNumber}`
+        );
+    }
+
+    seenPlotNumbers.add(normalizedPlotNumber);
+}
+
+// Return normalized plot data.
+return {
+    plotNumber,
+    areaSqm,
+    geometry: feature.geometry.type,
+    coordinates: feature.geometry.coordinates
+};
     });
 
     return plots;

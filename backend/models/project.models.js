@@ -2,7 +2,10 @@ import mongoose from "mongoose";
 
 const projectSchema = new mongoose.Schema(
   {
-    // Legacy project ownership.
+    // ==========================================
+    // LEGACY PROJECT OWNERSHIP
+    // ==========================================
+
     // Retained temporarily for backward compatibility.
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -13,7 +16,10 @@ const projectSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Company ownership for the new architecture.
+    // ==========================================
+    // COMPANY OWNERSHIP
+    // ==========================================
+
     companyId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Company",
@@ -21,7 +27,7 @@ const projectSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Authenticated user who created the company project.
+    // Authenticated user who created the project.
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -29,6 +35,10 @@ const projectSchema = new mongoose.Schema(
         return Boolean(this.companyId);
       },
     },
+
+    // ==========================================
+    // PROJECT INFORMATION
+    // ==========================================
 
     title: {
       type: String,
@@ -47,11 +57,41 @@ const projectSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // ==========================================
+    // PROJECT TYPE
+    // ==========================================
+
+    // VIWANJA: Residential, commercial and other plots.
+    // MASHAMBA: Agricultural and farming projects.
+    //
+    // No default is assigned because existing projects
+    // must be classified explicitly.
+    //
+    // The create controller and publication service
+    // will enforce this field in subsequent steps.
+
+    projectType: {
+      type: String,
+      enum: ["VIWANJA", "MASHAMBA"],
+      uppercase: true,
+      trim: true,
+      default: undefined,
+      index: true,
+    },
+
+    // ==========================================
+    // PROJECT PRICING
+    // ==========================================
+
     pricePerSqm: {
       type: Number,
       required: true,
       min: 0,
     },
+
+    // ==========================================
+    // PUBLICATION STATUS
+    // ==========================================
 
     status: {
       type: String,
@@ -64,6 +104,22 @@ const projectSchema = new mongoose.Schema(
   }
 );
 
-const Project = mongoose.model("Project", projectSchema);
+// ==========================================
+// PROJECT DISCOVERY INDEX
+// ==========================================
+
+// Supports filtering published company projects
+// by marketplace type.
+
+projectSchema.index({
+  companyId: 1,
+  status: 1,
+  projectType: 1,
+});
+
+const Project = mongoose.model(
+  "Project",
+  projectSchema
+);
 
 export default Project;

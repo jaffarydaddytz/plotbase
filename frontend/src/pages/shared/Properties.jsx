@@ -93,7 +93,33 @@ const getValidNumber = (value) => {
     : null;
 };
 
+// ==========================================
+// GET PROJECT CARD IMAGE
+// ==========================================
+
 const getImage = (property) => {
+  // ========================================
+  // COMPANY PROJECTS — GEOJSON MAP PREVIEW
+  // ========================================
+
+  // Company projects use their actual plot
+  // geometry as the default card thumbnail.
+
+  if (
+    property?.source === "COMPANY_PROJECT" &&
+    property?.companyProjectId
+  ) {
+    return `${API_URL}/api/project/${encodeURIComponent(
+      property.companyProjectId
+    )}/thumbnail.svg`;
+  }
+
+  // ========================================
+  // EXISTING LEGACY PROPERTY IMAGES
+  // ========================================
+
+  // Preserve existing property images.
+
   const images = property?.images;
 
   if (Array.isArray(images)) {
@@ -792,10 +818,19 @@ const ProjectCard = ({
   now,
   insideAdmin = false,
 }) => {
-  const navigate = useNavigate();
-  const projectDetailsPath = insideAdmin
-  ? `/admin/marketplace/${property._id}`
-  : `/property/${property._id}`;
+const navigate = useNavigate();
+
+// Identify projects created through the
+// new company project management system.
+const isCompanyProject =
+  property.source === "COMPANY_PROJECT";
+
+// Keep legacy property routes unchanged.
+const projectDetailsPath = isCompanyProject
+  ? `/project/${property.companyProjectId}`
+  : insideAdmin
+    ? `/admin/marketplace/${property._id}`
+    : `/property/${property._id}`;
 
   const [imageError, setImageError] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
@@ -877,26 +912,36 @@ const ProjectCard = ({
             text-[10px] font-semibold text-zinc-800 shadow-sm
           "
         >
-          {getLandUse(property.propertyType)}
+         {isCompanyProject
+  ? "Viwanja"
+  : getLandUse(property.propertyType)}
         </span>
 
         {/* PRICE BADGE */}
 
-        <span
-          className="
-            pointer-events-none absolute bottom-2.5 right-2.5
-            rounded-md bg-white px-2 py-1
-            text-[11px] font-semibold text-zinc-950 shadow-sm
-          "
-        >
-          {getValidNumber(property.price) !== null
-            ? `From ${formatCompactPrice(property.price)}`
-            : "Price on Request"}
-        </span>
+<span
+  className="
+    pointer-events-none absolute bottom-2.5 right-2.5
+    rounded-md bg-white px-2 py-1
+    text-[11px] font-semibold text-zinc-950 shadow-sm
+  "
+>
+  {isCompanyProject
+    ? getValidNumber(property.pricePerSqm) !== null
+      ? `${formatFullPrice(property.pricePerSqm)}/sqm`
+      : "Price on Request"
+    : getValidNumber(property.price) !== null
+      ? `From ${formatCompactPrice(property.price)}`
+      : "Price on Request"}
+</span>
 
         {/* BLACK WISHLIST HEART */}
 
-        <button
+
+
+        {!isCompanyProject && (
+  // Existing wishlist button goes here.
+          <button
           type="button"
           onClick={handleWishlist}
           disabled={wishlistLoading}
@@ -921,6 +966,7 @@ const ProjectCard = ({
             <HiOutlineHeart className="h-[18px] w-[18px] text-zinc-700" />
           )}
         </button>
+)}
       </div>
 
       {/* CONTENT */}
@@ -1108,29 +1154,215 @@ const Properties = ({ insideAdmin = false }) => {
      FETCH PROPERTIES
   ===================================================== */
 
-  const fetchProperties = useCallback(async () => {
-    setLoading(true);
-    setError("");
+// ==========================================
+// FETCH MARKETPLACE LISTINGS
+// ==========================================
 
-    try {
+const fetchProperties = useCallback(async () => {
+  setLoading(true);
+  setError("");
+
+  try {
+    // ======================================
+    // ADMIN MARKETPLACE
+    // ======================================
+
+    // Preserve the existing admin marketplace.
+    // Company projects are integrated into
+    // public Viwanja only.
+
+    if (insideAdmin) {
       const response = await axios.get(
         `${API_URL}/api/property`
       );
 
       const items = response.data?.properties;
 
-      setProperties(Array.isArray(items) ? items : []);
-    } catch (err) {
-      console.error("Failed to fetch properties:", err);
-
-      setError(
-        err.response?.data?.message ||
-          "Unable to load projects. Please try again."
+      setProperties(
+        Array.isArray(items) ? items : []
       );
-    } finally {
-      setLoading(false);
+
+      return;
     }
-  }, []);
+
+    // ======================================
+    // FETCH ALL PUBLISHED VIWANJA PROJECTS
+    // ======================================
+
+    const fetchCompanyProjects = async () => {
+      const projects = [];
+
+      let page = 1;
+      let totalPages = 1;
+
+      do {
+        const response = await axios.get(
+          `${API_URL}/api/project`,
+          {
+            params: {
+              projectType: "VIWANJA",
+              page,
+              limit: 24,
+            },
+          }
+        );
+
+        const data = response.data;
+
+        if (
+          data?.success !== true ||
+          !Array.isArray(data.projects)
+        ) {
+          throw new Error(
+            "Invalid public projects response."
+          );
+        }
+
+        projects.push(...data.projects);
+
+        totalPages = Math.max(
+          0,
+          Number(data.pagination?.totalPages) || 0
+        );
+
+        page += 1;
+      } while (page <= totalPages);
+
+      return projects;
+    };
+
+    // ======================================
+    // FETCH BOTH LISTING SOURCES
+    // ======================================
+
+    const [legacyResult, companyResult] =
+      await Promise.allSettled([
+        axios.get(`${API_URL}/api/property`),
+        fetchCompanyProjects(),
+      ]);
+
+    // Only show the main error state when
+    // both listing sources fail.
+
+    if (
+      legacyResult.status === "rejected" &&
+      companyResult.status === "rejected"
+    ) {
+      throw new Error(
+        "Unable to load marketplace projects."
+      );
+    }
+
+    // ======================================
+    // EXISTING PROPERTY LISTINGS
+    // ======================================
+
+    const legacyProperties =
+      legacyResult.status === "fulfilled" &&
+      Array.isArray(
+        legacyResult.value.data?.properties
+      )
+        ? legacyResult.value.data.properties
+        : [];
+
+    // ======================================
+    // NEW COMPANY PROJECTS
+    // ======================================
+
+    const publishedProjects =
+      companyResult.status === "fulfilled"
+        ? companyResult.value
+        : [];
+
+    // ======================================
+    // NORMALIZE COMPANY PROJECT DATA
+    // ======================================
+
+    // The existing ProjectCard expects
+    // Property-style data.
+    //
+    // Normalize only the fields needed
+    // for cards, filtering and navigation.
+
+    const companyProperties = publishedProjects
+      .filter((project) => project?.id)
+      .map((project) => ({
+        // Unique ID for React rendering.
+        _id: `company-project-${project.id}`,
+
+        // Preserve the actual Project ID.
+        companyProjectId: project.id,
+
+        // Distinguish new projects from
+        // legacy properties.
+        source: "COMPANY_PROJECT",
+
+        title: project.title || "",
+        description: project.description || "",
+
+        // Allow existing location search
+        // and display to work.
+        city: project.location || "",
+
+        location: project.location || "",
+
+        company: {
+          name: project.companyName || "",
+        },
+
+        // Project pricing is per sqm,
+        // not a full property price.
+        pricePerSqm: project.pricePerSqm,
+
+        // Never misrepresent the rate per sqm
+        // as a full property purchase price.
+        price: null,
+
+        // Land use is not yet recorded
+        // separately for company projects.
+        propertyType: "",
+
+        projectType: project.projectType,
+
+        status: project.status,
+
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+
+        // Image upload will be implemented
+        // separately.
+        images: [],
+      }));
+
+    // ======================================
+    // COMBINE MARKETPLACE LISTINGS
+    // ======================================
+
+    // Keep existing properties intact.
+    // Add published company projects to
+    // the same listing collection.
+
+    setProperties([
+      ...legacyProperties,
+      ...companyProperties,
+    ]);
+
+  } catch (err) {
+    console.error(
+      "Failed to fetch marketplace projects:",
+      err
+    );
+
+    setError(
+      err.response?.data?.message ||
+        err.message ||
+        "Unable to load projects. Please try again."
+    );
+
+  } finally {
+    setLoading(false);
+  }
+}, [insideAdmin]);
 
   useEffect(() => {
     fetchProperties();

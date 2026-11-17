@@ -10,7 +10,8 @@ import morgan from "morgan"
 
 
 const app = express();
-const PORT = 5000;
+const PORT = Number(process.env.PORT || 5000);
+const HOST = process.env.HOST || "0.0.0.0";
 import {connectDB} from './config/db.js';
 import authRouter from './routes/auth.routes.js';
 import userRouter from './routes/user.routes.js';
@@ -104,6 +105,6 @@ io.on("connection", (socket)=>{
 app.set("io", io);
 
 
-server.listen(PORT, "0.0.0.0", () => {
-    console.log(`server Started on port ${PORT}`);
+server.listen(PORT, HOST, () => {
+    console.log(`Server started on ${HOST}:${PORT}`);
 });

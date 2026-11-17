@@ -24,6 +24,10 @@ const STATUS_STYLES = {
 
 const CompanyCenter = () => {
   const { token } = useAuth();
+  // Approved company workspaces
+const [workspaces, setWorkspaces] = useState([]);
+const [workspacesLoading, setWorkspacesLoading] = useState(true);
+const [workspacesError, setWorkspacesError] = useState("");
 
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -85,6 +89,68 @@ const CompanyCenter = () => {
     return () => controller.abort();
   }, [token]);
 
+  // Fetch approved company workspaces
+useEffect(() => {
+  if (!token) {
+    setWorkspaces([]);
+    setWorkspacesLoading(false);
+    return;
+  }
+
+  const controller = new AbortController();
+
+  const fetchWorkspaces = async () => {
+    setWorkspacesLoading(true);
+    setWorkspacesError("");
+
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/companies/my-workspaces`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        }
+      );
+
+      if (
+        !response.data?.success ||
+        !Array.isArray(response.data.workspaces)
+      ) {
+        throw new Error(
+          "Unable to retrieve company workspaces."
+        );
+      }
+
+      if (!controller.signal.aborted) {
+        setWorkspaces(response.data.workspaces);
+      }
+    } catch (error) {
+      if (
+        controller.signal.aborted ||
+        axios.isCancel(error)
+      ) {
+        return;
+      }
+
+      setWorkspacesError(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to load company workspaces."
+      );
+    } finally {
+      if (!controller.signal.aborted) {
+        setWorkspacesLoading(false);
+      }
+    }
+  };
+
+  fetchWorkspaces();
+
+  return () => controller.abort();
+}, [token]);
+
   return (
     <div className="min-h-dvh bg-zinc-50 pt-[60px]">
       <Navbar />
@@ -102,6 +168,114 @@ const CompanyCenter = () => {
             business activities on Plotbase.
           </p>
         </div>
+
+
+        {/* COMPANY WORKSPACES */}
+
+<section className="mb-5 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm">
+
+  <div className="mb-4 flex items-center justify-between gap-3">
+    <div>
+      <h2 className="text-base font-semibold text-zinc-950">
+        Company Workspaces
+      </h2>
+
+      <p className="mt-1 text-xs text-zinc-500">
+        Approved companies where you have active membership.
+      </p>
+    </div>
+
+    {!workspacesLoading && !workspacesError && (
+      <span className="rounded-md bg-zinc-100 px-2.5 py-1 text-xs font-semibold text-zinc-700">
+        {workspaces.length}
+      </span>
+    )}
+  </div>
+
+  {/* Loading */}
+
+  {workspacesLoading ? (
+    <div className="space-y-3">
+      <Skeleton className="h-16 w-full rounded-lg" />
+      <Skeleton className="h-16 w-full rounded-lg" />
+    </div>
+  ) : workspacesError ? (
+
+    /* Error */
+
+    <div
+      role="alert"
+      className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+    >
+      {workspacesError}
+    </div>
+
+  ) : workspaces.length === 0 ? (
+
+    /* Empty State */
+
+    <div className="rounded-lg border border-dashed border-zinc-200 bg-zinc-50 px-4 py-6 text-center">
+      <Building2
+        size={22}
+        className="mx-auto text-zinc-400"
+      />
+
+      <p className="mt-2 text-sm font-medium text-zinc-800">
+        No Approved Workspaces
+      </p>
+
+      <p className="mt-1 text-xs text-zinc-500">
+        Your approved company workspaces will appear here.
+      </p>
+    </div>
+
+  ) : (
+
+    /* Available Workspaces */
+
+    <div className="space-y-2">
+      {workspaces.map((workspace) => (
+        <div
+          key={workspace.companyId}
+          className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 p-3"
+        >
+          <div className="flex min-w-0 items-center gap-3">
+
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100">
+              <Building2
+                size={19}
+                className="text-zinc-700"
+              />
+            </div>
+
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-zinc-950">
+                {workspace.name}
+              </p>
+
+              <p className="mt-1 text-xs text-zinc-500">
+                {workspace.role?.replaceAll("_", " ") || "MEMBER"}
+              </p>
+            </div>
+          </div>
+<div className="flex flex-wrap items-center justify-end gap-2">
+  <span className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-[11px] font-medium text-zinc-700">
+    Approved
+  </span>
+
+  <Link
+    to={`/company/${workspace.companyId}/projects`}
+    className="inline-flex items-center gap-1.5 rounded-md bg-zinc-950 px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-zinc-800"
+  >
+    Manage Projects
+    <ArrowRight size={14} />
+  </Link>
+</div>
+        </div>
+      ))}
+    </div>
+  )}
+</section>
 
         {/* LOADING */}
 
