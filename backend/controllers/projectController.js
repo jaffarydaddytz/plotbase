@@ -1172,6 +1172,13 @@ const updateCompanyProjectPricingController = async (
         });
 
     } catch (error) {
+        // Business-rule conflict.
+if (error.statusCode === 409) {
+    return res.status(409).json({
+        success: false,
+        message: error.message
+    });
+}
 
         if (error.statusCode === 400) {
             return res.status(400).json({
