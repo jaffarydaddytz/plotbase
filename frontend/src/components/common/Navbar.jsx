@@ -4,6 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Building2,
   ChevronDown,
+  ClipboardList,
   Heart,
   LogOut,
   Menu,
@@ -381,6 +382,7 @@ if (isInvestor) {
             My Profile
           </AccountMenuLink>
 
+
           <AccountMenuLink
             to="/wishlist"
             icon={Heart}
@@ -388,6 +390,16 @@ if (isInvestor) {
           >
             My Wishlist
           </AccountMenuLink>
+
+          {/* MY RESERVATIONS */}
+
+<AccountMenuLink
+  to="/my-reservations"
+  icon={ClipboardList}
+  onClick={closeMenus}
+>
+  My Reservations
+</AccountMenuLink>
         </div>
       )}
 

@@ -1,30 +1,123 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import L from "leaflet";
-import { MapContainer, TileLayer, useMap } from "react-leaflet";
+
+import {
+  MapContainer,
+  TileLayer,
+  useMap,
+} from "react-leaflet";
 
 import "leaflet/dist/leaflet.css";
 
-// Display GeoJSON polygons and automatically zoom to their boundaries
-const PlotPolygons = ({ data }) => {
+// ==========================================
+// PLOT COLORS
+// ==========================================
+
+const getPlotStyle = (
+  status,
+  selected = false
+) => {
+  const colors = {
+    AVAILABLE: "#059669",
+    RESERVED: "#d97706",
+    SOLD: "#dc2626",
+  };
+
+  const color =
+    colors[
+      String(status || "").toUpperCase()
+    ] || "#059669";
+
+  return {
+    color: selected ? "#18181b" : color,
+    weight: selected ? 4 : 2,
+    fillColor: color,
+    fillOpacity: selected ? 0.6 : 0.3,
+  };
+};
+
+// ==========================================
+// RESIZE LEAFLET MAP
+// ==========================================
+
+const ResizeMap = () => {
   const map = useMap();
 
   useEffect(() => {
-    if (!data) return;
+    const container = map.getContainer();
+
+    const updateSize = () => {
+      map.invalidateSize({
+        pan: false,
+        animate: false,
+      });
+    };
+
+    const observer =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(updateSize)
+        : null;
+
+    observer?.observe(container);
+
+    const frame =
+      requestAnimationFrame(updateSize);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+    };
+  }, [map]);
+
+  return null;
+};
+
+// ==========================================
+// GEOJSON PLOT POLYGONS
+// ==========================================
+
+const PlotPolygons = ({
+  data,
+  selectable,
+  selectedPlotId,
+  onSelectPlot,
+}) => {
+  const map = useMap();
+
+  const layersRef = useRef(new Map());
+
+  const onSelectRef = useRef(onSelectPlot);
+
+  onSelectRef.current = onSelectPlot;
+
+  // ========================================
+  // CREATE POLYGON LAYERS
+  // ========================================
+
+  useEffect(() => {
+    if (!Array.isArray(data?.features)) {
+      return;
+    }
+
+    const layers = new Map();
 
     const geoJsonLayer = L.geoJSON(data, {
-      // Polygon styling
-      style: {
-        color: "#059669",
-        weight: 2,
-        fillColor: "#10b981",
-        fillOpacity: 0.3,
-      },
+      // POLYGON STYLE
 
-      // Display plot information when clicked
+      style: (feature) =>
+        getPlotStyle(
+          feature?.properties?.status
+        ),
+
+      // FEATURE EVENTS
+
       onEachFeature: (feature, layer) => {
-        const properties = feature.properties || {};
+        const properties =
+          feature.properties || {};
 
-        // Support different GeoJSON plot number properties
+        const plotId =
+          properties.id ?? feature.id;
+
         const plotNumber =
           properties.plotNumber ??
           properties.plot_number ??
@@ -32,16 +125,40 @@ const PlotPolygons = ({ data }) => {
           properties.name ??
           "Unknown";
 
-        // Create popup container
-        const popupContent = document.createElement("div");
+        // ================================
+        // INVESTOR PLOT SELECTION
+        // ================================
 
-        // Plot heading
-        const title = document.createElement("strong");
-        title.textContent = `Plot ${plotNumber}`;
+        if (
+          selectable &&
+          plotId != null
+        ) {
+          const id = String(plotId);
 
-        popupContent.appendChild(title);
+          layers.set(id, layer);
 
-        // Helper for displaying information safely
+          layer.on("click", () => {
+            onSelectRef.current?.(id);
+          });
+
+          return;
+        }
+
+        // ================================
+        // UPLOAD PREVIEW POPUP
+        // ================================
+
+        const popup =
+          document.createElement("div");
+
+        const title =
+          document.createElement("strong");
+
+        title.textContent =
+          `Plot ${plotNumber}`;
+
+        popup.appendChild(title);
+
         const addInfo = (label, value) => {
           if (
             value === null ||
@@ -51,48 +168,92 @@ const PlotPolygons = ({ data }) => {
             return;
           }
 
-          const paragraph = document.createElement("p");
+          const row =
+            document.createElement("p");
 
-          paragraph.textContent = `${label}: ${value}`;
+          row.textContent =
+            `${label}: ${value}`;
 
-          popupContent.appendChild(paragraph);
+          popup.appendChild(row);
         };
 
-        // Plot area
+        // AREA
+
         const area =
           properties.areaSqm ??
           properties.legalArea;
 
         if (area != null) {
-          addInfo("Area", `${area} sqm`);
+          addInfo(
+            "Area",
+            `${area} sqm`
+          );
         }
 
+        // PRICE
 
-        // Plot location
-        addInfo("District", properties.district);
-        addInfo("Region", properties.region);
-        addInfo("Locality", properties.locality);
+        if (
+          properties.totalPrice != null
+        ) {
+          addInfo(
+            "Price",
+            `TZS ${Number(
+              properties.totalPrice
+            ).toLocaleString("en-TZ")}`
+          );
+        }
 
-        // Plot status
-        if (properties.plotStatus != null) {
+        // LOCATION
+
+        addInfo(
+          "District",
+          properties.district
+        );
+
+        addInfo(
+          "Region",
+          properties.region
+        );
+
+        addInfo(
+          "Locality",
+          properties.locality
+        );
+
+        // STATUS
+
+        if (
+          properties.plotStatus != null
+        ) {
           addInfo(
             "Source status code",
             properties.plotStatus
           );
         } else {
-          addInfo("Status", properties.status);
+          addInfo(
+            "Status",
+            properties.status
+          );
         }
 
-        // Attach popup to polygon
-        layer.bindPopup(popupContent);
+        layer.bindPopup(popup);
       },
     });
 
-    // Add GeoJSON polygons to the map
+    // ====================================
+    // ADD LAYER TO MAP
+    // ====================================
+
     geoJsonLayer.addTo(map);
 
-    // Automatically zoom to uploaded project boundaries
-    const bounds = geoJsonLayer.getBounds();
+    layersRef.current = layers;
+
+    // ====================================
+    // FIT MAP TO PROJECT BOUNDARIES
+    // ====================================
+
+    const bounds =
+      geoJsonLayer.getBounds();
 
     if (bounds.isValid()) {
       map.fitBounds(bounds, {
@@ -101,70 +262,201 @@ const PlotPolygons = ({ data }) => {
       });
     }
 
-    // Remove previous GeoJSON when data changes
+    // ====================================
+    // CLEANUP
+    // ====================================
+
     return () => {
-      map.removeLayer(geoJsonLayer);
+      layersRef.current = new Map();
+
+      map.removeLayer(
+        geoJsonLayer
+      );
     };
-  }, [data, map]);
+  }, [data, map, selectable]);
+
+  // ========================================
+  // HIGHLIGHT SELECTED POLYGON
+  // ========================================
+
+  useEffect(() => {
+    if (!selectable) return;
+
+    const selectedId =
+      selectedPlotId == null
+        ? null
+        : String(selectedPlotId);
+
+    for (
+      const [id, layer] of
+      layersRef.current
+    ) {
+      const status =
+        layer.feature?.properties?.status;
+
+      const selected =
+        id === selectedId;
+
+      layer.setStyle(
+        getPlotStyle(
+          status,
+          selected
+        )
+      );
+
+      if (selected) {
+        layer.bringToFront();
+      }
+    }
+  }, [
+    data,
+    selectable,
+    selectedPlotId,
+  ]);
 
   return null;
 };
 
-// Reusable GeoJSON Map Preview
-const GeoJsonPreview = ({ data }) => {
+// ==========================================
+// GEOJSON PREVIEW COMPONENT
+// ==========================================
+
+const GeoJsonPreview = ({
+  data,
+  selectable = false,
+  selectedPlotId = null,
+  onSelectPlot,
+  fillHeight = false,
+}) => {
   if (!data) return null;
 
   return (
-    <section className="w-full min-w-0 space-y-3">
+    <section
+      className={
+        fillHeight
+          ? "flex h-full min-h-0 w-full min-w-0 flex-col"
+          : "w-full min-w-0 space-y-3"
+      }
+    >
 
-      {/* Preview Header */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-800">
-          Project Map Preview
-        </h3>
+      {/* ==================================
+          PREVIEW HEADER
+      ================================== */}
 
-        <p className="mt-1 text-sm text-gray-500">
-          Preview the uploaded land plots before saving your project.
-        </p>
-      </div>
+      {!fillHeight && (
+        <div>
 
-      {/* Map Container */}
-      <div className="w-full min-w-0 overflow-hidden rounded-xl border border-gray-200">
+          <h3 className="text-sm font-semibold text-zinc-950">
+            {selectable
+              ? "Explore Plots"
+              : "Project Map Preview"}
+          </h3>
+
+          <p className="mt-1 text-xs text-zinc-500">
+            {selectable
+              ? "Select a plot on the map to view its details."
+              : "Preview the uploaded land plots before saving your project."}
+          </p>
+
+        </div>
+      )}
+
+      {/* ==================================
+          STANDALONE LEGEND
+      ================================== */}
+
+      {selectable && !fillHeight && (
+        <div className="flex flex-wrap gap-3 text-xs text-zinc-600">
+
+          <span>
+            🟢 Available
+          </span>
+
+          <span>
+            🟠 Reserved
+          </span>
+
+          <span>
+            🔴 Sold
+          </span>
+
+          <span>
+            ◼ Selected
+          </span>
+
+        </div>
+      )}
+
+      {/* ==================================
+          MAP CONTAINER
+      ================================== */}
+
+      <div
+        className={
+          fillHeight
+            ? "min-h-0 flex-1 overflow-hidden rounded-lg border border-zinc-200"
+            : "w-full min-w-0 overflow-hidden rounded-xl border border-zinc-200"
+        }
+      >
 
         <MapContainer
           center={[0, 0]}
           zoom={2}
           scrollWheelZoom={false}
-          className="h-72 w-full sm:h-96 lg:h-[420px]"
+          className={
+            fillHeight
+              ? "h-full w-full"
+              : "h-72 w-full sm:h-96 lg:h-[420px]"
+          }
         >
 
-          {/* OpenStreetMap Background */}
+          {/* MAP TILES */}
+
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
 
-          {/* Uploaded GeoJSON Polygons */}
-          <PlotPolygons data={data} />
+          {/* AUTOMATIC RESIZING */}
+
+          <ResizeMap />
+
+          {/* GEOJSON POLYGONS */}
+
+          <PlotPolygons
+            data={data}
+            selectable={selectable}
+            selectedPlotId={selectedPlotId}
+            onSelectPlot={onSelectPlot}
+          />
 
         </MapContainer>
 
       </div>
 
-      {/* Map Information */}
-      <div className="rounded-lg bg-emerald-50 p-3">
+      {/* ==================================
+          PREVIEW INFORMATION
+      ================================== */}
 
-        <p className="text-sm text-emerald-800">
-          <strong>Detected plots:</strong>{" "}
-          {data.features.length}
-        </p>
+      {!fillHeight && (
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs text-zinc-600">
 
-        <p className="mt-1 text-xs text-emerald-700">
-          Click a plot to view its information.
-          The map automatically adjusts to the uploaded geometry.
-        </p>
+          <strong className="text-zinc-900">
+            {data.features?.length ?? 0}
+          </strong>
 
-      </div>
+          {" "}
+
+          plots detected.
+
+          {" "}
+
+          {selectable
+            ? "Click a plot to select it."
+            : "Click a plot to view its information."}
+
+        </div>
+      )}
 
     </section>
   );

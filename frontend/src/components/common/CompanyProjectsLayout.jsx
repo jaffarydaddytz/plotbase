@@ -194,6 +194,13 @@ const CompanySidebar = ({
   const canManageProjects =
     EDITOR_ROLES.includes(workspace?.role);
 
+    const canViewReservations = [
+  "COMPANY_ADMIN",
+  "MANAGER",
+  "SALES_OFFICER",
+  "ACCOUNTANT",
+].includes(workspace?.role);
+
   // ===================================================
   // COMPANY NAVIGATION
   // ===================================================
@@ -234,12 +241,17 @@ const CompanySidebar = ({
       planned: true,
     },
 
-    {
-      name: "Reservations",
-      icon: CalendarCheck,
-      key: "reservations",
-      planned: true,
-    },
+...(canViewReservations
+  ? [
+      {
+        name: "Reservations",
+        icon: CalendarCheck,
+        path: `/company/${companyId}/reservations`,
+        key: "reservations",
+        end: true,
+      },
+    ]
+  : []),
 
     {
       name: "Customers",

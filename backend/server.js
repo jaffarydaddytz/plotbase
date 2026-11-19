@@ -24,12 +24,15 @@ import wishlistRouter from './routes/wishlist.routes.js';
 import projectRouter from './routes/project.routes.js';
 import companyRouter from './routes/company.routes.js';
 import mtaalamuRouter from './routes/mtaalamu.routes.js';
+import reservationRouter from './routes/reservation.routes.js';
+import {
+  expirePendingReservations,
+} from "./services/reservationService.js";
 
 
 app.set('trust proxy', false);
 
-//DB
-connectDB();
+
 
 //middlewares
 
@@ -65,6 +68,7 @@ app.use("/api/admin", adminRouter)
 app.use("/api/wishlist", wishlistRouter)
 app.use("/api/project", projectRouter)
 app.use("/api/companies", companyRouter);
+app.use("/api/reservations", reservationRouter);
 // Mtaalamu AI Assistant
 app.use("/api/mtaalamu", mtaalamuRouter);
 
@@ -105,6 +109,97 @@ io.on("connection", (socket)=>{
 app.set("io", io);
 
 
-server.listen(PORT, HOST, () => {
-    console.log(`Server started on ${HOST}:${PORT}`);
-});
+// ==========================================
+// RESERVATION EXPIRY CONFIGURATION
+// ==========================================
+
+const EXPIRY_INTERVAL_MS = 60 * 1000;
+
+let expiryCheckRunning = false;
+
+// ==========================================
+// PROCESS EXPIRED RESERVATIONS
+// ==========================================
+
+const runReservationExpiry = async () => {
+  // Prevent overlapping processing runs.
+
+  if (expiryCheckRunning) {
+    return;
+  }
+
+  expiryCheckRunning = true;
+
+  try {
+    const result = await expirePendingReservations({
+      batchSize: 50,
+    });
+
+    if (result.checked > 0) {
+      console.log(
+        "[Reservation Expiry]",
+        `Checked: ${result.checked}`,
+        `Expired: ${result.expired}`,
+        `Skipped: ${result.skipped}`
+      );
+    }
+  } catch (error) {
+    console.error(
+      "[Reservation Expiry] Processing failed:",
+      error
+    );
+  } finally {
+    expiryCheckRunning = false;
+  }
+};
+
+// ==========================================
+// START BACKEND SERVER
+// ==========================================
+
+const startServer = async () => {
+  try {
+    // Connect to MongoDB before starting
+    // the API and background processing.
+
+    await connectDB();
+
+    server.listen(PORT, HOST, () => {
+      console.log(
+        `Server started on ${HOST}:${PORT}`
+      );
+
+      // Process overdue reservations
+      // immediately after startup.
+
+      void runReservationExpiry();
+
+      // Continue processing periodically.
+
+      const expiryTimer = setInterval(
+        () => {
+          void runReservationExpiry();
+        },
+        EXPIRY_INTERVAL_MS
+      );
+
+      // The interval should not keep Node.js
+      // running after other services close.
+
+      expiryTimer.unref();
+    });
+  } catch (error) {
+    console.error(
+      "Backend startup failed:",
+      error
+    );
+
+    process.exit(1);
+  }
+};
+
+// ==========================================
+// INITIALIZE APPLICATION
+// ==========================================
+
+void startServer();

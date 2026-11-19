@@ -13,7 +13,10 @@ import { requireCompanyMembership } from "../middlewares/companyAccess.middlewar
 import { getCompanyWorkspace } from "../controllers/companyWorkspace.controller.js";
 import { getMyWorkspaces } from "../controllers/companyWorkspaces.controller.js";
 import geoJsonUploadMiddleware from "../middlewares/geoJsonUploadMiddleware.js";
-
+import {
+  getCompanyReservationsController,
+  confirmReservationController,
+} from "../controllers/reservation.controller.js";
 import {
   createProjectController,
   getCompanyProjectsController,
@@ -52,6 +55,41 @@ router.get(
   protect,
   requireCompanyMembership(),
   getCompanyWorkspace
+);
+
+// ==========================================
+// CONFIRM COMPANY PLOT RESERVATION
+// ==========================================
+
+// PATCH /api/companies/:companyId/reservations/:reservationId/confirm
+//
+// Authentication required.
+//
+// Only COMPANY_ADMIN and MANAGER
+// can confirm pending reservations.
+//
+// Confirmation rules:
+// - Company must be approved.
+// - Staff membership must be active.
+// - Reservation must belong to the company.
+// - Reservation must be PENDING.
+// - Reservation must not have expired.
+// - Plot must remain RESERVED.
+//
+// No payment integration.
+//
+// Successful confirmation:
+// Reservation -> CONFIRMED
+// Plot        -> RESERVED
+
+router.patch(
+  "/:companyId/reservations/:reservationId/confirm",
+  protect,
+  requireCompanyMembership(
+    "COMPANY_ADMIN",
+    "MANAGER"
+  ),
+  confirmReservationController
 );
 
 // Submit a completed company application for admin review
@@ -263,5 +301,30 @@ router.post(
   createProjectController
 );
 
+// ==========================================
+// COMPANY RESERVATION MANAGEMENT
+// ==========================================
+
+// GET /api/companies/:companyId/reservations
+//
+// Only authorized ACTIVE members of an
+// APPROVED company can view reservations.
+//
+// Supported query parameters:
+// ?page=1&limit=10
+// ?status=PENDING
+// ?projectId=PROJECT_ID
+
+router.get(
+  "/:companyId/reservations",
+  protect,
+  requireCompanyMembership(
+    "COMPANY_ADMIN",
+    "MANAGER",
+    "SALES_OFFICER",
+    "ACCOUNTANT"
+  ),
+  getCompanyReservationsController
+);
 
 export default router;
