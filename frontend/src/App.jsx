@@ -41,6 +41,7 @@ import PublicProjectDetails from "./pages/shared/PublicProjectDetails";
 import Profile from "./pages/shared/Profile";
 import ChatMessages from "./pages/shared/ChatMessages";
 import Contact from "./pages/shared/Contact";
+import MyReservations from "./pages/shared/MyReservations";
 
 import MyInquiries from "./pages/buyer/MyInquiries";
 import Wishlist from "./pages/buyer/Wishlist";
@@ -51,6 +52,7 @@ import Wishlist from "./pages/buyer/Wishlist";
 
 import RegisterCompany from "./pages/company/RegisterCompany";
 import CompanyCenter from "./pages/company/CompanyCenter";
+import CompanyReservations from "./pages/company/CompanyReservations";
 
 import CompanyProjects from "./pages/company/projects/CompanyProjects";
 import CreateProject from "./pages/company/projects/CreateProject";
@@ -459,6 +461,32 @@ const App = () => {
             </Route>
           </Route>
 
+                    {/* ==================================
+              COMPANY RESERVATION MANAGEMENT
+              APPROVED COMPANY MEMBERS
+          ================================== */}
+
+          <Route
+            path="/company/:companyId/reservations"
+            element={
+              <CompanyWorkspaceGuard
+                allowedRoles={[
+                  "COMPANY_ADMIN",
+                  "MANAGER",
+                  "SALES_OFFICER",
+                  "ACCOUNTANT",
+                ]}
+              />
+            }
+          >
+            <Route element={<CompanyProjectsLayout />}>
+              <Route
+                index
+                element={<CompanyReservations />}
+              />
+            </Route>
+          </Route>
+
           {/* COMPANY REGISTRATION */}
 
           <Route
@@ -473,6 +501,11 @@ const App = () => {
             element={<RegisterCompany applicationsOnly />}
           />
         </Route>
+
+        {/* ==================================
+    INVESTOR RESERVATION MANAGEMENT
+================================== */}
+
 
         {/* ==================================
             INVESTOR ACCESS
@@ -504,6 +537,13 @@ const App = () => {
             path="/wishlist"
             element={<Wishlist />}
           />
+
+          {/* INVESTOR RESERVATIONS */}
+
+        <Route
+          path="/my-reservations"
+          element={<MyReservations />}
+        />
 
           <Route
             path="/contact"

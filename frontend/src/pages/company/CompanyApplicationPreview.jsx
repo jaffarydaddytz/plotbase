@@ -37,7 +37,7 @@ const displayValue = (value) =>
 // =====================================================
 
 const cardClass =
-  "rounded-xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6";
+  "rounded-xl border border-zinc-200 bg-white p-4 shadow-sm sm:p-5";
 
 const sectionTitleClass =
   "text-sm font-semibold text-zinc-950";
@@ -82,6 +82,22 @@ const DetailField = ({
 );
 
 // =====================================================
+// STATUS BADGE
+// =====================================================
+
+const StatusBadge = ({ complete }) => (
+  <span
+    className={`inline-flex shrink-0 rounded-md px-2.5 py-1 text-xs font-medium ${
+      complete
+        ? "bg-emerald-50 text-emerald-700"
+        : "bg-amber-50 text-amber-700"
+    }`}
+  >
+    {complete ? "Complete" : "Incomplete"}
+  </span>
+);
+
+// =====================================================
 // COMPANY APPLICATION PREVIEW
 // =====================================================
 
@@ -94,11 +110,36 @@ const CompanyApplicationPreview = ({
 }) => {
   const { token } = useAuth();
 
-  const [company, setCompany] = useState(null);
+  // ===================================================
+  // STATE
+  // ===================================================
 
-  const [loading, setLoading] = useState(true);
+  const [applicationState, setApplicationState] =
+    useState({
+      companyId: null,
+      loading: true,
+      company: null,
+      error: "",
+    });
 
-  const [error, setError] = useState("");
+  // Prevent showing a previous company's
+  // application while a new one is loading.
+
+  const currentState =
+    applicationState.companyId === companyId
+      ? applicationState
+      : {
+          companyId,
+          loading: true,
+          company: null,
+          error: "",
+        };
+
+  const {
+    company,
+    loading,
+    error,
+  } = currentState;
 
   // ===================================================
   // LOAD COMPANY APPLICATION
@@ -108,11 +149,26 @@ const CompanyApplicationPreview = ({
     const controller = new AbortController();
 
     const loadApplication = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        setCompany(null);
+      if (!token || !companyId) {
+        setApplicationState({
+          companyId,
+          loading: false,
+          company: null,
+          error:
+            "Authentication or company information is missing.",
+        });
 
+        return;
+      }
+
+      setApplicationState({
+        companyId,
+        loading: true,
+        company: null,
+        error: "",
+      });
+
+      try {
         const response = await axios.get(
           `${API_URL}/api/companies/my-applications`,
           {
@@ -124,7 +180,7 @@ const CompanyApplicationPreview = ({
         );
 
         if (
-          !response.data.success ||
+          response.data?.success !== true ||
           !Array.isArray(response.data.applications)
         ) {
           throw new Error(
@@ -144,31 +200,42 @@ const CompanyApplicationPreview = ({
           );
         }
 
-        setCompany(application);
-      } catch (err) {
-        if (controller.signal.aborted) return;
-
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Unable to load company application."
-        );
-      } finally {
         if (!controller.signal.aborted) {
-          setLoading(false);
+          setApplicationState({
+            companyId,
+            loading: false,
+            company: application,
+            error: "",
+          });
         }
+      } catch (err) {
+        if (
+          controller.signal.aborted ||
+          axios.isCancel(err)
+        ) {
+          return;
+        }
+
+        setApplicationState({
+          companyId,
+          loading: false,
+          company: null,
+          error:
+            err.response?.data?.message ||
+            err.message ||
+            "Unable to load company application.",
+        });
       }
     };
 
-    if (token && companyId) {
-      loadApplication();
-    } else {
-      setCompany(null);
-      setError(
-        "Authentication or company information is missing."
-      );
-      setLoading(false);
-    }
+    // Defer state updates to avoid synchronous
+    // setState calls inside useEffect.
+
+    queueMicrotask(() => {
+      if (!controller.signal.aborted) {
+        void loadApplication();
+      }
+    });
 
     return () => controller.abort();
   }, [companyId, token]);
@@ -215,9 +282,14 @@ const CompanyApplicationPreview = ({
 
   const applicant = company.applicantInfo || {};
 
-  const applicantName = applicant.fullName || "";
-  const applicantEmail = applicant.email || "";
-  const applicantPhone = applicant.phone || "";
+  const applicantName =
+    applicant.fullName || "";
+
+  const applicantEmail =
+    applicant.email || "";
+
+  const applicantPhone =
+    applicant.phone || "";
 
   const applicantPosition =
     applicant.positionTitle || "";
@@ -251,13 +323,20 @@ const CompanyApplicationPreview = ({
 
   const missingApplicantFields = [];
 
-  if (applicantName.trim().length < 2) {
+  if (
+    typeof applicantName !== "string" ||
+    applicantName.trim().length < 2
+  ) {
     missingApplicantFields.push(
       "Applicant full name"
     );
   }
 
-  if (!emailRegex.test(applicantEmail.trim())) {
+  if (
+    !emailRegex.test(
+      String(applicantEmail).trim()
+    )
+  ) {
     missingApplicantFields.push(
       "Applicant email address"
     );
@@ -378,11 +457,11 @@ const CompanyApplicationPreview = ({
   // ===================================================
 
   return (
-    <section className="mx-auto w-full max-w-5xl space-y-5">
+    <section className="mx-auto w-full max-w-5xl space-y-4">
 
-      {/* ============================================= */}
-      {/* PAGE HEADER */}
-      {/* ============================================= */}
+      {/* =============================================
+          PAGE HEADER
+      ============================================= */}
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
 
@@ -405,11 +484,12 @@ const CompanyApplicationPreview = ({
         <span className="inline-flex w-fit items-center rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-semibold text-zinc-700">
           {company.verificationStatus || "UNKNOWN"}
         </span>
+
       </div>
 
-      {/* ============================================= */}
-      {/* APPLICATION READINESS */}
-      {/* ============================================= */}
+      {/* =============================================
+          APPLICATION READINESS
+      ============================================= */}
 
       <div
         className={`rounded-xl border px-4 py-3 ${
@@ -459,16 +539,17 @@ const CompanyApplicationPreview = ({
                   : "Only applications with DRAFT status can be submitted."}
             </p>
           </div>
+
         </div>
       </div>
 
-      {/* ============================================= */}
-      {/* 1. APPLICANT INFORMATION */}
-      {/* ============================================= */}
+      {/* =============================================
+          1. APPLICANT INFORMATION
+      ============================================= */}
 
       <div className={cardClass}>
 
-        <div className="mb-5 flex items-center justify-between gap-3 border-b border-zinc-100 pb-4">
+        <div className="mb-4 flex items-center justify-between gap-3 border-b border-zinc-100 pb-3">
 
           <div>
             <h2 className={sectionTitleClass}>
@@ -481,20 +562,11 @@ const CompanyApplicationPreview = ({
             </p>
           </div>
 
-          <span
-            className={`rounded-md px-2.5 py-1 text-xs font-medium ${
-              applicantComplete
-                ? "bg-emerald-50 text-emerald-700"
-                : "bg-amber-50 text-amber-700"
-            }`}
-          >
-            {applicantComplete
-              ? "Complete"
-              : "Incomplete"}
-          </span>
+          <StatusBadge complete={applicantComplete} />
+
         </div>
 
-        <dl className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
+        <dl className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
 
           <DetailField
             label="Full Name"
@@ -524,9 +596,9 @@ const CompanyApplicationPreview = ({
 
         </dl>
 
-        {/* Authorization */}
+        {/* AUTHORIZATION */}
 
-        <div className="mt-5 border-t border-zinc-100 pt-4">
+        <div className="mt-4 border-t border-zinc-100 pt-4">
 
           <div className="flex flex-wrap items-center justify-between gap-3">
 
@@ -536,8 +608,8 @@ const CompanyApplicationPreview = ({
               </p>
 
               <p className="mt-1 text-sm text-zinc-800">
-                Applicant confirmation of
-                authority to represent the company.
+                Applicant confirmation of authority
+                to represent the company.
               </p>
             </div>
 
@@ -554,17 +626,18 @@ const CompanyApplicationPreview = ({
             </span>
 
           </div>
+
         </div>
 
       </div>
 
-      {/* ============================================= */}
-      {/* 2. COMPANY INFORMATION */}
-      {/* ============================================= */}
+      {/* =============================================
+          2. COMPANY INFORMATION
+      ============================================= */}
 
       <div className={cardClass}>
 
-        <div className="mb-5 flex items-center justify-between gap-3 border-b border-zinc-100 pb-4">
+        <div className="mb-4 flex items-center justify-between gap-3 border-b border-zinc-100 pb-3">
 
           <div>
             <h2 className={sectionTitleClass}>
@@ -577,21 +650,11 @@ const CompanyApplicationPreview = ({
             </p>
           </div>
 
-          <span
-            className={`rounded-md px-2.5 py-1 text-xs font-medium ${
-              companyComplete
-                ? "bg-emerald-50 text-emerald-700"
-                : "bg-amber-50 text-amber-700"
-            }`}
-          >
-            {companyComplete
-              ? "Complete"
-              : "Incomplete"}
-          </span>
+          <StatusBadge complete={companyComplete} />
 
         </div>
 
-        <dl className="grid gap-x-5 gap-y-5 sm:grid-cols-2">
+        <dl className="grid gap-x-5 gap-y-4 sm:grid-cols-2">
 
           <DetailField
             label="Registered Company Name"
@@ -625,13 +688,13 @@ const CompanyApplicationPreview = ({
 
       </div>
 
-      {/* ============================================= */}
-      {/* 3. VERIFICATION DOCUMENTS */}
-      {/* ============================================= */}
+      {/* =============================================
+          3. VERIFICATION DOCUMENTS
+      ============================================= */}
 
       <div className={cardClass}>
 
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 pb-4">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-zinc-100 pb-3">
 
           <div>
             <h2 className={sectionTitleClass}>
@@ -651,12 +714,12 @@ const CompanyApplicationPreview = ({
                 : "bg-zinc-100 text-zinc-600"
             }`}
           >
-            {uploadedCount}/3 Uploaded
+            {uploadedCount}/{REQUIRED_DOCUMENTS.length} Uploaded
           </span>
 
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
 
           {REQUIRED_DOCUMENTS.map((item) => {
             const uploaded = documents.find(
@@ -689,9 +752,7 @@ const CompanyApplicationPreview = ({
                       : "bg-red-100 text-red-700"
                   }`}
                 >
-                  {uploaded
-                    ? "Uploaded"
-                    : "Missing"}
+                  {uploaded ? "Uploaded" : "Missing"}
                 </span>
 
               </div>
@@ -701,41 +762,37 @@ const CompanyApplicationPreview = ({
         </div>
 
         <p className="mt-4 text-xs leading-5 text-zinc-500">
-          Uploaded documents will be reviewed
-          by authorized Plotbase administrators
-          after your application is submitted.
-          Uploading a document does not mean
-          it has already been verified.
+          Uploaded documents will be reviewed by
+          authorized Plotbase administrators after
+          your application is submitted. Uploading
+          a document does not mean it has already
+          been verified.
         </p>
 
       </div>
 
-      {/* ============================================= */}
-      {/* MISSING INFORMATION */}
-      {/* ============================================= */}
+      {/* =============================================
+          MISSING INFORMATION
+      ============================================= */}
 
       {isDraft && missingInformation.length > 0 && (
-
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5">
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
 
           <h3 className="text-sm font-semibold text-amber-900">
             Information Required Before Submission
           </h3>
 
           <p className="mt-1 text-xs leading-5 text-amber-800">
-            The following information must be
-            completed before this application
-            can be submitted:
+            Complete the following information
+            before submitting your application:
           </p>
 
           <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm text-amber-900">
-
             {missingInformation.map((field) => (
               <li key={field}>
                 {field}
               </li>
             ))}
-
           </ul>
 
           <p className="mt-3 text-xs text-amber-800">
@@ -746,13 +803,14 @@ const CompanyApplicationPreview = ({
         </div>
       )}
 
-      {/* ============================================= */}
-      {/* 4. REVIEW & SUBMIT */}
-      {/* ============================================= */}
+      {/* =============================================
+          4. REVIEW & SUBMIT
+      ============================================= */}
 
       <div className={cardClass}>
 
-        <div className="border-b border-zinc-100 pb-4">
+        <div className="border-b border-zinc-100 pb-3">
+
           <h2 className={sectionTitleClass}>
             4. Review & Submit
           </h2>
@@ -760,6 +818,7 @@ const CompanyApplicationPreview = ({
           <p className="mt-1 text-xs text-zinc-500">
             Final application confirmation.
           </p>
+
         </div>
 
         <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-4">
@@ -772,9 +831,9 @@ const CompanyApplicationPreview = ({
           </p>
 
           <p className="mt-3 text-sm leading-6 text-zinc-700">
-            Once submitted, your application
-            will be sent to Plotbase administrators
-            for verification and approval.
+            Once submitted, your application will
+            be sent to Plotbase administrators for
+            verification and approval.
           </p>
 
           <p className="mt-3 text-xs leading-5 text-zinc-500">
@@ -786,15 +845,11 @@ const CompanyApplicationPreview = ({
 
         </div>
 
-        {/* ----------------------------------------- */}
         {/* ACTION BUTTONS */}
-        {/* ----------------------------------------- */}
 
-        <div className="mt-5 flex flex-col gap-3 border-t border-zinc-100 pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-4 flex flex-col gap-3 border-t border-zinc-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
 
-          {/* Back and Edit */}
-
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
 
             {onBack && (
               <button
@@ -820,8 +875,6 @@ const CompanyApplicationPreview = ({
 
           </div>
 
-          {/* Submit */}
-
           {onSubmit && (
             <button
               type="button"
@@ -843,16 +896,16 @@ const CompanyApplicationPreview = ({
 
         </div>
 
-        {/* Submission guidance */}
+        {/* SUBMISSION GUIDANCE */}
 
         {!readyToSubmit && isDraft && (
           <p
             role="status"
             className="mt-3 text-xs text-amber-700"
           >
-            Submission is disabled until
-            all required information and
-            documents are available.
+            Submission is disabled until all
+            required information and documents
+            are available.
           </p>
         )}
 

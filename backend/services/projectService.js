@@ -122,6 +122,39 @@ const getProjectById = async (projectId) => {
         throw new Error("Project not found");
     }
 
+    // ==========================================
+// VERIFY PUBLIC COMPANY PROJECT VISIBILITY
+// ==========================================
+
+// Preserve legacy project compatibility.
+// New company projects require an approved
+// company and a valid project classification.
+
+if (project.companyId) {
+
+    const validProjectType = [
+        "VIWANJA",
+        "MASHAMBA"
+    ].includes(project.projectType);
+
+    if (!validProjectType) {
+        const error = new Error("Project not found");
+        error.statusCode = 404;
+        throw error;
+    }
+
+    const approvedCompany = await Company.exists({
+        _id: project.companyId,
+        verificationStatus: "APPROVED"
+    });
+
+    if (!approvedCompany) {
+        const error = new Error("Project not found");
+        error.statusCode = 404;
+        throw error;
+    }
+}
+
     // Retrieve plots belonging to this project.
     const plots = await Plot.find({
         projectId: project._id
@@ -147,18 +180,19 @@ const getProjectById = async (projectId) => {
         }))
     };
 
-    return {
-        project: {
-            id: project._id,
-            title: project.title,
-            description: project.description,
-            location: project.location,
-            pricePerSqm: project.pricePerSqm,
-            status: project.status
-        },
+return {
+    project: {
+        id: project._id,
+        title: project.title,
+        description: project.description,
+        location: project.location,
+        projectType: project.projectType || null,
+        pricePerSqm: project.pricePerSqm,
+        status: project.status
+    },
 
-        plots: geoJson
-    };
+    plots: geoJson
+};
 };
 
 
@@ -274,11 +308,26 @@ const updateCompanyProjectPricing = async ({
             // transaction also coordinates concurrent
             // project pricing updates.
 
-            const project = await Project.findOneAndUpdate(
-                {
-                    _id: projectId,
-                    companyId
-                },
+// ======================================
+// ENFORCE PRICING RULES AT DATABASE LEVEL
+// ======================================
+
+const pricingFilter = {
+    _id: projectId,
+    companyId
+};
+
+// Zero pricing is permitted only for
+// DRAFT and INACTIVE projects.
+
+if (pricePerSqm === 0) {
+    pricingFilter.status = {
+        $in: ["DRAFT", "INACTIVE"]
+    };
+}
+
+const project = await Project.findOneAndUpdate(
+    pricingFilter,
                 {
                     $set: {
                         pricePerSqm
@@ -291,10 +340,32 @@ const updateCompanyProjectPricing = async ({
                 }
             );
 
-            if (!project) {
-                result = null;
-                return;
-            }
+if (!project) {
+
+    // Distinguish a missing project from
+    // an ACTIVE project rejecting zero pricing.
+
+    if (pricePerSqm === 0) {
+
+        const activeProject = await Project.exists({
+            _id: projectId,
+            companyId,
+            status: "ACTIVE"
+        }).session(session);
+
+        if (activeProject) {
+            const error = new Error(
+                "ACTIVE projects must have a positive price per sqm"
+            );
+
+            error.statusCode = 409;
+            throw error;
+        }
+    }
+
+    result = null;
+    return;
+}
 
             // ======================================
             // RECALCULATE AVAILABLE PLOTS
@@ -307,27 +378,28 @@ const updateCompanyProjectPricing = async ({
             //
             // RESERVED and SOLD plots are excluded.
 
-            const plotUpdate = await Plot.updateMany(
-                {
-                    projectId: project._id,
-                    status: "AVAILABLE"
-                },
-                [
-                    {
-                        $set: {
-                            totalPrice: {
-                                $multiply: [
-                                    "$areaSqm",
-                                    pricePerSqm
-                                ]
-                            }
-                        }
-                    }
-                ],
-                {
-                    session
+const plotUpdate = await Plot.updateMany(
+    {
+        projectId: project._id,
+        status: "AVAILABLE"
+    },
+    [
+        {
+            $set: {
+                totalPrice: {
+                    $multiply: [
+                        "$areaSqm",
+                        pricePerSqm
+                    ]
                 }
-            );
+            }
+        }
+    ],
+    {
+        session,
+        updatePipeline: true
+    }
+);
 
             // ======================================
             // PREPARE RESPONSE
@@ -397,30 +469,6 @@ const updateCompanyProjectPublication = async ({
 // real-estate companies and have a valid type.
 //
 // Legacy projects are preserved during migration.
-
-if (project.companyId) {
-
-    // A company project must be classified.
-
-    if (
-        !["VIWANJA", "MASHAMBA"].includes(
-            project.projectType
-        )
-    ) {
-        throw new Error("Project not found");
-    }
-
-    // Verify that the company is approved.
-
-    const approvedCompany = await Company.exists({
-        _id: project.companyId,
-        verificationStatus: "APPROVED"
-    });
-
-    if (!approvedCompany) {
-        throw new Error("Project not found");
-    }
-}
 
     // ======================================
     // DETERMINE STATUS TRANSITION
