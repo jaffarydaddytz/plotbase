@@ -822,12 +822,43 @@ const navigate = useNavigate();
 
 // Identify projects created through the
 // new company project management system.
+// ==========================================
+// IDENTIFY COMPANY PROJECT
+// ==========================================
+
 const isCompanyProject =
   property.source === "COMPANY_PROJECT";
 
-// Keep legacy property routes unchanged.
+// ==========================================
+// GENERATE PROJECT NAME SLUG
+// ==========================================
+
+const projectSlug =
+  String(property.title || "project")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "project";
+
+// ==========================================
+// IDENTIFY PROJECT MARKETPLACE
+// ==========================================
+
+const projectCategory =
+  property.projectType === "MASHAMBA"
+    ? "mashamba"
+    : "viwanja";
+
+// ==========================================
+// GENERATE PROJECT DETAILS URL
+// ==========================================
+
 const projectDetailsPath = isCompanyProject
-  ? `/project/${property.companyProjectId}`
+  ? `/${projectCategory}/${projectSlug}/${encodeURIComponent(
+      property.companyProjectId
+    )}`
   : insideAdmin
     ? `/admin/marketplace/${property._id}`
     : `/property/${property._id}`;
@@ -862,17 +893,17 @@ const projectDetailsPath = isCompanyProject
   };
 
   return (
-    <article
-      className="
-        group flex h-full min-w-0 flex-col overflow-hidden
-        rounded-xl border border-zinc-200 bg-white
-        transition-all duration-200
-        hover:border-zinc-300 hover:shadow-md
-      "
-    >
+<article
+  className="
+    group flex h-full min-w-0 flex-col overflow-hidden
+    rounded-xl border border-zinc-200 bg-white p-3
+    transition-colors duration-200
+    hover:border-zinc-300
+  "
+>
       {/* IMAGE */}
 
-      <div className="relative aspect-[16/9] overflow-hidden bg-zinc-100">
+      <div className="relative aspect-[16/9] overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
         <Link
           to={projectDetailsPath}
           className="absolute inset-0"
@@ -912,8 +943,10 @@ const projectDetailsPath = isCompanyProject
             text-[10px] font-semibold text-zinc-800 shadow-sm
           "
         >
-         {isCompanyProject
-  ? "Viwanja"
+{isCompanyProject
+  ? property.projectType === "MASHAMBA"
+    ? "Mashamba"
+    : "Viwanja"
   : getLandUse(property.propertyType)}
         </span>
 
@@ -971,7 +1004,7 @@ const projectDetailsPath = isCompanyProject
 
       {/* CONTENT */}
 
-      <div className="flex min-w-0 flex-1 flex-col p-3.5">
+    <div className="flex min-w-0 flex-1 flex-col px-0 pb-0 pt-3">
         <Link to={projectDetailsPath}>
           <h3
             className="
@@ -1119,7 +1152,10 @@ const ProjectSkeleton = () => (
    MAIN PROPERTIES PAGE
 ===================================================== */
 
-const Properties = ({ insideAdmin = false }) => {
+const Properties = ({
+  insideAdmin = false,
+  projectType = "VIWANJA",
+}) => {
   const { token } = useAuth();
   const location = useLocation();
 
@@ -1199,11 +1235,11 @@ const fetchProperties = useCallback(async () => {
         const response = await axios.get(
           `${API_URL}/api/project`,
           {
-            params: {
-              projectType: "VIWANJA",
-              page,
-              limit: 24,
-            },
+   params: {
+  projectType,
+  page,
+  limit: 24,
+},
           }
         );
 
@@ -1235,23 +1271,33 @@ const fetchProperties = useCallback(async () => {
     // FETCH BOTH LISTING SOURCES
     // ======================================
 
-    const [legacyResult, companyResult] =
-      await Promise.allSettled([
-        axios.get(`${API_URL}/api/property`),
-        fetchCompanyProjects(),
-      ]);
+const [legacyResult, companyResult] =
+  await Promise.allSettled([
+    // Legacy properties belong to Viwanja.
+    // Mashamba uses company projects only.
+    projectType === "MASHAMBA"
+      ? Promise.resolve({
+          data: { properties: [] },
+        })
+      : axios.get(`${API_URL}/api/property`),
+
+    fetchCompanyProjects(),
+  ]);
 
     // Only show the main error state when
     // both listing sources fail.
 
-    if (
-      legacyResult.status === "rejected" &&
-      companyResult.status === "rejected"
-    ) {
-      throw new Error(
-        "Unable to load marketplace projects."
-      );
-    }
+if (
+  companyResult.status === "rejected" &&
+  (
+    projectType === "MASHAMBA" ||
+    legacyResult.status === "rejected"
+  )
+) {
+  throw new Error(
+    "Unable to load marketplace projects."
+  );
+}
 
     // ======================================
     // EXISTING PROPERTY LISTINGS
@@ -1362,7 +1408,7 @@ const fetchProperties = useCallback(async () => {
   } finally {
     setLoading(false);
   }
-}, [insideAdmin]);
+}, [insideAdmin, projectType]);
 
   useEffect(() => {
     fetchProperties();
@@ -1759,7 +1805,13 @@ if (filters.minSize !== "" || filters.maxSize !== "") {
   ===================================================== */
 
 return (
-  <div className={insideAdmin ? "min-h-0 bg-zinc-50" : "min-h-screen bg-zinc-50"}>
+  <div
+  className={
+    insideAdmin
+      ? "min-h-0 bg-zinc-50"
+      : "min-h-screen bg-zinc-100"
+  }
+>
     {!insideAdmin && <Navbar />}
 
      <main
@@ -1772,13 +1824,17 @@ return (
         {/* HEADER */}
 
         <div className="mb-4">
-          <h1 className="text-[22px] font-semibold tracking-tight text-zinc-950 sm:text-2xl">
-            Find Your Next Land Investment
-          </h1>
+<h1 className="text-[22px] font-semibold tracking-tight text-zinc-950 sm:text-2xl">
+  {projectType === "MASHAMBA"
+    ? "Discover Agricultural Land Opportunities"
+    : "Find Your Next Land Investment"}
+</h1>
 
-          <p className="mt-1 text-xs text-zinc-500">
-            Explore real estate projects across Tanzania.
-          </p>
+<p className="mt-1 text-xs text-zinc-500">
+  {projectType === "MASHAMBA"
+    ? "Explore agricultural land and farming investment projects across Tanzania."
+    : "Explore real estate projects across Tanzania."}
+</p>
         </div>
 
         {/* =================================================

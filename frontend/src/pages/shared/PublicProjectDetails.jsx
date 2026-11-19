@@ -1,5 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import axios from "axios";
 
 import {
@@ -92,6 +97,9 @@ const LegendItem = ({
 const PublicProjectDetails = () => {
   const { projectId } = useParams();
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const {
     token,
     loading: authLoading,
@@ -176,6 +184,69 @@ const PublicProjectDetails = () => {
 
     return () => controller.abort();
   }, [projectId]);
+
+  // ==========================================
+// CANONICAL PROJECT URL
+// ==========================================
+
+useEffect(() => {
+  if (!project || !projectId) return;
+
+  // Do not redirect while displaying
+  // data for a previous project.
+
+  if (String(project.id) !== String(projectId)) {
+    return;
+  }
+
+  // Preserve legacy projects that do not
+  // have a supported marketplace category.
+
+  if (
+    !["VIWANJA", "MASHAMBA"].includes(
+      project.projectType
+    )
+  ) {
+    return;
+  }
+
+  // Generate a readable slug from
+  // the actual project title.
+
+  const slug =
+    String(project.title || "project")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "project";
+
+  const category =
+    project.projectType === "MASHAMBA"
+      ? "mashamba"
+      : "viwanja";
+
+  const canonicalPath =
+    `/${category}/${slug}/${encodeURIComponent(projectId)}`;
+
+  // Redirect old or incorrect URLs
+  // without adding browser history entries.
+
+  if (location.pathname !== canonicalPath) {
+    navigate(
+      `${canonicalPath}${location.search}${location.hash}`,
+      { replace: true }
+    );
+  }
+}, [
+  project,
+  projectId,
+  location.pathname,
+  location.search,
+  location.hash,
+  navigate,
+]);
 
   // ========================================
   // REFRESH PROJECT AVAILABILITY

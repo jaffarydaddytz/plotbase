@@ -330,12 +330,11 @@ const getPublicProjectThumbnailSvg = async (
       aria-label="Project plot layout preview"
     >
       <title>Project plot layout preview</title>
-
-      <rect
-        width="${WIDTH}"
-        height="${HEIGHT}"
-        fill="#f4f4f5"
-      />
+<rect
+  width="${WIDTH}"
+  height="${HEIGHT}"
+  fill="#e4e4e7"
+/>
 
       ${paths}
 
