@@ -395,8 +395,25 @@ const App = () => {
           path="/property/:id"
           element={<PropertyDetails />}
         />
+{/* ==================================
+    PUBLIC COMPANY PROJECT DETAILS
+================================== */}
 
-        {/* PUBLIC COMPANY PROJECT DETAILS */}
+{/* VIWANJA PROJECT DETAILS */}
+
+<Route
+  path="/viwanja/:slug/:projectId"
+  element={<PublicProjectDetails />}
+/>
+
+{/* MASHAMBA PROJECT DETAILS */}
+
+<Route
+  path="/mashamba/:slug/:projectId"
+  element={<PublicProjectDetails />}
+/>
+
+{/* LEGACY PROJECT URL - REDIRECT SUPPORT */}
 
 <Route
   path="/project/:projectId"
