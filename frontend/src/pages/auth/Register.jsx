@@ -13,7 +13,7 @@ const Register = () => {
     role: "buyer",
   });
 
-  const [success, setSuccess] = useState(" ");
+  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
