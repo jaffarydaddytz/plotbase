@@ -25,6 +25,7 @@ import {
   getCompanyProjectMapController,
   updateCompanyProjectController,
   updateCompanyProjectPricingController,
+  updateCompanyProjectPaymentTermsController,
   updateCompanyProjectPublicationController,
 } from "../controllers/projectController.js";
 
@@ -218,6 +219,20 @@ router.patch(
         "MANAGER"
     ),
     updateCompanyProjectPricingController
+);
+
+// ==========================================
+// UPDATE COMPANY PROJECT PAYMENT TERMS
+// ==========================================
+
+router.patch(
+    "/:companyId/projects/:projectId/payment-terms",
+    protect,
+    requireCompanyMembership(
+        "COMPANY_ADMIN",
+        "MANAGER"
+    ),
+    updateCompanyProjectPaymentTermsController
 );
 
 // ==========================================
