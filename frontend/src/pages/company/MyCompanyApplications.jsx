@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 const STATUS_STYLES = {
   DRAFT: "bg-zinc-100 text-zinc-700",
@@ -35,11 +35,15 @@ const MyCompanyApplications = ({
   applications = [],
   onRegisterAnother,
 }) => {
-  const [selectedId, setSelectedId] = useState("");
+const [searchParams, setSearchParams] = useSearchParams();
 
-  const selectedCompany =
-    applications.find((company) => company.id === selectedId) ||
-    applications[0];
+const selectedId = searchParams.get("companyId");
+
+const selectedCompany =
+  applications.find(
+    (company) =>
+      String(company.id || company._id) === selectedId
+  ) || applications[0];
 
   if (!selectedCompany) return null;
 
@@ -93,17 +97,24 @@ const MyCompanyApplications = ({
               Select Company
             </label>
 
-            <select
-              id="selectedCompany"
-              value={selectedCompany.id}
-              onChange={(e) => setSelectedId(e.target.value)}
+<select
+  id="selectedCompany"
+  value={String(selectedCompany.id || selectedCompany._id)}
+  onChange={(e) =>
+    setSearchParams({
+      companyId: e.target.value,
+    })
+  }
               className="mt-1.5 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none focus:border-zinc-950 focus:ring-2 focus:ring-zinc-200"
             >
-              {applications.map((company) => (
-                <option key={company.id} value={company.id}>
-                  {company.name} — {company.verificationStatus}
-                </option>
-              ))}
+{applications.map((company) => (
+  <option
+    key={String(company.id || company._id)}
+    value={String(company.id || company._id)}
+  >
+    {company.name} — {company.verificationStatus}
+  </option>
+))}
             </select>
 
           </div>

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 
+import axios from "axios";
+import API_URL from "../../config";
+
 import {
   Link,
   NavLink,
@@ -156,7 +159,120 @@ const CompanySidebar = ({
 }) => {
   const { pathname } = useLocation();
 
-  const { user, logout } = useAuth();
+const { user, logout, token } = useAuth();
+
+// ===================================================
+// COMPANY SWITCHER
+// ===================================================
+
+const [switcherOpen, setSwitcherOpen] = useState(false);
+
+const [approvedWorkspaces, setApprovedWorkspaces] =
+  useState([]);
+
+const [companyApplications, setCompanyApplications] =
+  useState([]);
+
+const [switcherLoading, setSwitcherLoading] =
+  useState(false);
+
+const [switcherError, setSwitcherError] =
+  useState("");
+
+useEffect(() => {
+  if (!switcherOpen || !token) return;
+
+  const controller = new AbortController();
+
+  const loadCompanies = async () => {
+    setSwitcherLoading(true);
+    setSwitcherError("");
+
+    try {
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const [workspacesResponse, applicationsResponse] =
+        await Promise.all([
+          axios.get(
+            `${API_URL}/api/companies/my-workspaces`,
+            {
+              headers,
+              signal: controller.signal,
+            }
+          ),
+
+          axios.get(
+            `${API_URL}/api/companies/my-applications`,
+            {
+              headers,
+              signal: controller.signal,
+            }
+          ),
+        ]);
+
+      if (
+        !workspacesResponse.data?.success ||
+        !Array.isArray(workspacesResponse.data.workspaces) ||
+        !applicationsResponse.data?.success ||
+        !Array.isArray(applicationsResponse.data.applications)
+      ) {
+        throw new Error("Unable to retrieve company information.");
+      }
+
+      if (!controller.signal.aborted) {
+        setApprovedWorkspaces(
+          workspacesResponse.data.workspaces
+        );
+
+        setCompanyApplications(
+          applicationsResponse.data.applications
+        );
+      }
+    } catch (error) {
+      if (
+        controller.signal.aborted ||
+        axios.isCancel(error)
+      ) {
+        return;
+      }
+
+      setSwitcherError(
+        error.response?.data?.message ||
+        error.message ||
+        "Unable to load companies."
+      );
+    } finally {
+      if (!controller.signal.aborted) {
+        setSwitcherLoading(false);
+      }
+    }
+  };
+
+  loadCompanies();
+
+  return () => controller.abort();
+}, [switcherOpen, token]);
+
+// Avoid displaying an approved company twice.
+const approvedCompanyIds = new Set(
+  approvedWorkspaces.map((company) =>
+    String(company.companyId)
+  )
+);
+
+const otherApplications = companyApplications.filter(
+  (company) =>
+    !approvedCompanyIds.has(
+      String(company.id || company._id)
+    )
+);
+
+const closeCompanySwitcher = () => {
+  setSwitcherOpen(false);
+  onClose();
+};
 
   // ===================================================
   // COMPANY INFORMATION
@@ -221,18 +337,6 @@ const CompanySidebar = ({
       key: "projects",
       end: false,
     },
-
-    ...(canManageProjects
-      ? [
-          {
-            name: "Create Project",
-            icon: Plus,
-            path: createProjectPath,
-            key: "create",
-            end: true,
-          },
-        ]
-      : []),
 
     {
       name: "Plot Management",
@@ -464,24 +568,190 @@ const CompanySidebar = ({
         >
           {/* SWITCH COMPANY */}
 
-          <Link
-            to="/company/center"
-            onClick={onClose}
-            className="
-              flex h-9 w-full items-center
-              gap-2.5 rounded-lg px-2.5
-              text-[13px] font-medium
-              text-zinc-600 transition-colors
-              hover:bg-zinc-100 hover:text-zinc-950
-            "
-          >
-            <Building2
-              size={17}
-              strokeWidth={1.8}
-            />
+{/* COMPANY SWITCHER */}
 
-            <span>Switch Company</span>
-          </Link>
+<div className="relative">
+
+  <button
+    type="button"
+    onClick={() => setSwitcherOpen((open) => !open)}
+    aria-expanded={switcherOpen}
+    aria-controls="company-switcher-menu"
+    className="
+      flex h-9 w-full items-center
+      gap-2.5 rounded-lg px-2.5
+      text-[13px] font-medium
+      text-zinc-600 transition-colors
+      hover:bg-zinc-100 hover:text-zinc-950
+    "
+  >
+    <Building2 size={17} strokeWidth={1.8} />
+
+    <span className="flex-1 text-left">
+      Switch Company
+    </span>
+
+    <span className="text-xs text-zinc-400">
+      {switcherOpen ? "▲" : "▼"}
+    </span>
+  </button>
+
+  {switcherOpen && (
+    <div
+      id="company-switcher-menu"
+      className="
+        absolute bottom-full left-0 right-0 z-50
+        mb-2 max-h-[55vh] overflow-y-auto
+        rounded-xl border border-zinc-200
+        bg-white p-2 shadow-lg
+      "
+    >
+
+      <p className="px-2 py-2 text-[11px] font-semibold uppercase tracking-wide text-zinc-500">
+        My Companies
+      </p>
+
+      {switcherLoading ? (
+        <p className="px-2 py-3 text-xs text-zinc-500">
+          Loading companies...
+        </p>
+      ) : switcherError ? (
+        <div
+          role="alert"
+          className="rounded-lg bg-red-50 p-2 text-xs text-red-700"
+        >
+          {switcherError}
+        </div>
+      ) : (
+        <>
+          {/* APPROVED COMPANIES */}
+
+          {approvedWorkspaces.map((company) => {
+            const isCurrent =
+              String(company.companyId) ===
+              String(companyId);
+
+return (
+  <Link
+    key={String(company.companyId)}
+    to={`/company/${company.companyId}/projects`}
+    onClick={() => {
+      const userId = user?.id || user?._id;
+
+      if (userId) {
+        try {
+          localStorage.setItem(
+            `plotbase:lastCompany:${String(userId)}`,
+            String(company.companyId)
+          );
+        } catch {
+          // Navigation must still work if storage is unavailable.
+        }
+      }
+
+      closeCompanySwitcher();
+    }}
+    className="
+      block rounded-lg px-2 py-2.5
+      transition-colors hover:bg-zinc-50
+    "
+  >
+    <div className="flex items-center justify-between gap-2">
+      <span
+        className="truncate text-xs font-semibold text-zinc-900"
+        title={company.name}
+      >
+        {company.name}
+      </span>
+
+      {isCurrent && (
+        <span className="shrink-0 text-[10px] font-medium text-zinc-500">
+          Current
+        </span>
+      )}
+    </div>
+
+    <p className="mt-1 truncate text-[11px] text-zinc-500">
+      Approved ·{" "}
+      {company.role?.replaceAll("_", " ") || "Member"}
+    </p>
+  </Link>
+);
+          })}
+
+          {/* OTHER COMPANY APPLICATIONS */}
+
+          {otherApplications.map((company) => {
+            const status =
+              company.verificationStatus || "DRAFT";
+
+            return (
+              <Link
+                key={String(company.id || company._id)}
+                to="/company/applications"
+                onClick={closeCompanySwitcher}
+                className="
+                  block rounded-lg px-2 py-2.5
+                  transition-colors hover:bg-zinc-50
+                "
+              >
+                <p
+                  className="truncate text-xs font-semibold text-zinc-900"
+                  title={company.name}
+                >
+                  {company.name}
+                </p>
+
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  {status === "PENDING"
+                    ? "Pending Verification"
+                    : status}
+                </p>
+              </Link>
+            );
+          })}
+
+          {approvedWorkspaces.length === 0 &&
+            otherApplications.length === 0 && (
+              <p className="px-2 py-3 text-xs text-zinc-500">
+                No companies found.
+              </p>
+            )}
+        </>
+      )}
+
+      {/* ADDITIONAL ACTIONS */}
+
+      <div className="mt-2 space-y-1 border-t border-zinc-100 pt-2">
+
+        <Link
+          to="/company/applications"
+          onClick={closeCompanySwitcher}
+          className="
+            block rounded-lg px-2 py-2
+            text-xs font-medium text-zinc-700
+            hover:bg-zinc-50
+          "
+        >
+          View Applications
+        </Link>
+
+        <Link
+          to="/company/register"
+          onClick={closeCompanySwitcher}
+          className="
+            block rounded-lg px-2 py-2
+            text-xs font-medium text-zinc-900
+            hover:bg-zinc-50
+          "
+        >
+          + Register Company
+        </Link>
+
+      </div>
+    </div>
+  )}
+</div>
 
           {/* COMPANY USER PROFILE */}
 
