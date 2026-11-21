@@ -792,15 +792,39 @@ const PublicProjectDetails = () => {
                       </p>
                     </div>
 
-                    {/* BOOK PLOT BUTTON */}
+{/* PLOT ACTIONS */}
 
-                    <button
-                      type="button"
-                      onClick={handleOpenBooking}
-                      disabled={!canBook || bookingLoading || authLoading}
-                      className="mt-5 flex min-h-11 w-full items-center justify-center rounded-lg bg-zinc-950 px-3 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500">
-                      {canBook ? "Book Plot" : "Unavailable"}
-                    </button>
+<div className="mt-4 grid w-full grid-cols-3 gap-2">
+  {/* BUY */}
+  <button
+    type="button"
+    disabled
+    title="Purchasing coming soon"
+    className="flex h-8 w-full items-center justify-center rounded-md bg-zinc-200 px-2 text-xs font-medium text-zinc-500 cursor-not-allowed"
+  >
+    Buy
+  </button>
+
+  {/* BOOK */}
+  <button
+    type="button"
+    onClick={handleOpenBooking}
+    disabled={!canBook || bookingLoading || authLoading}
+    className="flex h-8 w-full items-center justify-center rounded-md bg-zinc-950 px-2 text-xs font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500"
+  >
+    Book
+  </button>
+
+  {/* FIKASITE */}
+  <button
+    type="button"
+    disabled
+    title="Site visits coming soon"
+    className="flex h-8 w-full items-center justify-center rounded-md border border-zinc-300 bg-white px-2 text-xs font-medium text-zinc-500 cursor-not-allowed"
+  >
+    FikaSite
+  </button>
+</div>
 
                     {/* RESERVATION PERIOD */}
 
