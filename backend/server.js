@@ -25,6 +25,8 @@ import projectRouter from './routes/project.routes.js';
 import companyRouter from './routes/company.routes.js';
 import mtaalamuRouter from './routes/mtaalamu.routes.js';
 import reservationRouter from './routes/reservation.routes.js';
+import purchaseRouter from "./routes/purchase.routes.js";
+import companyPaymentRouter from "./routes/companyPayment.routes.js";
 import {
   expirePendingReservations,
 } from "./services/reservationService.js";
@@ -66,7 +68,34 @@ app.use("/api/inquiry", inquiryRouter)
 app.use("/api/chat", chatRouter)
 app.use("/api/admin", adminRouter)
 app.use("/api/wishlist", wishlistRouter)
-app.use("/api/project", projectRouter)
+app.use("/api/project", projectRouter);
+
+// ==========================================
+// PURCHASE AND PAYMENT API
+// ==========================================
+
+// Disabled by default.
+//
+// Do not enable until financial safeguards,
+// database indexes, and functional validation
+// are completed.
+
+const purchaseApiEnabled =
+  process.env.ENABLE_PURCHASE_API === "true";
+
+if (purchaseApiEnabled) {
+  app.use("/api/purchases", purchaseRouter);
+
+  app.use(
+    "/api/companies",
+    companyPaymentRouter
+  );
+}
+
+// ==========================================
+// EXISTING COMPANY AND RESERVATION ROUTES
+// ==========================================
+
 app.use("/api/companies", companyRouter);
 app.use("/api/reservations", reservationRouter);
 // Mtaalamu AI Assistant

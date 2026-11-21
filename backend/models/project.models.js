@@ -90,6 +90,33 @@ const projectSchema = new mongoose.Schema(
     },
 
     // ==========================================
+    // PROJECT PAYMENT TERMS
+    // ==========================================
+
+    paymentTerms: {
+      // Allow full payment
+      fullPaymentEnabled: {
+        type: Boolean,
+        default: true,
+      },
+
+      // Interest-free installment plans
+      installmentDurationsMonths: {
+        type: [Number],
+        default: [],
+        validate: {
+          validator: (months) =>
+            months.every((month) =>
+              [3, 6, 12].includes(month)
+            ) &&
+            new Set(months).size === months.length,
+
+          message:
+            "Installment durations must be unique and limited to 3, 6, or 12 months",
+        },
+      },
+    },
+    // ==========================================
     // PUBLICATION STATUS
     // ==========================================
 

@@ -1,10 +1,12 @@
 import mongoose from "mongoose";
-
+import Payment from "../models/payment.model.js";
 import Project from "../models/project.models.js";
 import Plot from "../models/plot.model.js";
 import Company from "../models/company.model.js";
 import Reservation from "../models/reservation.model.js";
+import Purchase from "../models/purchase.model.js";
 import CompanyMembership from "../models/companyMembership.model.js";
+
 
 // ==========================================
 // CONFIGURATION
@@ -322,6 +324,31 @@ export const cancelPlotReservation = async ({
           );
         }
 
+        // ==========================================
+// PREVENT CANCELLATION OF ACTIVE PURCHASES
+// ==========================================
+
+const activePurchase = await Purchase.findOne({
+  reservationId: reservation._id,
+  status: {
+    $in: [
+      "PENDING_PAYMENT",
+      "IN_PROGRESS",
+      "COMPLETED",
+    ],
+  },
+})
+  .select("_id status")
+  .session(session)
+  .lean();
+
+if (activePurchase) {
+  throw createError(
+    409,
+    "This reservation is linked to a purchase and cannot be cancelled directly"
+  );
+}
+
         // ==================================
         // CANCEL RESERVATION
         // ==================================
@@ -478,6 +505,7 @@ export const expirePendingReservations = async ({
     );
   }
 
+
   // ========================================
   // FIND EXPIRED PENDING RESERVATIONS
   // ========================================
@@ -509,6 +537,68 @@ export const expirePendingReservations = async ({
     try {
       const result = await session.withTransaction(
         async () => {
+          // ==========================================
+// CHECK FOR LINKED PURCHASE
+// ==========================================
+
+const linkedPurchase = await Purchase.findOne({
+  reservationId: candidate._id,
+})
+  .select("_id status paymentDueAt")
+  .session(session)
+  .lean();
+
+// Do not release inventory belonging to a
+// purchase that has already progressed
+// beyond the initial payment stage.
+
+if (
+  linkedPurchase &&
+  ["IN_PROGRESS", "COMPLETED"].includes(
+    linkedPurchase.status
+  )
+) {
+  return false;
+}
+
+// Do not release the plot before the
+// purchase payment deadline.
+
+if (
+  linkedPurchase?.status === "PENDING_PAYMENT" &&
+  linkedPurchase.paymentDueAt > now
+) {
+  return false;
+}
+
+// ==========================================
+// PROTECT PAYMENTS AWAITING VERIFICATION
+// ==========================================
+
+// A payment submitted within the deadline
+// must be reviewed before releasing the plot.
+
+if (linkedPurchase?.status === "PENDING_PAYMENT") {
+  const pendingPayment = await Payment.findOne({
+    purchaseId: linkedPurchase._id,
+
+    status: "SUBMITTED",
+
+    submittedAt: {
+      $lte: linkedPurchase.paymentDueAt,
+    },
+  })
+    .select("_id")
+    .session(session)
+    .lean();
+
+  if (pendingPayment) {
+    // Payment verification is still pending.
+    // Do not expire the purchase or
+    // release the reserved plot.
+    return false;
+  }
+}
           // ==================================
           // MARK RESERVATION AS EXPIRED
           // ==================================
@@ -541,6 +631,40 @@ export const expirePendingReservations = async ({
           if (!reservation) {
             return false;
           }
+
+          // ==========================================
+// EXPIRE LINKED UNPAID PURCHASE
+// ==========================================
+
+if (linkedPurchase?.status === "PENDING_PAYMENT") {
+  const expiredPurchase =
+    await Purchase.findOneAndUpdate(
+      {
+        _id: linkedPurchase._id,
+        status: "PENDING_PAYMENT",
+        paymentDueAt: {
+          $lte: now,
+        },
+      },
+      {
+        $set: {
+          status: "EXPIRED",
+          expiredAt: now,
+        },
+      },
+      {
+        session,
+        returnDocument: "after",
+        runValidators: true,
+      }
+    );
+
+  if (!expiredPurchase) {
+    throw new Error(
+      `Cannot expire purchase for reservation ${reservation._id}`
+    );
+  }
+}
 
           // ==================================
           // RELEASE THE RESERVED PLOT
@@ -1266,6 +1390,31 @@ export const confirmPlotReservation = async ({
             "Reservation has expired and cannot be confirmed"
           );
         }
+
+        // ==========================================
+// PROTECT RESERVATIONS LINKED TO PURCHASES
+// ==========================================
+
+const activePurchase = await Purchase.findOne({
+  reservationId: reservation._id,
+  status: {
+    $in: [
+      "PENDING_PAYMENT",
+      "IN_PROGRESS",
+      "COMPLETED",
+    ],
+  },
+})
+  .select("_id status")
+  .session(session)
+  .lean();
+
+if (activePurchase) {
+  throw createError(
+    409,
+    "This reservation is linked to an active purchase. Complete the purchase payment workflow instead."
+  );
+}
 
         // ==================================
         // VERIFY RESERVED PLOT
