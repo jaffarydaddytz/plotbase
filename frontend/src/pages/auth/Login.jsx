@@ -6,7 +6,9 @@ import { loginStyles as s } from "../../assets/dummyStyles";
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";
 
-const Login = () => {
+import PublicPlatformNavbar from "../../components/common/PublicPlatformNavbar";
+
+const Login = ({ isRems = false }) => {
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -34,6 +36,10 @@ const Login = () => {
 
   // Determine destination based on the user's global role
   const getLoginDestination = (role) => {
+    if (isRems) {
+      return "/rems";
+    }
+
     switch (role) {
       case "admin":
         return "/admin-dashboard";
@@ -74,8 +80,8 @@ const Login = () => {
         // AuthContext stores the authenticated user after login
         const storedUser = JSON.parse(
           localStorage.getItem("user") ||
-            sessionStorage.getItem("user") ||
-            "null"
+          sessionStorage.getItem("user") ||
+          "null"
         );
 
         if (!storedUser) {
@@ -103,9 +109,13 @@ const Login = () => {
           formData.email.trim().toLowerCase()
         );
 
-        navigate("/verify-email", {
-          replace: true,
-        });
+navigate("/verify-email", {
+  replace: true,
+  state: {
+    email: formData.email.trim().toLowerCase(),
+    isRems,
+  },
+});
 
         return;
       }
@@ -113,7 +123,7 @@ const Login = () => {
       // Other authentication errors
       setError(
         result.message ||
-          "Login failed. Please check your credentials."
+        "Login failed. Please check your credentials."
       );
     } catch (err) {
       setError(
@@ -124,19 +134,33 @@ const Login = () => {
     }
   };
 
-  return (
-    <div className={s.pageContainer}>
-      <Navbar />
+return (
+  <div
+    className={
+      isRems
+        ? s.pageContainer
+        : "flex min-h-screen flex-col bg-zinc-50"
+    }
+  >
+    {isRems ? <Navbar /> : <PublicPlatformNavbar />}
 
-      <div className={s.containerCenter}>
-        <div className={s.card}>
+    <div
+      className={
+        isRems
+          ? s.containerCenter
+          : "flex w-full flex-1 items-center justify-center px-4 py-8"
+      }
+    >
+      <div className={s.card}>
           {/* Header */}
           <h2 className={s.title}>
-            Welcome Back
+            {isRems ? "Plotbase REMS" : "Welcome Back"}
           </h2>
 
           <p className={s.subtitle}>
-            Please enter your details to sign in
+            {isRems
+              ? "Sign in to your real estate management workspace."
+              : "Please enter your details to sign in"}
           </p>
 
           {/* Login error */}
@@ -252,12 +276,12 @@ const Login = () => {
           <p className={s.footerText}>
             Don't have an account?{" "}
 
-            <Link
-              to="/register"
-              className={s.registerLink}
-            >
-              Create an Account
-            </Link>
+<Link
+  to={isRems ? "/rems/register" : "/register"}
+  className={s.registerLink}
+>
+  Create an Account
+</Link>
           </p>
         </div>
       </div>

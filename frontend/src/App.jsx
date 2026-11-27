@@ -16,6 +16,9 @@ import About from "./pages/shared/About";
 import AskPlotbase from "./pages/shared/AskPlotbase";
 import Footer from "./components/common/Footer";
 
+import { useAuth } from "./context/AuthContext";
+import PublicMobileNavigation from "./components/common/PublicMobileNavigation";
+
 
 // ==========================================
 // AUTHENTICATION
@@ -94,6 +97,10 @@ import AdminComingSoon from "./pages/admin/AdminComingSoon";
 // SCROLL TO TOP ON ROUTE CHANGE
 // ==========================================
 
+// ==========================================
+// SCROLL TO TOP ON ROUTE CHANGE
+// ==========================================
+
 const ScrollToTopOnRouteChange = () => {
   const { pathname } = useLocation();
 
@@ -106,6 +113,7 @@ const ScrollToTopOnRouteChange = () => {
 
   return null;
 };
+
 
 // ==========================================
 // SCROLL TO TOP BUTTON
@@ -153,8 +161,37 @@ const ScrollTopButton = () => {
 // MAIN APPLICATION
 // ==========================================
 
+// ==========================================
+// MAIN APPLICATION
+// ==========================================
+
+const publicMobileRoutes = new Set([
+  "/",
+  "/ramani",
+  "/fikasite",
+  "/maarifa",
+  "/profile",
+  "/about",
+  "/contact",
+]);
+
 const App = () => {
   const { pathname } = useLocation();
+  const { user, loading: authLoading } = useAuth();
+
+  const isPublicRoute = publicMobileRoutes.has(
+    pathname.replace(/\/+$/, "") || "/"
+  );
+
+  const isPublicMember = ["investor", "buyer"].includes(
+    user?.role
+  );
+
+  const showPublicMobileNavigation =
+    !authLoading &&
+    Boolean(user) &&
+    isPublicMember &&
+    isPublicRoute;
 
   // ========================================
   // PUBLIC SEO METADATA
@@ -317,10 +354,24 @@ document.documentElement.style.overflowX = "clip";
   // ========================================
 
   return (
-    <div className="min-h-screen w-full overflow-x-clip">
+   <div
+  className={`min-h-screen w-full overflow-x-clip ${
+    showPublicMobileNavigation
+      ? "pb-[calc(4rem+env(safe-area-inset-bottom,0px))] md:pb-0"
+      : ""
+  }`}
+>
       <ScrollToTopOnRouteChange />
 
-      <ScrollTopButton />
+    <div
+  className={
+    showPublicMobileNavigation
+      ? "hidden md:block"
+      : ""
+  }
+>
+  <ScrollTopButton />
+</div>
 
     
 
@@ -329,16 +380,23 @@ document.documentElement.style.overflowX = "clip";
             AUTHENTICATION
         ================================== */}
 
-        <Route element={<PublicRoute />}>
-          <Route path="/login" element={<Login />} />
+<Route element={<PublicRoute />}>
+  {/* PUBLIC AUTHENTICATION */}
+  <Route path="/login" element={<Login />} />
 
-          <Route path="/register" element={<Register />} />
+  <Route path="/register" element={<Register />} />
 
-          <Route
-            path="/verify-email"
-            element={<VerifyEmail />}
-          />
-        </Route>
+  {/* REMS AUTHENTICATION */}
+  <Route path="/rems/login" element={<Login isRems />} />
+
+  <Route path="/rems/register" element={<Register isRems />} />
+
+  {/* EMAIL VERIFICATION */}
+  <Route
+    path="/verify-email"
+    element={<VerifyEmail />}
+  />
+</Route>
 
         <Route
           path="/forgot-password"
@@ -360,10 +418,41 @@ document.documentElement.style.overflowX = "clip";
 
 <Route path="/" element={<PublicHome />} />
 
+{/* ==================================
+    PUBLIC PLATFORM
+================================== */}
+
 <Route path="/" element={<PublicHome />} />
 
 <Route path="/ramani" element={<Ramani />} />
 
+
+{/* ==================================
+    REMS MARKETPLACE
+================================== */}
+
+<Route path="/rems" element={<Properties />} />
+
+<Route path="/rems/viwanja" element={<Properties />} />
+
+<Route path="/rems/mashamba" element={<Mashamba />} />
+
+<Route path="/rems/maarifa" element={<Maarifa />} />
+
+
+{/* ==================================
+    REMS PROJECT DETAILS
+================================== */}
+
+<Route
+  path="/rems/viwanja/:slug/:projectId"
+  element={<PublicProjectDetails />}
+/>
+
+<Route
+  path="/rems/mashamba/:slug/:projectId"
+  element={<PublicProjectDetails />}
+/>
 <Route path="/contact" element={<Contact />} />
 
 <Route path="/viwanja" element={<Properties />} />
@@ -421,13 +510,16 @@ document.documentElement.style.overflowX = "clip";
             COMPANY WORKSPACE
         ================================== */}
 
-        <Route element={<ProtectedRoute />}>
-          {/* COMPANY CENTER */}
+<Route element={<ProtectedRoute />}>
 
-          <Route
-            path="/company/center"
-            element={<CompanyCenter />}
-          />
+
+
+  {/* COMPANY CENTER */}
+
+  <Route
+    path="/company/center"
+    element={<CompanyCenter />}
+  />
 
           {/* ==================================
               COMPANY PROJECT MANAGEMENT
@@ -536,6 +628,11 @@ document.documentElement.style.overflowX = "clip";
             path="/profile"
             element={<Profile />}
           />
+
+          <Route
+  path="/rems/profile"
+  element={<Profile />}
+/>
 
           <Route
             path="/messages"
@@ -748,7 +845,25 @@ document.documentElement.style.overflowX = "clip";
 
       {/* PUBLIC FOOTER */}
 
-      {showFooter && <Footer />}
+   {/* PUBLIC FOOTER */}
+
+{showFooter && (
+  <div
+    className={
+      showPublicMobileNavigation
+        ? "hidden md:block"
+        : ""
+    }
+  >
+    <Footer />
+  </div>
+)}
+
+{/* AUTHENTICATED PUBLIC MOBILE NAVIGATION */}
+
+{showPublicMobileNavigation && (
+  <PublicMobileNavigation />
+)}
     </div>
   );
 };

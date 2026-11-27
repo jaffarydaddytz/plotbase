@@ -1,8 +1,10 @@
 import { useAuth } from "../../context/AuthContext";
+import PublicPlatformNavbar from "./PublicPlatformNavbar";
 
 import {
   Navigate,
   Outlet,
+  useLocation,
 } from "react-router-dom";
 
 import Navbar from "./Navbar";
@@ -18,16 +20,12 @@ const getDashboardPath = (role) => {
       return "/admin-dashboard";
 
     case "seller":
-      // Legacy seller dashboard
       return "/seller/dashboard";
 
     case "investor":
     case "buyer":
-      // Public project discovery
-      return "/projects";
-
     default:
-      return "/projects";
+      return "/";
   }
 };
 
@@ -43,14 +41,14 @@ const getDashboardPath = (role) => {
 // Protected page content is NOT rendered until
 // the authentication check completes.
 
-const AuthenticationLoader = () => {
+const AuthenticationLoader = ({ isRems = false }) => {
   return (
     <div className="min-h-dvh bg-zinc-50 pt-[60px]">
-      {/* Navbar stays visible */}
-      <Navbar />
 
-      {/* Plotbase Text Shimmer */}
+      {isRems ? <Navbar /> : <PublicPlatformNavbar />}
+
       <Loader />
+
     </div>
   );
 };
@@ -64,26 +62,32 @@ export const ProtectedRoute = ({
 }) => {
   const { user, loading } = useAuth();
 
+  const { pathname } = useLocation();
+
+const isRemsRoute =
+  pathname === "/rems" ||
+  pathname.startsWith("/rems/");
+
   // ---------------------------------------------------
   // AUTHENTICATION LOADING
   // ---------------------------------------------------
 
-  if (loading) {
-    return <AuthenticationLoader />;
-  }
+if (loading) {
+  return <AuthenticationLoader isRems={isRemsRoute} />;
+}
 
   // ---------------------------------------------------
   // USER MUST BE AUTHENTICATED
   // ---------------------------------------------------
 
-  if (!user) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-      />
-    );
-  }
+if (!user) {
+  return (
+    <Navigate
+      to={isRemsRoute ? "/rems/login" : "/login"}
+      replace
+    />
+  );
+}
 
   // ---------------------------------------------------
   // CHECK GLOBAL ROLE PERMISSIONS
@@ -118,30 +122,29 @@ export const ProtectedRoute = ({
 export const PublicRoute = () => {
   const { user, loading } = useAuth();
 
-  // ---------------------------------------------------
-  // AUTHENTICATION LOADING
-  // ---------------------------------------------------
+  const { pathname, state } = useLocation();
+
+  const isRemsRoute =
+    pathname === "/rems" ||
+    pathname.startsWith("/rems/") ||
+    (pathname === "/verify-email" && state?.isRems === true);
 
   if (loading) {
-    return <AuthenticationLoader />;
+    return <AuthenticationLoader isRems={isRemsRoute} />;
   }
-
-  // ---------------------------------------------------
-  // REDIRECT AUTHENTICATED USERS
-  // ---------------------------------------------------
 
   if (user) {
     return (
       <Navigate
-        to={getDashboardPath(user.role)}
+        to={
+          isRemsRoute
+            ? "/rems"
+            : getDashboardPath(user.role)
+        }
         replace
       />
     );
   }
-
-  // ---------------------------------------------------
-  // RENDER PUBLIC PAGE
-  // ---------------------------------------------------
 
   return <Outlet />;
 };
