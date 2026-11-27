@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 
 import Navbar from "../../components/common/Navbar";
-import communityImage from "../../assets/image.jpeg";
+
+
 
 // =====================================================
 // CATEGORIES
@@ -83,7 +84,7 @@ const sampleArticles = [
     tags: ["Experiences", "Investment"],
     readingTime: "7 min read",
     icon: Sprout,
-    image: communityImage,
+    image: null,
   },
 ];
 
@@ -148,7 +149,7 @@ const ArticleCard = ({ article }) => {
         {/* ARTICLE IMAGE */}
 
         <div className="h-44 w-full shrink-0 overflow-hidden rounded-lg bg-zinc-100 sm:h-[160px] sm:w-[180px] xl:w-[190px]">
-          {imageFailed ? (
+          {!article.image || imageFailed ? (
             <div className="flex h-full w-full items-center justify-center">
               <Icon
                 className="h-10 w-10 text-zinc-400"
@@ -249,8 +250,8 @@ const Maarifa = () => {
     activeCategory === "all"
       ? sampleArticles
       : sampleArticles.filter((article) =>
-          article.tags.includes(activeCategory)
-        );
+        article.tags.includes(activeCategory)
+      );
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-950">

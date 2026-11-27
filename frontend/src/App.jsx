@@ -5,7 +5,7 @@ import { FaChevronUp } from "react-icons/fa";
 // ==========================================
 // PUBLIC PAGES
 // ==========================================
-
+import PublicHome from "./pages/public/PublicHome";
 import Properties from "./pages/shared/Properties";
 import PropertyDetails from "./pages/shared/PropertyDetails";
 import PropertyDetailPage from "./pages/shared/propertyDetailPage";
@@ -14,7 +14,7 @@ import Maarifa from "./pages/shared/Maarifa";
 import About from "./pages/shared/About";
 import AskPlotbase from "./pages/shared/AskPlotbase";
 import Footer from "./components/common/Footer";
-import MtaalamuWidget from "./components/common/MtaalamuWidget";
+
 
 // ==========================================
 // AUTHENTICATION
@@ -199,6 +199,12 @@ const App = () => {
         description:
           "Ask questions about land, property and real estate investment through Plotbase Mtaalamu.",
       },
+
+      "/": {
+  title: "Plotbase Tanzania | Digital Tools for Smarter Real Estate",
+  description:
+    "Explore Ramani, FikaSite and Maarifa. Digital real estate tools and management solutions for Viwanja na Mashamba in Tanzania.",
+},
     };
 
     const seo = seoPages[pathname] || defaultSEO;
@@ -228,7 +234,7 @@ const App = () => {
     // SEARCH ENGINE INDEXING
     // ======================================
 
-    const shouldIndex = new Set(["/about"]).has(pathname);
+    const shouldIndex = new Set(["/", "/about"]).has(pathname);
 
     const robots =
       pathname === "/viwanja"
@@ -244,7 +250,7 @@ const App = () => {
     // ======================================
 
     const canonicalRoutes = {
-      "/": "/viwanja",
+      "/": "/",
       "/viwanja": "/viwanja",
       "/projects": "/viwanja",
       "/properties": "/viwanja",
@@ -278,7 +284,8 @@ const App = () => {
   // ========================================
 
   const publicFooterRoutes = [
-    "/viwanja",
+      "/",
+  "/viwanja",
     "/projects",
     "/mashamba",
     "/maarifa",
@@ -295,8 +302,8 @@ const App = () => {
   // ========================================
 
   useEffect(() => {
-    document.body.style.overflowX = "hidden";
-    document.documentElement.style.overflowX = "hidden";
+document.body.style.overflowX = "clip";
+document.documentElement.style.overflowX = "clip";
 
     return () => {
       document.body.style.overflowX = "";
@@ -309,12 +316,12 @@ const App = () => {
   // ========================================
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">
+    <div className="min-h-screen w-full overflow-x-clip">
       <ScrollToTopOnRouteChange />
 
       <ScrollTopButton />
 
-      <MtaalamuWidget />
+    
 
       <Routes>
         {/* ==================================
@@ -346,55 +353,40 @@ const App = () => {
             PUBLIC PAGES
         ================================== */}
 
-        <Route
-          path="/"
-          element={<Navigate to="/viwanja" replace />}
-        />
+ {/* ==================================
+    PUBLIC PAGES
+================================== */}
 
-        <Route
-          path="/viwanja"
-          element={<Properties />}
-        />
+<Route path="/" element={<PublicHome />} />
 
-        <Route
-          path="/projects"
-          element={<Properties />}
-        />
+<Route path="/contact" element={<Contact />} />
 
-        <Route
-          path="/properties"
-          element={<Navigate to="/projects" replace />}
-        />
+<Route path="/viwanja" element={<Properties />} />
 
-        <Route
-          path="/mashamba"
-          element={<Mashamba />}
-        />
+<Route path="/projects" element={<Properties />} />
 
-        <Route
-          path="/maarifa"
-          element={<Maarifa />}
-        />
+<Route
+  path="/properties"
+  element={<Navigate to="/projects" replace />}
+/>
 
-        <Route
-          path="/about"
-          element={<About />}
-        />
+<Route path="/mashamba" element={<Mashamba />} />
 
-        <Route
-          path="/ask-plotbase"
-          element={<AskPlotbase />}
-        />
+<Route path="/maarifa" element={<Maarifa />} />
 
-        <Route
-          path="/propertydetailpage"
-          element={<PropertyDetailPage />}
-        />
+<Route path="/about" element={<About />} />
 
-        <Route
-          path="/property/:id"
-          element={<PropertyDetails />}
-        />
+<Route path="/ask-plotbase" element={<AskPlotbase />} />
+
+<Route
+  path="/propertydetailpage"
+  element={<PropertyDetailPage />}
+/>
+
+<Route
+  path="/property/:id"
+  element={<PropertyDetails />}
+/>
 {/* ==================================
     PUBLIC COMPANY PROJECT DETAILS
 ================================== */}
@@ -562,10 +554,7 @@ const App = () => {
           element={<MyReservations />}
         />
 
-          <Route
-            path="/contact"
-            element={<Contact />}
-          />
+
         </Route>
 
         {/* ==================================

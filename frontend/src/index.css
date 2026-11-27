@@ -302,3 +302,76 @@ textarea,
     --sidebar-border: oklch(1 0 0 / 10%);
     --sidebar-ring: oklch(0.556 0 0);
 }
+
+/* ========================================
+   PLOTBASE HERO LAND MARKERS
+======================================== */
+
+@keyframes plotbase-marker-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes plotbase-marker-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(3);
+        opacity: 0;
+    }
+}
+
+/* Floating markers */
+.hero-land-marker {
+    animation: plotbase-marker-float 4s ease-in-out infinite;
+    cursor: pointer;
+    will-change: transform;
+}
+
+/* Offset Mashamba animation */
+.hero-land-marker-delayed {
+    animation-delay: -2s;
+}
+
+/* Location dot */
+.hero-land-marker > div:last-child {
+    position: relative;
+}
+
+/* Pulsing location indicator */
+.hero-land-marker > div:last-child::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: white;
+    animation: plotbase-marker-pulse 2s ease-out infinite;
+}
+
+/* Pause animation during interaction */
+.hero-land-marker:hover,
+.hero-land-marker:focus-visible {
+    animation-play-state: paused;
+}
+
+.hero-land-marker:hover > div:last-child::after,
+.hero-land-marker:focus-visible > div:last-child::after {
+    animation-play-state: paused;
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .hero-land-marker,
+    .hero-land-marker > div:last-child::after {
+        animation: none;
+        will-change: auto;
+    }
+}
