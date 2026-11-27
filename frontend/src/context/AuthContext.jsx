@@ -16,14 +16,17 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
 
   // to logout
-const logout =()=>{
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
-    navigate("/login");
+const logout = (destination = "/login") => {
+  setToken(null);
+  setUser(null);
+
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  sessionStorage.removeItem("token");
+  sessionStorage.removeItem("user");
+
+  navigate(destination, { replace: true });
 };
 useEffect(() => {
 

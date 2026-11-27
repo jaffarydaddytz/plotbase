@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+﻿import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -161,10 +161,10 @@ const Navbar = () => {
   // LOGOUT
   // ===================================================
 
-  const handleLogout = () => {
-    closeMenus();
-    logout();
-  };
+const handleLogout = () => {
+  closeMenus();
+  logout("/rems");
+};
 
   // ===================================================
   // USER INFORMATION
@@ -217,37 +217,37 @@ const Navbar = () => {
     // VISITOR
 
     if (!isAuthenticated) {
-      const isLoginPage = pathname === "/login";
-      const isRegisterPage = pathname === "/register";
+const isLoginPage = pathname === "/rems/login";
+const isRegisterPage = pathname === "/rems/register";
 
 const items = [
   {
     label: "Viwanja",
-    to: "/viwanja",
+    to: "/rems/viwanja",
   },
   {
     label: "Mashamba",
-    to: "/mashamba",
+    to: "/rems/mashamba",
   },
   {
     label: "Maarifa",
-    to: "/maarifa",
+    to: "/rems/maarifa",
   },
 ];
 
-      if (!isLoginPage) {
-        items.push({
-          label: isRegisterPage ? "Sign In" : "Login",
-          to: "/login",
-        });
-      }
+if (!isLoginPage) {
+  items.push({
+    label: isRegisterPage ? "Sign In" : "Login",
+    to: "/rems/login",
+  });
+}
 
-      if (!isRegisterPage) {
-        items.push({
-          label: isLoginPage ? "Create Account" : "Register",
-          to: "/register",
-        });
-      }
+if (!isRegisterPage) {
+  items.push({
+    label: isLoginPage ? "Create Account" : "Register",
+    to: "/rems/register",
+  });
+}
 
       return items;
     }
@@ -260,15 +260,15 @@ if (isInvestor) {
   return [
     {
       label: "Viwanja",
-      to: "/viwanja",
+      to: "/rems/viwanja",
     },
     {
       label: "Mashamba",
-      to: "/mashamba",
+      to: "/rems/mashamba",
     },
     {
       label: "Maarifa",
-      to: "/maarifa",
+      to: "/rems/maarifa",
     },
   ];
 }
@@ -279,7 +279,7 @@ if (isInvestor) {
       return [
         {
           label: "Projects",
-          to: "/projects",
+          to: "/rems",
         },
         {
           label: "Wishlist",
@@ -302,7 +302,7 @@ if (isInvestor) {
       return [
         {
           label: "Projects",
-          to: "/projects",
+          to: "/rems",
         },
         {
           label: "Dashboard",
@@ -317,7 +317,7 @@ if (isInvestor) {
       return [
         {
           label: "Projects",
-          to: "/projects",
+          to: "/rems",
         },
         {
           label: "Admin Dashboard",
@@ -337,7 +337,7 @@ if (isInvestor) {
     return [
       {
         label: "Projects",
-        to: "/projects",
+        to: "/rems",
       },
     ];
   };
@@ -374,13 +374,13 @@ if (isInvestor) {
             My Account
           </p>
 
-          <AccountMenuLink
-            to="/profile"
-            icon={UserRound}
-            onClick={closeMenus}
-          >
-            My Profile
-          </AccountMenuLink>
+<AccountMenuLink
+  to="/rems/profile"
+  icon={UserRound}
+  onClick={closeMenus}
+>
+  My Profile
+</AccountMenuLink>
 
 
           <AccountMenuLink
@@ -455,7 +455,7 @@ if (isInvestor) {
           {/* BRAND */}
 
           <div className="flex shrink-0 items-center">
-            <Logo />
+            <Logo to="/rems" />
           </div>
 
           {/* DESKTOP NAVIGATION */}
@@ -585,7 +585,7 @@ if (isInvestor) {
         {/* DRAWER HEADER */}
 
         <div className="flex h-[60px] shrink-0 items-center justify-between border-b border-zinc-200 px-5">
-          <Logo onClick={closeMenus} />
+         <Logo to="/rems" onClick={closeMenus} />
 
           <button
             type="button"
