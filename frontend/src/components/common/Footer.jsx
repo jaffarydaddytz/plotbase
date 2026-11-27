@@ -1,92 +1,104 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, MapPin } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 
 const footerSections = [
   {
-    title: "Explore",
+    title: "Products",
     links: [
-      { label: "Viwanja", to: "/viwanja", available: true },
-      { label: "Mashamba", to: "/mashamba", available: true },
-      { label: "Maarifa", to: "/maarifa", available: true },
+      { label: "Ramani", to: "/#tools" },
+      { label: "FikaSite", to: "/#tools" },
+      { label: "Maarifa", to: "/maarifa" },
+      { label: "Plotbase REMS", to: "/contact" },
     ],
   },
   {
-    title: "Platform",
+    title: "Company",
     links: [
-{ label: "About Plotbase", to: "/about", available: true },
-      { label: "How It Works", to: "/how-it-works" },
+      { label: "About Us", to: "/about" },
     ],
   },
-{
-  title: "Support",
-  links: [
-    { label: "Contact Us", to: "/contact" },
-    { label: "Help Center", to: "/help" },
-    { label: "Privacy Policy", to: "/privacy-policy" },
-    { label: "Terms & Conditions", to: "/terms" },
-  ],
-},
+  {
+    title: "Support",
+    links: [
+      { label: "Contact Us", to: "/contact" },
+    ],
+  },
 ];
 
 const Footer = () => {
+  const handleNavigation = (to) => {
+    if (to === "/#tools") {
+      // Allow the homepage to render before scrolling.
+      setTimeout(() => {
+        document.getElementById("tools")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }, 150);
+
+      return;
+    }
+
+    window.scrollTo({
+      top: 0,
+      behavior: "auto",
+    });
+  };
+
   return (
     <footer className="w-full border-t border-zinc-200 bg-white text-zinc-900">
-      <div className="mx-auto max-w-6xl px-4 pb-6 pt-10 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-5 pt-8 sm:px-6">
 
         {/* MAIN FOOTER */}
-        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
 
           {/* BRAND */}
-          <div className="max-w-xs">
+          <div className="col-span-2 max-w-xs md:col-span-1">
             <Link
-              to="/viwanja"
+              to="/"
+              onClick={() => handleNavigation("/")}
               className="inline-flex text-xl font-semibold tracking-tight text-zinc-950"
             >
               Plotbase Tanzania
             </Link>
 
-            <p className="mt-3 text-sm leading-6 text-zinc-500">
-              Connecting investors with land opportunities
-              across Tanzania.
-            </p>
+            <div className="mt-3 space-y-1 text-sm leading-6 text-zinc-500">
+              <p>
+                Digital tools for smarter real estate.
+              </p>
 
-            <p className="mt-3 text-sm font-medium text-zinc-800">
+              <p>
+                Empowering real estate through technology.
+              </p>
+            </div>
+
+            <p className="mt-3 text-sm font-medium text-zinc-900">
               Tupo Pamoja.
             </p>
           </div>
 
-          {/* FOOTER LINKS */}
+          {/* FOOTER NAVIGATION */}
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h2 className="mb-4 text-sm font-semibold text-zinc-950">
+              <h2 className="mb-3 text-sm font-semibold text-zinc-950">
                 {section.title}
               </h2>
 
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {section.links.map((item) => (
                   <li key={item.label}>
-                    {item.available ? (
-                      <Link
-                        to={item.to}
-                        className="group inline-flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-950"
-                      >
-                        {item.label}
+                    <Link
+                      to={item.to}
+                      onClick={() => handleNavigation(item.to)}
+                      className="group inline-flex items-center gap-1 text-sm text-zinc-500 transition-colors hover:text-zinc-950"
+                    >
+                      {item.label}
 
-                        <ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </Link>
-                    ) : (
-                      <span
-                        aria-disabled="true"
-                        title="Coming soon"
-                        className="inline-flex items-center gap-2 text-sm text-zinc-500"
-                      >
-                        {item.label}
-
-                        <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] text-zinc-500">
-                          Soon
-                        </span>
-                      </span>
-                    )}
+                      <ArrowUpRight
+                        aria-hidden="true"
+                        className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100"
+                      />
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -95,19 +107,41 @@ const Footer = () => {
         </div>
 
         {/* BOTTOM SECTION */}
-        <div className="mt-10 flex flex-col gap-4 border-t border-zinc-200 pt-5 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-4 border-t border-zinc-200 pt-4 sm:flex-row sm:items-center sm:justify-between">
 
-          <p>
-            © {new Date().getFullYear()} Plotbase Tanzania.
-            All rights reserved.
+          {/* COPYRIGHT */}
+          <p className="text-xs leading-5 text-zinc-500">
+            © {new Date().getFullYear()} Plotbase Technologies Co. Ltd.
+            {" "}All rights reserved.
           </p>
 
-          <div className="flex items-center gap-2">
-            <MapPin className="h-3.5 w-3.5" />
-
-            <span>
-              Made for Tanzania. Tupo Pamoja.
-            </span>
+          {/* SOCIAL MEDIA */}
+          <div className="flex items-center gap-3">
+            <a
+              href="https://www.instagram.com/plotbase_tanzania/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Plotbase Tanzania on Instagram"
+              title="Instagram"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-950"
+            >
+              <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="16"
+  height="16"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  strokeWidth="1.75"
+  strokeLinecap="round"
+  strokeLinejoin="round"
+  aria-hidden="true"
+>
+  <rect x="2" y="2" width="20" height="20" rx="5" />
+  <circle cx="12" cy="12" r="4" />
+  <circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+</svg>
+            </a>
           </div>
 
         </div>

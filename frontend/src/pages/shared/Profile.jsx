@@ -5,6 +5,9 @@ import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";
 import API_URL from "../../config";
 
+
+import { useLocation } from "react-router-dom";
+import PublicPlatformNavbar from "../../components/common/PublicPlatformNavbar";
 import {
   HiOutlineCamera,
   HiOutlinePencil,
@@ -33,6 +36,15 @@ const getRoleLabel = (role) => {
 
 const Profile = () => {
   const { user, setUser, token } = useAuth();
+  const { pathname } = useLocation();
+
+  const isRems =
+    pathname === "/rems" ||
+    pathname.startsWith("/rems/");
+
+  const isSellerWorkspace =
+    pathname.startsWith("/seller/") &&
+    user?.role === "seller";
 
   const fileInputRef = useRef(null);
   const previewUrlRef = useRef(null);
@@ -247,16 +259,17 @@ const Profile = () => {
 
   const labelClass =
     "mb-1.5 block text-[11px] font-medium text-zinc-500";
+return (
+  <div className="min-h-screen bg-zinc-50">
+    {!isSellerWorkspace && (
+      isRems ? <Navbar /> : <PublicPlatformNavbar />
+    )}
 
-  return (
-    <div className="min-h-screen bg-zinc-50">
-      {user?.role !== "seller" && <Navbar />}
-
-      <main
-        className={`mx-auto w-full max-w-4xl px-4 pb-10 sm:px-6 ${
-          user?.role === "seller" ? "pt-8" : "pt-24"
-        }`}
-      >
+    <main
+      className={`mx-auto w-full max-w-4xl px-4 pb-10 sm:px-6 ${
+        isRems ? "pt-24" : "pt-8"
+      }`}
+    >
         {/* PAGE HEADER */}
 
         <header className="mb-4">
@@ -366,7 +379,10 @@ const Profile = () => {
               </p>
 
               <span className="mt-1.5 inline-flex rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[10px] font-medium text-zinc-600">
-                {getRoleLabel(user?.role)}
+               {!isRems &&
+(user?.role === "investor" || user?.role === "buyer")
+  ? "Plotbase Member"
+  : getRoleLabel(user?.role)}
               </span>
             </div>
 

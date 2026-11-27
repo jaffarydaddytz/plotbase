@@ -4,15 +4,17 @@ import Navbar from '../../components/common/Navbar'
 import {  useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import API_URL from '../../config';
-
+import PublicPlatformNavbar from "../../components/common/PublicPlatformNavbar";
 const VerifyEmail = () => {
     const [code, setCode] = useState("");
     const [error, setError] = useState("")
     const [success, setSuccess]=useState("");
     const [isLoading, setIsLoading]=useState(false);
 
-    const navigate = useNavigate();
-    const location = useLocation();
+const navigate = useNavigate();
+const location = useLocation();
+
+const isRems = location.state?.isRems === true;
 
     // to get email passed from register page
     const emailFromState = location.state?.email || "";
@@ -32,10 +34,15 @@ const VerifyEmail = () => {
                 code
             });
             
-            if(res.data.success){
-                setSuccess("email verified successfuly!");
-                setTimeout(() => navigate("/login"), 2000);
-            }
+if (res.data.success) {
+    setSuccess("Email verified successfully!");
+
+    setTimeout(() => {
+        navigate(isRems ? "/rems/login" : "/login", {
+            replace: true,
+        });
+    }, 2000);
+}
         } catch (err) {
             
             setError(
@@ -51,7 +58,7 @@ const VerifyEmail = () => {
   return (
     <div className={s.pageContainer}>
 
-        <Navbar />
+        {isRems ? <Navbar /> : <PublicPlatformNavbar />}
         <div className={s.containerCenter}>
             <div className={s.card}>
                 <h2 className={s.title}>Verify Your Email</h2>

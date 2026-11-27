@@ -2,13 +2,30 @@ import { Mail, Phone, MessageSquare } from "lucide-react";
 
 import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";
+import { useLocation } from "react-router-dom";
+import PublicPlatformNavbar from "../../components/common/PublicPlatformNavbar";
 
 const Contact = () => {
   const { user } = useAuth();
+  const { pathname } = useLocation();
+
+  const isRems =
+    pathname === "/rems" ||
+    pathname.startsWith("/rems/");
+
+  const isSellerWorkspace =
+    pathname.startsWith("/seller/") &&
+    user?.role === "seller";
 
   return (
-    <div className="flex min-h-dvh flex-col bg-zinc-50 pt-[60px]">
-      {user?.role !== "seller" && <Navbar />}
+   <div
+  className={`flex min-h-dvh flex-col bg-zinc-50 ${
+    isRems || isSellerWorkspace ? "pt-[60px]" : ""
+  }`}
+>
+ {!isSellerWorkspace && (
+  isRems ? <Navbar /> : <PublicPlatformNavbar />
+)}
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:py-12">
 
@@ -23,11 +40,10 @@ const Contact = () => {
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl">
             Get in touch
           </h1>
-
-          <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-zinc-500">
-            Questions about land investment, company registration,
-            or Plotbase? We're here to help.
-          </p>
+<p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-zinc-500">
+  Have questions about our products, business solutions
+  or partnership opportunities? We're here to help.
+</p>
 
         </div>
 

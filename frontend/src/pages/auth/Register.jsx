@@ -4,8 +4,9 @@ import { useAuth } from "../../context/AuthContext";
 import Navbar from "../../components/common/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { HiEye, HiEyeOff } from "react-icons/hi";
+import PublicPlatformNavbar from "../../components/common/PublicPlatformNavbar";
 
-const Register = () => {
+const Register = ({ isRems = false }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,10 +37,16 @@ const Register = () => {
     const result = await register(formData);
     if (result.success) {
       setSuccess("Registration successful");
-      setTimeout(
-        () => navigate("/verify-email", { state: { email: formData.email } }),
-        1500,
-      );
+setTimeout(
+  () =>
+    navigate("/verify-email", {
+      state: {
+        email: formData.email,
+        isRems,
+      },
+    }),
+  1500,
+);
     } else {
       setError(result.message);
     }
@@ -48,13 +55,31 @@ const Register = () => {
 
   const [error, setError] = useState("");
 
-  return (
-    <div className={s.pageWrapper}>
-      <Navbar />
-      <div className={s.container}>
-        <div className={s.formCard}>
-          <h2 className={s.heading}>Create Account</h2>
-          <p className={s.subheading}>Join our Community to find Plots</p>
+return (
+  <div
+    className={
+      isRems
+        ? s.pageWrapper
+        : "flex min-h-screen flex-col bg-zinc-50"
+    }
+  >
+    {isRems ? <Navbar /> : <PublicPlatformNavbar />}
+
+    <div
+      className={
+        isRems
+          ? s.container
+          : "flex w-full flex-1 items-center justify-center px-4 py-8"
+      }
+    >
+      <div className={s.formCard}>
+<h2 className={s.heading}>Create Account</h2>
+
+<p className={s.subheading}>
+  {isRems
+    ? "Join our real estate investment community."
+    : "Create your Plotbase account to get started."}
+</p>
 
           {error && <div className={s.errorMessage}>{error} </div>}
           {success && <div className={s.successMessage}> {success} </div>}
@@ -125,17 +150,22 @@ const Register = () => {
          
 
             <button className={s.submitButton} type="submit" disabled={isLoading}>
-                {isLoading ? "Creating Account": "Create Acccount"}
+               {isLoading ? "Creating Account..." : "Create Account"}
             </button>
 
 
           </form>
 
-          <p className={s.footerText}>
-            Already have an Account{" "} 
-            <Link to='/login' className={s.loginLink}> Sign in here </Link>
+<p className={s.footerText}>
+  Already have an account?{" "}
 
-          </p>
+  <Link
+    to={isRems ? "/rems/login" : "/login"}
+    className={s.loginLink}
+  >
+    Sign in here
+  </Link>
+</p>
         </div>
       </div>
     </div>

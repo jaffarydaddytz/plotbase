@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-
+import { Link, useLocation } from "react-router-dom";
+import PublicPlatformNavbar from "../../components/common/PublicPlatformNavbar";
 import {
   ArrowRight,
   BookOpen,
@@ -242,8 +242,13 @@ const ArticleCard = ({ article }) => {
 // =====================================================
 // MAARIFA PAGE
 // =====================================================
-
 const Maarifa = () => {
+  const { pathname } = useLocation();
+
+  const isRems =
+    pathname === "/rems" ||
+    pathname.startsWith("/rems/");
+
   const [activeCategory, setActiveCategory] = useState("all");
 
   const filteredArticles =
@@ -255,40 +260,51 @@ const Maarifa = () => {
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-950">
-      <Navbar />
+     {isRems ? <Navbar /> : <PublicPlatformNavbar />}
 
       {/* MAIN PAGE CONTAINER */}
 
-      <main
-        className="
-          mx-auto
-          flex
-          w-full
-          max-w-[1440px]
-          flex-col
-          px-4
-          pb-12
-          pt-20
-          sm:px-6
-          lg:h-dvh
-          lg:min-h-0
-          lg:overflow-hidden
-          lg:pb-5
-          lg:px-8
-        "
-      >
-
+<main
+  className={`
+    mx-auto
+    flex
+    w-full
+    max-w-[1440px]
+    flex-col
+    px-4
+    pb-12
+    sm:px-6
+    lg:min-h-0
+    lg:overflow-hidden
+    lg:pb-5
+    lg:px-8
+    ${
+      isRems
+        ? "pt-20 lg:h-dvh"
+        : "pt-4 sm:pt-6 lg:h-[calc(100dvh-4rem)]"
+    }
+  `}
+>
         {/* ==========================================
             PAGE HEADER
         ========================================== */}
 
-        <header className="mb-5 shrink-0">
+      <header
+  className={`shrink-0 ${
+    isRems ? "mb-5" : "mb-3 md:mb-5"
+  }`}
+>
           <div className="flex flex-wrap items-center gap-3">
 
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-zinc-200/70">
-              <BookOpen className="h-6 w-6" strokeWidth={1.7} />
-            </div>
-
+<div
+  className={`
+    h-11 w-11 shrink-0 items-center justify-center
+    rounded-xl bg-zinc-200/70
+    ${isRems ? "flex" : "hidden md:flex"}
+  `}
+>
+  <BookOpen className="h-6 w-6" strokeWidth={1.7} />
+</div>
             <div className="min-w-0">
 
               <div className="flex flex-wrap items-center gap-3">
@@ -424,16 +440,20 @@ const Maarifa = () => {
 
             {/* MOBILE EXPLORE BUTTON */}
 
-            <div className="mt-5 lg:hidden">
-              <Link
-                to="/viwanja"
-                className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
-              >
-                <MapPin className="h-4 w-4" />
-                Explore Viwanja
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+        {/* MOBILE EXPLORE BUTTON */}
+
+{isRems && (
+  <div className="mt-5 lg:hidden">
+    <Link
+      to="/rems/viwanja"
+      className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 text-sm font-medium text-white transition-colors hover:bg-zinc-800"
+    >
+      <MapPin className="h-4 w-4" />
+      Explore Viwanja
+      <ArrowRight className="h-4 w-4" />
+    </Link>
+  </div>
+)}
 
             {/* CENTER FOOTNOTE */}
 
@@ -499,16 +519,20 @@ const Maarifa = () => {
 
               {/* EXPLORE BUTTON */}
 
-              <div className="mt-4 border-t border-zinc-200 pt-4">
-                <Link
-                  to="/viwanja"
-                  className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
-                >
-                  <MapPin className="h-4 w-4" />
-                  Explore Viwanja
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+          {/* EXPLORE BUTTON */}
+
+{isRems && (
+  <div className="mt-4 border-t border-zinc-200 pt-4">
+    <Link
+      to="/rems/viwanja"
+      className="flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 text-xs font-semibold text-white transition-colors hover:bg-zinc-800"
+    >
+      <MapPin className="h-4 w-4" />
+      Explore Viwanja
+      <ArrowRight className="h-4 w-4" />
+    </Link>
+  </div>
+)}
 
             </div>
           </aside>
