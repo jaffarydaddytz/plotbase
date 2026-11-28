@@ -36,15 +36,15 @@ const products = [
     action: "Start mapping",
     to: "/ramani",
     icon: Map,
-    available: false,
+    available: true,
   },
   {
     name: "FikaSite",
-    description: "Organize site visits and keep track of locations.",
+    description: "Organize site visits and manage participants.",
     action: "Create a visit",
     to: "/fikasite",
     icon: MapPin,
-    available: false,
+    available: true,
   },
   {
     name: "Maarifa",
@@ -55,7 +55,6 @@ const products = [
     available: true,
   },
 ];
-
 // =====================================================
 // DASHBOARD PRODUCT CARD
 // =====================================================
@@ -383,7 +382,7 @@ const PublicHome = () => {
                 return (
                   <Card
                     key={product.name}
-                    className="group rounded-xl border-border bg-background shadow-none transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
+               className="group relative rounded-xl border-border bg-background shadow-none transition-all duration-200 hover:-translate-y-1 hover:shadow-md"
                   >
 
                     <CardHeader className="pb-3">
@@ -405,10 +404,11 @@ const PublicHome = () => {
                     <CardContent>
 
                       {product.available ? (
-                        <Link
-                          to={product.to}
-                          className="inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground"
-                        >
+<Link
+  to={product.to}
+  aria-label={`Open ${product.name}`}
+  className="inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-muted-foreground after:absolute after:inset-0 after:rounded-xl focus-visible:after:ring-2 focus-visible:after:ring-zinc-500"
+>
                           {product.action}
 
                           <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
