@@ -44,6 +44,7 @@ const Ramani = () => {
 
   const fileInputRef = useRef(null);
   const titleInputRef = useRef(null);
+  const closeDialogRef = useRef(null);
 
   const [selectedFile, setSelectedFile] =
     useState(null);
@@ -135,11 +136,7 @@ const Ramani = () => {
 
   const removeFile = () => {
 
-    const confirmed = window.confirm(
-      "Close this map? Unsaved changes will be lost."
-    );
-
-    if (!confirmed) return;
+    closeDialogRef.current?.close();
 
     setSelectedFile(null);
     setMapTitle("");
@@ -259,7 +256,7 @@ const Ramani = () => {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={removeFile}
+                onClick={() => closeDialogRef.current?.showModal()}
                 aria-label="Close map"
                 title="Close map"
                 className="shrink-0 text-muted-foreground"
@@ -487,6 +484,59 @@ const Ramani = () => {
         )}
 
       </main>
+
+      <dialog
+        ref={closeDialogRef}
+        aria-labelledby="ramani-close-title"
+        aria-describedby="ramani-close-description"
+        className="fixed inset-0 m-auto w-[calc(100%_-_2rem)] max-w-sm rounded-xl border bg-background p-5 text-foreground shadow-xl backdrop:bg-black/40"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <h2
+            id="ramani-close-title"
+            className="text-base font-semibold"
+          >
+            Close map?
+          </h2>
+
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Cancel"
+            onClick={() => closeDialogRef.current?.close()}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <p
+          id="ramani-close-description"
+          className="mt-2 text-sm leading-relaxed text-muted-foreground"
+        >
+          Closing this map will discard your current
+          workspace. Exported maps will remain on your device.
+        </p>
+
+        <div className="mt-5 grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => closeDialogRef.current?.close()}
+            className="h-10"
+          >
+            Cancel
+          </Button>
+
+          <Button
+            type="button"
+            onClick={removeFile}
+            className="h-10"
+          >
+            Discard
+          </Button>
+        </div>
+      </dialog>
 
     </div>
   );
