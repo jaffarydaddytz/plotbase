@@ -7,7 +7,7 @@ const footerSections = [
     links: [
       { label: "Ramani", to: "/#tools" },
       { label: "FikaSite", to: "/#tools" },
-      { label: "Maarifa", to: "/maarifa" },
+      { label: "ardhiMaarifa", to: "/ardhimaarifa" },
       { label: "Plotbase REMS", to: "/contact" },
     ],
   },

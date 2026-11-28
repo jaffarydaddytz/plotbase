@@ -21,7 +21,7 @@ import { useAuth } from "../../context/AuthContext";
 const productLinks = [
   { label: "Ramani", to: "/ramani" },
   { label: "FikaSite", to: "/fikasite" },
-  { label: "Maarifa", to: "/maarifa" },
+  { label: "ardhiMaarifa", to: "/ardhimaarifa" },
 ];
 
 const PublicPlatformNavbar = () => {

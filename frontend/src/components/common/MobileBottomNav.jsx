@@ -34,8 +34,8 @@ const MobileBottomNav = () => {
       icon: MapPin,
     },
     {
-      label: "Maarifa",
-      to: "/maarifa",
+      label: "ardhiMaarifa",
+      to: "/ardhimaarifa",
       icon: BookOpen,
     },
     {

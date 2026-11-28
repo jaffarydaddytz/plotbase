@@ -170,7 +170,7 @@ const publicMobileRoutes = new Set([
   "/",
   "/ramani",
   "/fikasite",
-  "/maarifa",
+  "/ardhimaarifa",
   "/profile",
   "/about",
   "/contact",
@@ -198,59 +198,112 @@ const App = () => {
   // PUBLIC SEO METADATA
   // ========================================
 
+  // ========================================
+  // PUBLIC SEO METADATA
+  // ========================================
+
   useEffect(() => {
+    const SITE_URL = "https://plotbase.co.tz";
+
+    const normalizedPath = pathname.replace(/\/+$/, "") || "/";
+
     const defaultSEO = {
-      title: "Plotbase Tanzania | Viwanja, Mashamba & Land Investment",
+      title: "Plotbase Tanzania | Digital Real Estate Solutions",
       description:
-        "Discover viwanja, mashamba and land projects in Tanzania with Plotbase.",
+        "Plotbase provides digital tools and management solutions for smarter real estate operations in Tanzania.",
     };
 
-    const landSEO = {
-      title: "Viwanja Tanzania | Explore Land Projects - Plotbase",
-      description:
-        "Explore viwanja and land projects across Tanzania. Discover locations, compare plot prices and find land investment opportunities with Plotbase.",
-    };
+    // ======================================
+    // PAGE TITLES AND DESCRIPTIONS
+    // ======================================
 
     const seoPages = {
-      "/viwanja": landSEO,
-      "/projects": landSEO,
-
-      "/mashamba": {
-        title: "Mashamba Tanzania | Plotbase",
+      "/": {
+        title:
+          "Plotbase Tanzania | Digital Tools for Smarter Real Estate",
         description:
-          "Discover the upcoming Mashamba experience on Plotbase, focused on agricultural land and farming opportunities in Tanzania.",
+          "Explore Ramani, FikaSite and ardhiMaarifa. Digital tools for land mapping, site visit management, real estate knowledge and business operations in Tanzania.",
       },
 
-      "/maarifa": {
-        title: "Maarifa | Land Investment Knowledge - Plotbase",
+      "/ramani": {
+        title:
+          "Ramani | Interactive Land Mapping Tool - Plotbase",
         description:
-          "Explore land investment knowledge, property information and educational resources through Plotbase Maarifa.",
+          "Transform PDF survey maps into interactive maps with Ramani. Detect plots, manage plot statuses, visualize land layouts and export maps as images.",
+      },
+
+      "/fikasite": {
+        title:
+          "FikaSite | Organize and Manage Site Visits - Plotbase",
+        description:
+          "Create site visits, share registration links, manage participants, track attendance and calculate Go & Return Fees with FikaSite.",
       },
 
       "/about": {
-        title: "About Plotbase | Land Investment Platform Tanzania",
+        title:
+          "About Plotbase | Digital Real Estate Solutions in Tanzania",
         description:
-          "Learn about Plotbase, a platform designed to help people explore land projects and real estate investment opportunities in Tanzania.",
+          "Learn about Plotbase and our mission to simplify real estate operations through digital tools, knowledge and innovative management solutions.",
+      },
+
+      "/contact": {
+        title:
+          "Contact Plotbase Tanzania",
+        description:
+          "Contact Plotbase for support, inquiries, partnerships and information about our digital tools and real estate management solutions.",
+      },
+
+      "/login": {
+        title:
+          "Login to Plotbase",
+        description:
+          "Sign in to your Plotbase account to access your workspace, digital tools and account services.",
+      },
+
+      "/register": {
+        title:
+          "Create Your Plotbase Account",
+        description:
+          "Create a Plotbase account and explore digital tools for land mapping, site visits and real estate management.",
+      },
+
+      "/ardhimaarifa": {
+        title:
+          "ardhiMaarifa | Land and Real Estate Knowledge - Plotbase",
+        description:
+          "Explore educational resources, land knowledge and insights into real estate through Plotbase ardhiMaarifa.",
+      },
+
+      "/viwanja": {
+        title:
+          "Viwanja | Plotbase",
+        description:
+          "Explore land projects and investment opportunities across Tanzania.",
+      },
+
+      "/mashamba": {
+        title:
+          "Mashamba | Plotbase",
+        description:
+          "Explore agricultural land and farming opportunities in Tanzania.",
       },
 
       "/ask-plotbase": {
-        title: "Ask Mtaalamu | Plotbase Tanzania",
+        title:
+          "Ask Mtaalamu | Plotbase",
         description:
-          "Ask questions about land, property and real estate investment through Plotbase Mtaalamu.",
+          "Ask questions about land, property and real estate.",
       },
-
-      "/": {
-  title: "Plotbase Tanzania | Digital Tools for Smarter Real Estate",
-  description:
-    "Explore Ramani, FikaSite and Maarifa. Digital real estate tools and management solutions for Viwanja na Mashamba in Tanzania.",
-},
     };
 
-    const seo = seoPages[pathname] || defaultSEO;
+    const seo = seoPages[normalizedPath] || defaultSEO;
 
     document.title = seo.title;
 
-    // Update metadata
+    // ======================================
+    // METADATA HELPER
+    // ======================================
+
     const updateMeta = (attribute, key, content) => {
       let element = document.head.querySelector(
         `meta[${attribute}="${key}"]`
@@ -265,58 +318,83 @@ const App = () => {
       element.setAttribute("content", content);
     };
 
+    // ======================================
+    // STANDARD SEO METADATA
+    // ======================================
+
     updateMeta("name", "description", seo.description);
+
+    // ======================================
+    // OPEN GRAPH METADATA
+    // ======================================
+
     updateMeta("property", "og:title", seo.title);
     updateMeta("property", "og:description", seo.description);
+    updateMeta("property", "og:site_name", "Plotbase");
+    updateMeta("property", "og:type", "website");
+    updateMeta("property", "og:locale", "en_TZ");
 
     // ======================================
-    // SEARCH ENGINE INDEXING
+    // TWITTER / X METADATA
     // ======================================
 
-    const shouldIndex = new Set(["/", "/about"]).has(pathname);
+    updateMeta("name", "twitter:card", "summary_large_image");
+    updateMeta("name", "twitter:title", seo.title);
+    updateMeta("name", "twitter:description", seo.description);
 
-    const robots =
-      pathname === "/viwanja"
-        ? "noindex, follow"
-        : shouldIndex
-          ? "index, follow"
-          : "noindex, nofollow";
+    // ======================================
+    // SEARCH ENGINE INDEXING POLICY
+    // ======================================
 
-    updateMeta("name", "robots", robots);
+    const indexableRoutes = new Set([
+      "/",
+      "/ramani",
+      "/fikasite",
+      "/about",
+      "/contact",
+      "/login",
+      "/register",
+    ]);
+
+    const shouldIndex = indexableRoutes.has(normalizedPath);
+
+    updateMeta(
+      "name",
+      "robots",
+      shouldIndex
+        ? "index, follow"
+        : "noindex, nofollow"
+    );
 
     // ======================================
     // CANONICAL URL MANAGEMENT
     // ======================================
 
-    const canonicalRoutes = {
-      "/": "/",
-      "/viwanja": "/viwanja",
-      "/projects": "/viwanja",
-      "/properties": "/viwanja",
-      "/about": "/about",
-    };
-
-    const canonicalPath = canonicalRoutes[pathname];
-
     let canonicalLink = document.querySelector(
       'link[rel="canonical"]'
     );
 
-    if (canonicalPath) {
+    if (shouldIndex) {
+      const canonicalUrl = `${SITE_URL}${normalizedPath}`;
+
       if (!canonicalLink) {
         canonicalLink = document.createElement("link");
         canonicalLink.setAttribute("rel", "canonical");
         document.head.appendChild(canonicalLink);
       }
 
-      canonicalLink.setAttribute(
-        "href",
-        `https://plotbase.co.tz${canonicalPath}`
-      );
+      canonicalLink.setAttribute("href", canonicalUrl);
+
+      updateMeta("property", "og:url", canonicalUrl);
     } else {
       canonicalLink?.remove();
+
+      document.head
+        .querySelector('meta[property="og:url"]')
+        ?.remove();
     }
   }, [pathname]);
+
 
   // ========================================
   // PUBLIC FOOTER ROUTES
@@ -327,7 +405,7 @@ const App = () => {
   "/viwanja",
     "/projects",
     "/mashamba",
-    "/maarifa",
+    "/ardhimaarifa",
     "/about",
     "/propertydetailpage",
   ];
@@ -468,7 +546,8 @@ document.documentElement.style.overflowX = "clip";
 
 <Route path="/mashamba" element={<Mashamba />} />
 
-<Route path="/maarifa" element={<Maarifa />} />
+<Route path="/ardhimaarifa" element={<Maarifa />} />
+<Route path="/maarifa" element={<Navigate to="/ardhimaarifa" replace />} />
 
 <Route path="/about" element={<About />} />
 

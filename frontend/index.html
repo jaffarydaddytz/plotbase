@@ -1,5 +1,35 @@
 <!doctype html>
 <html lang="en">
+  <!-- ========================================
+     STRUCTURED DATA - PLOTBASE
+========================================= -->
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+{
+  "@type": "Organization",
+  "@id": "https://plotbase.co.tz/#organization",
+  "name": "Plotbase",
+  "url": "https://plotbase.co.tz/",
+  "logo": "https://plotbase.co.tz/plotbase-logo.png",
+  "description": "Digital tools and management solutions for smarter real estate operations in Tanzania."
+},
+    {
+      "@type": "WebSite",
+      "@id": "https://plotbase.co.tz/#website",
+      "url": "https://plotbase.co.tz/",
+      "name": "Plotbase",
+      "alternateName": "Plotbase Tanzania",
+      "publisher": {
+        "@id": "https://plotbase.co.tz/#organization"
+      },
+      "inLanguage": "en"
+    }
+  ]
+}
+</script>
   <head>
     <!-- Character Encoding -->
     <meta charset="UTF-8" />
@@ -17,41 +47,66 @@
       href="/favicon.ico"
     />
 
-    <!-- Default SEO Metadata -->
-    <title>
-      Plotbase Tanzania | Viwanja, Mashamba & Land Investment
-    </title>
+    <!-- ========================================
+         DEFAULT SEO METADATA
+    ========================================= -->
+
+    <title>Plotbase Tanzania | Digital Tools for Smarter Real Estate</title>
 
     <meta
       name="description"
-      content="Discover viwanja, mashamba and land projects in Tanzania. Explore project locations, land prices and real estate investment information with Plotbase."
+      content="Explore Ramani, FikaSite and ardhiMaarifa. Digital tools for land mapping, site visit management, real estate knowledge and business operations in Tanzania."
     />
 
-    <!-- Open Graph: Default Social Sharing -->
+    <meta name="author" content="Plotbase" />
+
+    <!-- ========================================
+         OPEN GRAPH METADATA
+    ========================================= -->
+
     <meta property="og:type" content="website" />
 
-    <meta
-      property="og:site_name"
-      content="Plotbase"
-    />
+    <meta property="og:site_name" content="Plotbase" />
+
+    <meta property="og:locale" content="en_TZ" />
 
     <meta
       property="og:title"
-      content="Plotbase Tanzania | Viwanja, Mashamba & Land Investment"
+      content="Plotbase Tanzania | Digital Tools for Smarter Real Estate"
     />
 
     <meta
       property="og:description"
-      content="Explore viwanja, mashamba and land investment opportunities across Tanzania with Plotbase."
+      content="Explore Ramani, FikaSite and ardhiMaarifa. Digital tools for land mapping, site visit management, real estate knowledge and business operations in Tanzania."
     />
 
-    <!-- Twitter/X -->
     <meta
-      name="twitter:card"
-      content="summary"
-    />
+  property="og:image"
+  content="https://plotbase.co.tz/og-image.png"
+/>
 
-    <!-- Fonts -->
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="plotbase" />
+
+    <!-- ========================================
+         TWITTER / X METADATA
+    ========================================= -->
+
+<meta name="twitter:card" content="summary_large_image" />
+
+<meta
+  name="twitter:image"
+  content="https://plotbase.co.tz/og-image.png"
+/>
+
+<meta name="twitter:image:alt" content="plotbase" />
+
+    <!-- ========================================
+         FONTS
+    ========================================= -->
+
     <link
       rel="preconnect"
       href="https://fonts.googleapis.com"

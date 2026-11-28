@@ -47,10 +47,10 @@ const products = [
     available: true,
   },
   {
-    name: "Maarifa",
+    name: "ardhiMaarifa",
     description: "Discover practical real estate knowledge.",
     action: "Explore knowledge",
-    to: "/maarifa",
+    to: "/ardhimaarifa",
     icon: BookOpen,
     available: true,
   },
@@ -66,7 +66,7 @@ const DashboardProductCard = ({ product }) => {
     "group flex min-w-0 flex-col rounded-xl",
     "border border-zinc-200 bg-white p-4",
     "transition-colors md:p-5",
-    product.name === "Maarifa"
+    product.name === "ardhiMaarifa"
       ? "col-span-2 md:col-span-1"
       : "col-span-1",
   ].join(" ");

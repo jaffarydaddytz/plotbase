@@ -1,4 +1,4 @@
-﻿import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 import {
@@ -230,7 +230,7 @@ const items = [
     to: "/rems/mashamba",
   },
   {
-    label: "Maarifa",
+    label: "ardhiMaarifa",
     to: "/rems/maarifa",
   },
 ];
@@ -267,7 +267,7 @@ if (isInvestor) {
       to: "/rems/mashamba",
     },
     {
-      label: "Maarifa",
+      label: "ardhiMaarifa",
       to: "/rems/maarifa",
     },
   ];

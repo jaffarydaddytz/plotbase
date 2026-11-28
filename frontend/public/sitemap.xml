@@ -2,7 +2,31 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
+    <loc>https://plotbase.co.tz/</loc>
+  </url>
+
+  <url>
+    <loc>https://plotbase.co.tz/ramani</loc>
+  </url>
+
+  <url>
+    <loc>https://plotbase.co.tz/fikasite</loc>
+  </url>
+
+  <url>
     <loc>https://plotbase.co.tz/about</loc>
+  </url>
+
+  <url>
+    <loc>https://plotbase.co.tz/contact</loc>
+  </url>
+
+  <url>
+    <loc>https://plotbase.co.tz/login</loc>
+  </url>
+
+  <url>
+    <loc>https://plotbase.co.tz/register</loc>
   </url>
 
 </urlset>

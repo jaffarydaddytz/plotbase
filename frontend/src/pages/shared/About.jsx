@@ -30,7 +30,7 @@ const products = [
   },
   {
     icon: BookOpen,
-    title: "Maarifa",
+    title: "ardhiMaarifa",
     description:
       "A knowledge platform dedicated to practical real estate education and industry insights.",
   },

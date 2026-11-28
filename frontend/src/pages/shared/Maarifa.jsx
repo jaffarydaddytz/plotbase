@@ -182,7 +182,7 @@ const ArticleCard = ({ article }) => {
             </span>
 
             <span className="font-semibold text-zinc-900">
-              Plotbase Maarifa
+              Plotbase ardhiMaarifa
             </span>
 
             <span className="text-zinc-400">·</span>
@@ -309,7 +309,7 @@ const Maarifa = () => {
 
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  Plotbase Maarifa
+                  Plotbase ardhiMaarifa
                 </h1>
 
                 <span className="rounded-full bg-zinc-200 px-3 py-1 text-[10px] font-semibold text-zinc-700">
@@ -364,7 +364,7 @@ const Maarifa = () => {
             <div className="rounded-xl border border-zinc-200 bg-white p-3">
 
               <nav
-                aria-label="Maarifa topics"
+                aria-label="ardhiMaarifa topics"
                 className="space-y-1"
               >
                 {categories.map((category) => (
@@ -385,7 +385,7 @@ const Maarifa = () => {
           ======================================== */}
 
           <section
-            aria-label="Maarifa articles"
+            aria-label="ardhiMaarifa articles"
             tabIndex={0}
             className="
               min-w-0
@@ -433,7 +433,7 @@ const Maarifa = () => {
                 </p>
 
                 <p className="mt-1 text-xs text-zinc-500">
-                  More Maarifa articles are coming soon.
+                  More ardhiMaarifa articles are coming soon.
                 </p>
               </div>
             )}
@@ -459,7 +459,7 @@ const Maarifa = () => {
 
             <div className="mt-6 border-t border-zinc-200 pt-4">
               <p className="text-xs text-zinc-500">
-                Plotbase Maarifa — Tupo Pamoja.
+                Plotbase ardhiMaarifa — Tupo Pamoja.
               </p>
             </div>
 
@@ -494,7 +494,7 @@ const Maarifa = () => {
               </div>
 
               <p className="mt-2 text-xs leading-5 text-zinc-500">
-                Makala zijazo katika Plotbase Maarifa.
+                Makala zijazo katika Plotbase ardhiMaarifa.
               </p>
 
               {/* UPCOMING TOPICS */}
