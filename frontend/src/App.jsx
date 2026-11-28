@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { FaChevronUp } from "react-icons/fa";
 import Ramani from "./pages/ramani/Ramani";
+import FikaSite from "./pages/fikasite/FikaSite";
 
 // ==========================================
 // PUBLIC PAGES
@@ -425,6 +426,7 @@ document.documentElement.style.overflowX = "clip";
 <Route path="/" element={<PublicHome />} />
 
 <Route path="/ramani" element={<Ramani />} />
+<Route path="/fikasite" element={<FikaSite />} />
 
 
 {/* ==================================
